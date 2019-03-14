@@ -1,4 +1,4 @@
-import { StaffIndex } from './StaffTypes';
+import { CellId } from './CellTypes';
 
 export type NoteId = string;
 
@@ -25,8 +25,7 @@ export interface NoteSpec {
   id: NoteId;
   type: NoteType;
   length: NoteLength;
-  staffIndex?: StaffIndex;
-  x: number;
+  cellId?: CellId;
   y: number;
   isPlaying: boolean;
 }

@@ -5,8 +5,7 @@ import Clef from '../Clef/Clef';
 import { LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
 import DraggableNote from '../DraggableNote/DraggableNote';
 import { ProjectStore } from '../stores/project.store';
-import { MouseMode, UiStore } from '../stores/ui.store';
-import { NoteType } from '../types/NoteTypes';
+import { UiStore } from '../stores/ui.store';
 import { StaffSpec } from '../types/StaffTypes';
 import './Staff.css';
 
@@ -33,7 +32,7 @@ class Staff extends Component<StaffProps> {
     return notes!;
   }
 
-  renderLedgerLines() {
+  /*renderLedgerLines() {
     const { index } = this.props.spec;
     const { uiStore } = this.injected;
     const notes = this.notes.filter(note => note.type !== NoteType.REST);
@@ -89,7 +88,7 @@ class Staff extends Component<StaffProps> {
       }
     }
     return ledgerLines;
-  }
+  }*/
 
   renderNotes() {
     const { index } = this.props.spec;
@@ -147,9 +146,36 @@ class Staff extends Component<StaffProps> {
     );
   }
 
-  isActiveStaff() {
+  renderCellGuidelines() {
     const { uiStore } = this.injected;
-    return uiStore.activeStaff === this.props.spec.index;
+    const { activeCell } = uiStore;
+    if (activeCell && activeCell.staffIndex === this.props.spec.index) {
+      return (
+        <g>
+          <line
+            x1={activeCell.x - 10}
+            x2={activeCell.x - 10}
+            y1={0}
+            y2={STAFF_HEIGHT}
+            stroke="#ddd"
+          />
+          <line
+            x1={activeCell.x + 25}
+            x2={activeCell.x + 25}
+            y1={0}
+            y2={STAFF_HEIGHT}
+            stroke="#ddd"
+          />
+        </g>
+      );
+    }
+    return <g />;
+  }
+
+  isActiveStaff() {
+    /*const { uiStore } = this.injected;
+    return uiStore.activeStaff === this.props.spec.index;*/
+    return false;
   }
 
   render() {
@@ -157,8 +183,8 @@ class Staff extends Component<StaffProps> {
     const startY = index * STAFF_HEIGHT + index * STAFF_MARGIN;
     return (
       <g transform={`translate(0, ${startY})`}>
+        {this.renderCellGuidelines()}
         {this.renderLines()}
-        {this.renderLedgerLines()}
         {clef !== undefined && <Clef x={10} y={-LINE_DY} />}
         {this.renderNotes()}
       </g>

@@ -1,4 +1,5 @@
 import { ProjectStore } from '../stores/project.store';
+import { CellId } from '../types/CellTypes';
 import { NoteLength, NoteSpec, NoteType } from '../types/NoteTypes';
 
 const audioLibrary: { [i: string]: ArrayBuffer } = {
@@ -155,6 +156,7 @@ class Audio {
 
   play(noteSpec: NoteSpec) {
     const { id, y, type, length } = noteSpec;
+    console.log(id, y, type, length);
     const timeLength = this.beatsToSeconds(this.noteSpecLengthToBeats(length));
 
     if (type === NoteType.REST) {
@@ -217,10 +219,15 @@ class Audio {
   playNoteList(list: NoteSpec[]) {
     let currentIndex = 0;
     const sorted = list.slice();
-    sorted.sort(
-      (a, b) =>
-        (a.staffIndex || 0) * 1000 + a.x - ((b.staffIndex || 0) * 1000 + b.x)
-    );
+
+    sorted.sort((a, b) => {
+      const cellA = this.projectStore!.getCellById(a.cellId!)!;
+      const cellB = this.projectStore!.getCellById(b.cellId!)!;
+      if (cellA.staffIndex < cellB.staffIndex) {
+        return -1;
+      }
+      return cellA.x - cellB.x;
+    });
     const playNextNote = () => {
       if (currentIndex < sorted.length) {
         const currentNote = sorted[currentIndex];
@@ -233,6 +240,13 @@ class Audio {
       }
     };
     playNextNote();
+  }
+
+  playCell(cellId: CellId) {
+    const notesInCell = this.projectStore!.getNotesForCell(cellId);
+    console.log(cellId);
+    console.log(notesInCell);
+    notesInCell.forEach(note => this.play(note)); // TODO: Optimize?
   }
 
   playEffect(effect: string) {

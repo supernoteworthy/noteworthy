@@ -14,6 +14,7 @@ import {
 import RenderNote from '../RenderNote/RenderNote';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
+import { CellSpec } from '../types/CellTypes';
 import { NoteOrientation, NoteType } from '../types/NoteTypes';
 import { StaffIndex } from '../types/StaffTypes';
 
@@ -44,10 +45,11 @@ export default class CursorNote extends Component<CursorNoteProps> {
     document.removeEventListener('mousemove', this.onMouseMove);
   }
   onMouseMove = (e: MouseEvent) => {
-    const { uiStore } = this.injected;
+    const { uiStore, projectStore } = this.injected;
     uiStore.insertX = e.clientX;
     uiStore.insertY = e.clientY;
     const { x, yOnStaff, staffIndex } = this.clientPositionToSvgPosition()!;
+    uiStore.activeCell = projectStore.findAdjacentCell(x, staffIndex);
     uiStore.insertStaffId = staffIndex;
     uiStore.insertStaffX = x;
     uiStore.insertStaffY = yOnStaff;
@@ -66,17 +68,31 @@ export default class CursorNote extends Component<CursorNoteProps> {
 
     const { projectStore } = this.injected;
     const { x, y, staffIndex } = this.clientPositionToSvgPosition()!;
+    const adjacentCell = projectStore.findAdjacentCell(x, staffIndex);
     const staffY = this.svgYToStaffY(y, staffIndex);
 
-    projectStore.addNote({
-      ...cursorSpec,
-      id: newNoteId,
-      x,
-      y: staffY,
-      staffIndex
-    });
+    let newCell: CellSpec | undefined;
+    if (!adjacentCell) {
+      newCell = {
+        id: uuid(),
+        staffIndex,
+        x
+      };
+    }
 
-    Audio.play(projectStore.getNoteById(newNoteId)!);
+    const cellId = adjacentCell ? adjacentCell.id : newCell!.id;
+
+    projectStore.addNote(
+      {
+        ...cursorSpec,
+        id: newNoteId,
+        y: staffY,
+        cellId
+      },
+      newCell
+    );
+
+    Audio.playCell(cellId);
 
     uiStore.mouseMode = MouseMode.DRAG;
     uiStore.dragNoteId = newNoteId;

@@ -1,4 +1,5 @@
 import { computed, observable } from 'mobx';
+import { CellSpec } from '../types/CellTypes';
 import { NoteSpec } from '../types/NoteTypes';
 import { StaffIndex } from '../types/StaffTypes';
 
@@ -27,6 +28,8 @@ export class UiStore {
   @observable insertStaffId: StaffIndex = 0;
   @observable insertStaffX: number = 0;
   @observable insertStaffY: number = 0;
+
+  @observable activeCell?: CellSpec;
 
   @computed get activeStaff() {
     if (this.mouseMode === MouseMode.INSERT) {

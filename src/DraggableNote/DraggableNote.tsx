@@ -47,6 +47,16 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
     return noteSpecInStore;
   }
 
+  get x() {
+    const { projectStore } = this.injected;
+    return projectStore.getCellById(this.noteSpec.cellId)!.x;
+  }
+
+  get staffIndex() {
+    const { projectStore } = this.injected;
+    return projectStore.getCellById(this.noteSpec.cellId)!.staffIndex;
+  }
+
   componentDidMount() {
     // Catch drag events when this note was just created.
     const { uiStore } = this.injected;
@@ -66,9 +76,9 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
     const { uiStore } = this.injected;
     uiStore.mouseMode = MouseMode.DRAG;
     uiStore.dragNoteId = this.noteSpec.id;
-    uiStore.dragStartX = this.noteSpec.x;
+    uiStore.dragStartX = this.x;
     uiStore.dragStartY = this.noteSpec.y;
-    uiStore.dragStartStaffIndex = this.noteSpec.staffIndex;
+    uiStore.dragStartStaffIndex = this.staffIndex;
     uiStore.dragStartClientX = e.clientX;
     uiStore.dragStartClientY = e.clientY;
     document.addEventListener('mouseup', this.onMouseUp);
@@ -97,10 +107,14 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
       staffIndexAndY.y,
       staffIndexAndY.staffIndex
     );
+    uiStore.activeCell = projectStore.findAdjacentCell(
+      x,
+      staffIndexAndY.staffIndex
+    );
     uiStore.dragActiveStaffIndex = staffIndexAndY.staffIndex;
 
     if (positionChanged) {
-      Audio.play(this.noteSpec);
+      Audio.playCell(this.noteSpec.cellId!);
     }
   };
 
@@ -108,12 +122,12 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
     const { uiStore, projectStore } = this.injected;
     uiStore.mouseMode = MouseMode.INSERT;
 
-    const noteDeleted = this.noteSpec.x < 0;
+    const noteDeleted = this.x < 0;
 
     const noteTapped =
-      uiStore.dragStartX === this.noteSpec.x &&
+      uiStore.dragStartX === this.x &&
       uiStore.dragStartY === this.noteSpec.y &&
-      uiStore.dragStartStaffIndex === this.noteSpec.staffIndex &&
+      uiStore.dragStartStaffIndex === this.staffIndex &&
       !this.state.justPlaced;
 
     this.setState({ justPlaced: false });
@@ -122,14 +136,18 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
       Audio.playEffect('delete');
       projectStore.deleteNote(this.noteSpec.id);
     } else if (noteTapped) {
-      Audio.play(this.noteSpec);
+      Audio.playCell(this.noteSpec.cellId!);
+    }
+
+    if (uiStore.activeCell) {
+      projectStore.updateNoteCell(this.noteSpec.id, uiStore.activeCell.id);
     }
 
     uiStore.dragNoteId = undefined;
     uiStore.dragStartX = undefined;
     uiStore.dragStartY = undefined;
     uiStore.dragStartStaffIndex = undefined;
-    uiStore.dragActiveStaffIndex = undefined;
+    uiStore.activeCell = undefined;
     uiStore.dragStartClientX = undefined;
     uiStore.dragStartClientY = undefined;
 
@@ -174,7 +192,7 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
   render() {
     const { uiStore } = this.injected;
     const { type, length } = this.props;
-    const { x, y, id, isPlaying, staffIndex } = this.noteSpec;
+    const { y, id, isPlaying } = this.noteSpec;
     const dragging = uiStore.dragNoteId === id;
     return (
       <RenderNote
@@ -182,14 +200,14 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
         length={length}
         type={type}
         color={isPlaying ? '#7c527c' : '#000'}
-        x={x}
+        x={this.x}
         y={y}
         orientation={this.orientation}
         isSelected={dragging}
         onMouseDown={this.onMouseDown}
         onMouseEnter={() => {
           uiStore.mouseMode = MouseMode.DRAG;
-          uiStore.dragActiveStaffIndex = staffIndex;
+          uiStore.dragActiveStaffIndex = this.staffIndex;
         }}
         onMouseLeave={() => !dragging && (uiStore.mouseMode = MouseMode.INSERT)}
       />
