@@ -135,7 +135,7 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
 
     if (noteDeleted) {
       Audio.playEffect('delete');
-      projectStore.deleteNote(this.noteSpec.id);
+      projectStore.deleteCell(this.noteSpec.cellId!);
     } else if (noteTapped) {
       Audio.playCell(this.noteSpec.cellId!);
     }

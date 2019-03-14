@@ -1,5 +1,5 @@
 import { ProjectStore } from '../stores/project.store';
-import { CellId } from '../types/CellTypes';
+import { CellId, CellSpec } from '../types/CellTypes';
 import { NoteLength, NoteSpec, NoteType } from '../types/NoteTypes';
 
 const audioLibrary: { [i: string]: ArrayBuffer } = {
@@ -189,7 +189,7 @@ class Audio {
 
     gain.gain.setValueAtTime(
       1,
-      this.audioContext.currentTime + timeLength * 0.8
+      this.audioContext.currentTime + timeLength * 0.7
     );
     gain.gain.exponentialRampToValueAtTime(
       EPSILON,
@@ -244,9 +244,34 @@ class Audio {
 
   playCell(cellId: CellId) {
     const notesInCell = this.projectStore!.getNotesForCell(cellId);
-    console.log(cellId);
-    console.log(notesInCell);
     notesInCell.forEach(note => this.play(note)); // TODO: Optimize?
+  }
+
+  cellLength(cellId: CellId) {
+    const notesInCell = this.projectStore!.getNotesForCell(cellId);
+    const lengths = notesInCell.map(note =>
+      this.beatsToSeconds(this.noteSpecLengthToBeats(note.length))
+    );
+    return Math.max(...lengths);
+  }
+
+  playCellList(list: CellSpec[]) {
+    let currentIndex = 0;
+    const sorted = list.slice();
+
+    sorted.sort((a, b) => {
+      return a.staffIndex * 10000 + a.x - (b.staffIndex * 10000 + b.x);
+    });
+    const playNextCell = () => {
+      if (currentIndex < sorted.length) {
+        const currentCell = sorted[currentIndex];
+        this.playCell(currentCell.id);
+        const timeLength = this.cellLength(currentCell.id);
+        currentIndex++;
+        setTimeout(playNextCell, timeLength * 1000);
+      }
+    };
+    playNextCell();
   }
 
   playEffect(effect: string) {

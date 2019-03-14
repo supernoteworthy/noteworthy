@@ -5,7 +5,8 @@ import Clef from '../Clef/Clef';
 import { LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
 import DraggableNote from '../DraggableNote/DraggableNote';
 import { ProjectStore } from '../stores/project.store';
-import { UiStore } from '../stores/ui.store';
+import { MouseMode, UiStore } from '../stores/ui.store';
+import { NoteType } from '../types/NoteTypes';
 import { StaffSpec } from '../types/StaffTypes';
 import './Staff.css';
 
@@ -32,10 +33,12 @@ class Staff extends Component<StaffProps> {
     return notes!;
   }
 
-  /*renderLedgerLines() {
+  renderLedgerLines() {
     const { index } = this.props.spec;
-    const { uiStore } = this.injected;
-    const notes = this.notes.filter(note => note.type !== NoteType.REST);
+    const { uiStore, projectStore } = this.injected;
+    let ledgerLines = [];
+
+    const className = classNames('StaffLine');
 
     if (
       uiStore.mouseMode === MouseMode.INSERT &&
@@ -43,26 +46,45 @@ class Staff extends Component<StaffProps> {
       uiStore.cursorSpec &&
       uiStore.cursorSpec.type !== NoteType.REST
     ) {
-      notes.push({
-        ...uiStore.cursorSpec,
-        x: uiStore.insertStaffX,
-        y: uiStore.insertStaffY
-      });
+      if (uiStore.insertStaffY < 0) {
+        for (let y = -LINE_DY; y >= uiStore.insertStaffY; y -= LINE_DY) {
+          ledgerLines.push(
+            <line
+              x1={uiStore.insertStaffX - 3}
+              x2={uiStore.insertStaffX + 25}
+              y1={y}
+              y2={y}
+              className={className}
+              key={`ledgerline_cursor_${y}`}
+            />
+          );
+        }
+      } else {
+        for (let y = STAFF_HEIGHT; y <= uiStore.insertStaffY; y += LINE_DY) {
+          ledgerLines.push(
+            <line
+              x1={uiStore.insertStaffX - 3}
+              x2={uiStore.insertStaffX + 25}
+              y1={y}
+              y2={y}
+              className={className}
+              key={`ledgerline_cursor_${y}`}
+            />
+          );
+        }
+      }
     }
 
-    let ledgerLines = [];
-
-    const className = classNames('StaffLine', {
-      'StaffLine--active': this.isActiveStaff()
-    });
+    const notes = this.notes.filter(note => note.type !== NoteType.REST);
 
     const notesAboveStaff = notes.filter(note => note.y < 0);
     for (let note of notesAboveStaff) {
+      const x = projectStore.getCellById(note.cellId)!.x;
       for (let y = -LINE_DY; y >= note.y; y -= LINE_DY) {
         ledgerLines.push(
           <line
-            x1={note.x - 3}
-            x2={note.x + 25}
+            x1={x - 3}
+            x2={x + 25}
             y1={y}
             y2={y}
             className={className}
@@ -75,10 +97,11 @@ class Staff extends Component<StaffProps> {
     const notesBelowStaff = notes.filter(note => note.y >= STAFF_HEIGHT);
     for (let note of notesBelowStaff) {
       for (let y = STAFF_HEIGHT; y <= note.y; y += LINE_DY) {
+        const x = projectStore.getCellById(note.cellId)!.x;
         ledgerLines.push(
           <line
-            x1={note.x - 3}
-            x2={note.x + 25}
+            x1={x - 3}
+            x2={x + 25}
             y1={y}
             y2={y}
             className={className}
@@ -88,7 +111,7 @@ class Staff extends Component<StaffProps> {
       }
     }
     return ledgerLines;
-  }*/
+  }
 
   renderNotes() {
     const { index } = this.props.spec;
@@ -185,6 +208,7 @@ class Staff extends Component<StaffProps> {
       <g transform={`translate(0, ${startY})`}>
         {this.renderCellGuidelines()}
         {this.renderLines()}
+        {this.renderLedgerLines()}
         {clef !== undefined && <Clef x={10} y={-LINE_DY} />}
         {this.renderNotes()}
       </g>
