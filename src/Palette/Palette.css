@@ -9,3 +9,7 @@
 .PaletteNote {
   cursor: pointer;
 }
+
+.PaletteNote .MainBox {
+  cursor: pointer !important;
+}

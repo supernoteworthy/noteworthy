@@ -1,8 +1,19 @@
 .SelectBox {
-    fill: rgba(0, 0, 0, 0);
-  }
-  
-  .SelectBox--selected {
-    fill: rgba(0, 100, 255, 0.2);
-  }
-  
+  fill: rgba(0, 0, 0, 0);
+}
+
+.Sheet .SelectBox {
+  pointer-events: none;
+}
+
+.SelectBox--selected {
+  fill: rgba(0, 100, 255, 0.2);
+}
+
+.MainBox {
+  fill: rgba(0, 0, 0, 0);
+  pointer-events: none;
+}
+.Sheet .MainBox {
+  pointer-events: all !important;
+}

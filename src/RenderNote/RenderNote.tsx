@@ -12,6 +12,9 @@ interface RenderNoteProps {
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onMainMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onMainMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onMainMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
   x: number;
   y: number;
   color?: string;
@@ -29,7 +32,10 @@ export default function RenderNote(props: RenderNoteProps) {
     isSelected,
     onMouseDown,
     onMouseEnter,
-    onMouseLeave
+    onMouseLeave,
+    onMainMouseDown,
+    onMainMouseEnter,
+    onMainMouseLeave
   } = props;
   const selectBoxClasses = classNames('SelectBox', cssClass, {
     'SelectBox--selected': isSelected
@@ -42,16 +48,28 @@ export default function RenderNote(props: RenderNoteProps) {
         <Fragment>
           <rect width="20" height="20" y="20" fill={color} />
           <rect
-            className={selectBoxClasses}
             width="26"
             height="30"
             x="-3"
             y="14"
             rx="3"
             ry="3"
+            className={selectBoxClasses}
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            width="26"
+            height="30"
+            x="-3"
+            y="14"
+            rx="3"
+            ry="3"
+            className={'MainBox'}
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -60,16 +78,28 @@ export default function RenderNote(props: RenderNoteProps) {
         <Fragment>
           <rect width="20" height="10" y="40" fill={color} />
           <rect
-            className={selectBoxClasses}
             width="26"
             height="20"
             x="-3"
             y="35"
             rx="3"
             ry="3"
+            className={selectBoxClasses}
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            width="26"
+            height="20"
+            x="-3"
+            y="35"
+            rx="3"
+            ry="3"
+            className={'MainBox'}
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -78,16 +108,28 @@ export default function RenderNote(props: RenderNoteProps) {
         <Fragment>
           <rect width="20" height="10" y="50" fill={color} />
           <rect
-            className={selectBoxClasses}
             width="26"
             height="20"
             x="-3"
             y="45"
             rx="3"
             ry="3"
+            className={selectBoxClasses}
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            width="26"
+            height="20"
+            x="-3"
+            y="45"
+            rx="3"
+            ry="3"
+            className={'MainBox'}
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -99,16 +141,28 @@ export default function RenderNote(props: RenderNoteProps) {
             d="M 4.234 33.744 L 18.85 51.233 C 18.85 51.233 12.668 58.834 12.539 63.401 C 12.366 69.554 20.106 80.247 20.106 80.247 C 20.106 80.247 11.737 78.877 9.575 81.56 C 7.412 84.243 11.018 91.525 11.018 91.525 C 11.018 91.525 -1.969 84.394 0.059 77.949 C 1.577 73.124 12.317 72.838 12.317 72.838 C 12.317 72.838 2.833 64.533 2.828 60.435 C 2.824 57.127 8.879 52.026 9.058 46.639 C 9.161 43.545 6.46 39.885 5.214 37.322 C 4.452 35.753 4.234 33.744 4.234 33.744 Z"
           />
           <rect
-            className={selectBoxClasses}
             width="25"
             height="60"
             x="-4"
             y="33"
             rx="3"
             ry="3"
+            className={selectBoxClasses}
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            width="25"
+            height="60"
+            x="-4"
+            y="33"
+            rx="3"
+            ry="3"
+            className={'MainBox'}
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -120,16 +174,28 @@ export default function RenderNote(props: RenderNoteProps) {
             d="M 16.469 49.33 C 19.283 47.799 21.766 46.176 22.04 46.169 L 13.285 79.482 L 9.914 79.496 L 18.262 51.648 C 18.262 51.648 15.304 53.623 13.424 54.389 C 10.551 55.56 13.168 54.503 10.374 55.621 C 9.153 56.063 8.151 56.179 6.862 56.179 C 3.156 56.179 0.152 53.227 0.152 49.585 C 0.152 45.943 3.156 42.991 6.862 42.991 C 10.568 42.991 13.57 45.84 12.996 49.037 C 12.855 49.819 12.548 50.712 12.469 51.118 C 13.213 50.783 15.216 50.011 16.469 49.33 Z"
           />
           <rect
-            className={selectBoxClasses}
             width="25"
             height="40"
             x="-2"
             y="40"
             rx="3"
             ry="3"
+            className={selectBoxClasses}
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            width="25"
+            height="40"
+            x="-2"
+            y="40"
+            rx="3"
+            ry="3"
+            className={'MainBox'}
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -141,16 +207,28 @@ export default function RenderNote(props: RenderNoteProps) {
             d="M 11.345 66.917 C 12.597 66.236 13.783 65.537 14.738 64.97 L 18.262 51.648 C 18.262 51.648 15.304 53.623 13.424 54.389 C 10.551 55.56 13.168 54.503 10.374 55.621 C 9.153 56.063 8.151 56.179 6.862 56.179 C 3.156 56.179 0.152 53.227 0.152 49.585 C 0.152 45.943 3.156 42.991 6.862 42.991 C 10.568 42.991 13.57 45.84 12.996 49.037 C 12.855 49.819 12.548 50.712 12.469 51.118 C 13.213 50.783 15.216 50.011 16.469 49.33 C 19.283 47.799 21.766 46.176 22.04 46.169 L 7.868 99.537 L 5.548 99.713 L 13.723 68.806 C 12.657 69.512 9.809 71.361 8.3 71.976 C 5.427 73.147 8.044 72.09 5.25 73.208 C 4.029 73.65 3.027 73.766 1.738 73.766 C -1.968 73.766 -4.972 70.814 -4.972 67.172 C -4.972 63.53 -1.968 60.578 1.738 60.578 C 5.444 60.578 8.446 63.427 7.872 66.624 C 7.731 67.406 7.424 68.299 7.345 68.705 C 8.089 68.37 10.092 67.598 11.345 66.917 Z"
           />
           <rect
-            className={selectBoxClasses}
             width="30"
             height="60"
             x="-7"
             y="40"
             rx="3"
             ry="3"
+            className={selectBoxClasses}
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            width="30"
+            height="60"
+            x="-7"
+            y="40"
+            rx="3"
+            ry="3"
+            className={'MainBox'}
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -175,6 +253,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="20"
+            x="-1"
+            y="10"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
+          />
         </Fragment>
       );
     } else if (orientation === NoteOrientation.DOWN) {
@@ -195,6 +285,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="20"
+            x="-2"
+            y="10"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -220,6 +322,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="22"
+            x="-1"
+            y="8"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
+          />
         </Fragment>
       );
     } else if (orientation === NoteOrientation.DOWN) {
@@ -242,6 +356,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="22"
+            x="-2"
+            y="10"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
+          />
         </Fragment>
       );
     }
@@ -261,7 +387,21 @@ export default function RenderNote(props: RenderNoteProps) {
           y="10"
           rx="3"
           ry="3"
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
           onMouseDown={onMouseDown}
+        />
+        <rect
+          className={'MainBox'}
+          width="22"
+          height="22"
+          x="0"
+          y="10"
+          rx="3"
+          ry="3"
+          onMouseDown={onMainMouseDown}
+          onMouseEnter={onMainMouseEnter}
+          onMouseLeave={onMainMouseLeave}
         />
       </Fragment>
     );
@@ -285,7 +425,21 @@ export default function RenderNote(props: RenderNoteProps) {
           y="6"
           rx="3"
           ry="3"
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
           onMouseDown={onMouseDown}
+        />
+        <rect
+          className={'MainBox'}
+          width="36"
+          height="28"
+          x="-3"
+          y="6"
+          rx="3"
+          ry="3"
+          onMouseDown={onMainMouseDown}
+          onMouseEnter={onMainMouseEnter}
+          onMouseLeave={onMainMouseLeave}
         />
       </Fragment>
     );
@@ -309,6 +463,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="22"
+            x="-1"
+            y="5"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
+          />
         </Fragment>
       );
     } else if (orientation === NoteOrientation.DOWN) {
@@ -329,6 +495,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="22"
+            x="-1"
+            y="5"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );
@@ -353,6 +531,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="22"
+            x="-1"
+            y="5"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
+          />
         </Fragment>
       );
     } else if (orientation === NoteOrientation.DOWN) {
@@ -373,6 +563,18 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseDown={onMouseDown}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+          />
+          <rect
+            className={'MainBox'}
+            width="22"
+            height="22"
+            x="-2"
+            y="10"
+            rx="3"
+            ry="3"
+            onMouseDown={onMainMouseDown}
+            onMouseEnter={onMainMouseEnter}
+            onMouseLeave={onMainMouseLeave}
           />
         </Fragment>
       );

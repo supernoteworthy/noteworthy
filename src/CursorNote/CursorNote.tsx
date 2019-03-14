@@ -169,7 +169,7 @@ export default class CursorNote extends Component<CursorNoteProps> {
         color={CURSOR_COLOR}
         cssClass="CursorNote"
         orientation={orientation}
-        onMouseDown={this.onMouseDown}
+        onMainMouseDown={this.onMouseDown}
       />
     );
   }

@@ -109,7 +109,8 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
     );
     uiStore.activeCell = projectStore.findAdjacentCell(
       x,
-      staffIndexAndY.staffIndex
+      staffIndexAndY.staffIndex,
+      this.noteSpec.cellId
     );
     uiStore.dragActiveStaffIndex = staffIndexAndY.staffIndex;
 
@@ -204,12 +205,14 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
         y={y}
         orientation={this.orientation}
         isSelected={dragging}
-        onMouseDown={this.onMouseDown}
-        onMouseEnter={() => {
+        onMainMouseDown={this.onMouseDown}
+        onMainMouseEnter={() => {
           uiStore.mouseMode = MouseMode.DRAG;
           uiStore.dragActiveStaffIndex = this.staffIndex;
         }}
-        onMouseLeave={() => !dragging && (uiStore.mouseMode = MouseMode.INSERT)}
+        onMainMouseLeave={() =>
+          !dragging && (uiStore.mouseMode = MouseMode.INSERT)
+        }
       />
     );
   }

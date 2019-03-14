@@ -2,7 +2,7 @@ import { action, computed, observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
 import { CellId, CellSpec } from '../types/CellTypes';
 import { ClefType } from '../types/ClefTypes';
-import { NoteId, NoteSpec } from '../types/NoteTypes';
+import { NoteId, NoteLength, NoteSpec, NoteType } from '../types/NoteTypes';
 import { StaffIndex, StaffSpec } from '../types/StaffTypes';
 
 export class ProjectStore {
@@ -15,8 +15,28 @@ export class ProjectStore {
     { index: 5 },
     { index: 6 }
   ];
-  @observable noteList: NoteSpec[] = [];
-  @observable cellList: CellSpec[] = [];
+  @observable noteList: NoteSpec[] = [
+    {
+      id: 'abc',
+      cellId: '123',
+      y: 0,
+      length: NoteLength.SIXTEENTH,
+      type: NoteType.TONE,
+      isPlaying: false
+    },
+    {
+      id: 'cde',
+      cellId: '345',
+      y: 100,
+      length: NoteLength.SIXTEENTH,
+      type: NoteType.TONE,
+      isPlaying: false
+    }
+  ];
+  @observable cellList: CellSpec[] = [
+    { id: '123', x: 100, staffIndex: 0 },
+    { id: '345', x: 200, staffIndex: 0 }
+  ];
 
   @action
   addNote(newNote: NoteSpec, cell?: CellSpec) {
@@ -26,11 +46,13 @@ export class ProjectStore {
     }
   }
 
-  findAdjacentCell(x: number, staffIndex: StaffIndex) {
+  findAdjacentCell(x: number, staffIndex: StaffIndex, excludeCell?: CellId) {
     const staffCells = this.cellList.filter(
       cell => cell.staffIndex === staffIndex
     );
-    return staffCells.find(cell => x > cell.x - 20 && x < cell.x + 20);
+    return staffCells.find(
+      cell => cell.id !== excludeCell && x > cell.x - 20 && x < cell.x + 20
+    );
   }
 
   @computed get getNotesForStaff() {

@@ -1,6 +1,3 @@
-.DraggableNote {
-    cursor: grab;
-}
-.DraggableNote.SelectBox--selected {
-    cursor: grabbing;
+.DraggableNote .MainBox {
+  cursor: grab;
 }
