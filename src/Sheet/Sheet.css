@@ -1,0 +1,10 @@
+.Sheet {
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  background: #fff;
+}
+
+.Sheet > svg {
+  z-index: 1;
+}

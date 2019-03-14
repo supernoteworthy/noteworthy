@@ -3,14 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/classnames": "^2.2.7",
     "@types/jest": "24.0.9",
     "@types/node": "11.10.4",
     "@types/react": "16.8.6",
     "@types/react-dom": "16.8.2",
+    "@types/uuid": "^3.4.4",
+    "@types/webaudioapi": "0.0.27",
+    "classnames": "^2.2.6",
+    "mobx": "^5.9.0",
+    "mobx-react": "^5.4.3",
+    "mobx-utils": "^5.2.0",
+    "prettier": "^1.16.4",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-scripts": "2.1.5",
-    "typescript": "3.3.3333"
+    "typescript": "3.3.3333",
+    "uuid": "^3.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -26,5 +35,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "arraybuffer-loader": "^1.0.7"
+  }
 }

@@ -1,0 +1,11 @@
+.Palette > svg {
+  width: 175px;
+  height: 500px;
+  background: rgb(58, 47, 58);
+  transform: scale(0.6);
+  margin-left: -30px;
+}
+
+.PaletteNote {
+  cursor: pointer;
+}

@@ -1,0 +1,9 @@
+.StaffLine {
+  stroke: #000;
+  stroke-width: 1px;
+  pointer-events: none;
+}
+
+.StaffLine--active {
+  stroke: rgb(180, 145, 173);
+}

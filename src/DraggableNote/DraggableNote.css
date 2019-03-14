@@ -1,0 +1,6 @@
+.DraggableNote {
+    cursor: grab;
+}
+.DraggableNote.SelectBox--selected {
+    cursor: grabbing;
+}

@@ -1,0 +1,8 @@
+.SelectBox {
+    fill: rgba(0, 0, 0, 0);
+  }
+  
+  .SelectBox--selected {
+    fill: rgba(0, 100, 255, 0.2);
+  }
+  
