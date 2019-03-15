@@ -80,7 +80,10 @@ export class ProjectStore {
     }
     const cell = this.getCellById(note.cellId)!;
     cell.x = x;
-    note.y = y;
+    const dy = y - note.y;
+    for (let cellNote of this.getNotesForCell(note.cellId!)) {
+      cellNote.y += dy;
+    }
     if (staffIndex !== undefined) {
       cell.staffIndex = staffIndex;
     }

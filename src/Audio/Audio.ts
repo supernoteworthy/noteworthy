@@ -151,7 +151,6 @@ class Audio {
     if (y == -40) {
       return 'C6';
     }
-    throw new Error(`Could not find note for ${y}`);
   }
 
   play(noteSpec: NoteSpec) {
@@ -182,7 +181,12 @@ class Audio {
     }
 
     const source = this.audioContext.createBufferSource();
-    source.buffer = this.bufferMap[this.yToNote(y)];
+    const note = this.yToNote(y);
+    if (!note) {
+      console.warn(`Could not find note for ${y}`);
+      return;
+    }
+    source.buffer = this.bufferMap[note];
     source.start();
 
     const gain = this.audioContext.createGain();
