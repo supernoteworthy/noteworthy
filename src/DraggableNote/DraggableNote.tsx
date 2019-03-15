@@ -200,7 +200,7 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
         cssClass="DraggableNote"
         length={length}
         type={type}
-        color={isPlaying ? '#7c527c' : '#000'}
+        color={isPlaying ? '#900' : '#000'}
         x={this.x}
         y={y}
         orientation={this.orientation}

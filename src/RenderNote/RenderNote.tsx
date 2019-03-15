@@ -18,6 +18,7 @@ interface RenderNoteProps {
   x: number;
   y: number;
   color?: string;
+  tooltip?: string;
 }
 
 export default function RenderNote(props: RenderNoteProps) {
@@ -26,6 +27,7 @@ export default function RenderNote(props: RenderNoteProps) {
     y,
     color,
     cssClass,
+    tooltip,
     type,
     length,
     orientation,
@@ -39,6 +41,9 @@ export default function RenderNote(props: RenderNoteProps) {
   } = props;
   const selectBoxClasses = classNames('SelectBox', cssClass, {
     'SelectBox--selected': isSelected
+  });
+  const mainBoxClasses = classNames('MainBox', cssClass, {
+    'MainBox--selected': isSelected
   });
   let innerSVG;
   if (type === NoteType.REST) {
@@ -66,7 +71,7 @@ export default function RenderNote(props: RenderNoteProps) {
             y="14"
             rx="3"
             ry="3"
-            className={'MainBox'}
+            className={mainBoxClasses}
             onMouseDown={onMainMouseDown}
             onMouseEnter={onMainMouseEnter}
             onMouseLeave={onMainMouseLeave}
@@ -96,7 +101,7 @@ export default function RenderNote(props: RenderNoteProps) {
             y="35"
             rx="3"
             ry="3"
-            className={'MainBox'}
+            className={mainBoxClasses}
             onMouseDown={onMainMouseDown}
             onMouseEnter={onMainMouseEnter}
             onMouseLeave={onMainMouseLeave}
@@ -126,7 +131,7 @@ export default function RenderNote(props: RenderNoteProps) {
             y="45"
             rx="3"
             ry="3"
-            className={'MainBox'}
+            className={mainBoxClasses}
             onMouseDown={onMainMouseDown}
             onMouseEnter={onMainMouseEnter}
             onMouseLeave={onMainMouseLeave}
@@ -159,7 +164,7 @@ export default function RenderNote(props: RenderNoteProps) {
             y="33"
             rx="3"
             ry="3"
-            className={'MainBox'}
+            className={mainBoxClasses}
             onMouseDown={onMainMouseDown}
             onMouseEnter={onMainMouseEnter}
             onMouseLeave={onMainMouseLeave}
@@ -192,7 +197,7 @@ export default function RenderNote(props: RenderNoteProps) {
             y="40"
             rx="3"
             ry="3"
-            className={'MainBox'}
+            className={mainBoxClasses}
             onMouseDown={onMainMouseDown}
             onMouseEnter={onMainMouseEnter}
             onMouseLeave={onMainMouseLeave}
@@ -225,7 +230,7 @@ export default function RenderNote(props: RenderNoteProps) {
             y="40"
             rx="3"
             ry="3"
-            className={'MainBox'}
+            className={mainBoxClasses}
             onMouseDown={onMainMouseDown}
             onMouseEnter={onMainMouseEnter}
             onMouseLeave={onMainMouseLeave}
@@ -254,7 +259,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="20"
             x="-1"
@@ -287,7 +292,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="20"
             x="-2"
@@ -323,7 +328,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="22"
             x="-1"
@@ -357,7 +362,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="22"
             x="-2"
@@ -392,7 +397,7 @@ export default function RenderNote(props: RenderNoteProps) {
           onMouseDown={onMouseDown}
         />
         <rect
-          className={'MainBox'}
+          className={mainBoxClasses}
           width="22"
           height="22"
           x="0"
@@ -430,7 +435,7 @@ export default function RenderNote(props: RenderNoteProps) {
           onMouseDown={onMouseDown}
         />
         <rect
-          className={'MainBox'}
+          className={mainBoxClasses}
           width="36"
           height="28"
           x="-3"
@@ -464,7 +469,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="22"
             x="-1"
@@ -497,7 +502,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="22"
             x="-1"
@@ -532,7 +537,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="22"
             x="-1"
@@ -565,7 +570,7 @@ export default function RenderNote(props: RenderNoteProps) {
             onMouseLeave={onMouseLeave}
           />
           <rect
-            className={'MainBox'}
+            className={mainBoxClasses}
             width="22"
             height="22"
             x="-2"
@@ -581,7 +586,11 @@ export default function RenderNote(props: RenderNoteProps) {
     }
   }
   // -20 hack: Aligns (y=0) for a note with the center of the top staff line.
-  return <g transform={`translate(${x}, ${y - 20})`}>{innerSVG}</g>;
+  return (
+    <g transform={`translate(${x}, ${y - 20})`} data-tip={tooltip}>
+      {innerSVG}
+    </g>
+  );
 }
 
 RenderNote.defaultProps = {

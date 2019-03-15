@@ -1,5 +1,6 @@
 import { inject } from 'mobx-react';
 import React, { Component } from 'react';
+import ReactTooltip from 'react-tooltip';
 import RenderNote from '../RenderNote/RenderNote';
 import { UiStore } from '../stores/ui.store';
 import { NoteOrientation, NoteSpec } from '../types/NoteTypes';
@@ -37,9 +38,16 @@ export default class Palette extends Component<PaletteProps> {
     const { selectedNote } = this.state;
     return (
       <div className="Palette">
-        <svg width="100%" height="100%">
+        <ReactTooltip
+          place="right"
+          effect="solid"
+          className="PaletteTooltip"
+          type="info"
+        />
+        <svg>
           {PALETTE_NOTES.map(note => (
             <RenderNote
+              tooltip={note.tooltip}
               key={note.id}
               length={note.length}
               type={note.type}

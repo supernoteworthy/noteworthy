@@ -1,9 +1,15 @@
+.Palette {
+  width: 80px;
+  height: 100vh;
+  overflow: auto;
+}
 .Palette > svg {
-  width: 175px;
-  height: 500px;
+  width: 100px;
+  height: 750px;
+  margin-left: 25px;
   background: rgb(58, 47, 58);
-  transform: scale(0.6);
-  margin-left: -30px;
+  transform-origin: top left;
+  transform: scale(0.8);
 }
 
 .PaletteNote {
@@ -12,4 +18,8 @@
 
 .PaletteNote .MainBox {
   cursor: pointer !important;
+}
+
+.PaletteTooltip {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
 }

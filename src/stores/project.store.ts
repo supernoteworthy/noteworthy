@@ -1,5 +1,6 @@
 import { action, computed, observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
+import { CHORD_GUIDELINE_WIDTH } from '../constants';
 import { CellId, CellSpec } from '../types/CellTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
@@ -31,7 +32,10 @@ export class ProjectStore {
       cell => cell.staffIndex === staffIndex
     );
     return staffCells.find(
-      cell => cell.id !== excludeCell && x > cell.x - 20 && x < cell.x + 20
+      cell =>
+        cell.id !== excludeCell &&
+        x > cell.x - CHORD_GUIDELINE_WIDTH / 2 &&
+        x < cell.x + CHORD_GUIDELINE_WIDTH / 2
     );
   }
 

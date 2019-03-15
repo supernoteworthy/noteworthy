@@ -2,7 +2,13 @@ import classNames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
 import Clef from '../Clef/Clef';
-import { LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
+import {
+  CHORD_GUIDELINE_OFFSET,
+  CHORD_GUIDELINE_WIDTH,
+  LINE_DY,
+  STAFF_HEIGHT,
+  STAFF_MARGIN
+} from '../constants';
 import DraggableNote from '../DraggableNote/DraggableNote';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
@@ -176,18 +182,26 @@ class Staff extends Component<StaffProps> {
       return (
         <g>
           <line
-            x1={activeCell.x - 10}
-            x2={activeCell.x - 10}
+            x1={
+              activeCell.x - CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+            }
+            x2={
+              activeCell.x - CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+            }
             y1={0}
             y2={STAFF_HEIGHT}
-            stroke="#ddd"
+            className="ChordGuideline"
           />
           <line
-            x1={activeCell.x + 25}
-            x2={activeCell.x + 25}
+            x1={
+              activeCell.x + CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+            }
+            x2={
+              activeCell.x + CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+            }
             y1={0}
             y2={STAFF_HEIGHT}
-            stroke="#ddd"
+            className="ChordGuideline"
           />
         </g>
       );

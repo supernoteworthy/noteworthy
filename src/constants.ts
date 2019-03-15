@@ -7,3 +7,6 @@ export const STAFF_MARGIN = 80;
 export const MOUSE_OFFSET_X = -10;
 export const MOUSE_OFFSET_Y = -1 * SHEET_MARGIN_TOP;
 export const CURSOR_COLOR = '#ddd';
+
+export const CHORD_GUIDELINE_WIDTH = 25;
+export const CHORD_GUIDELINE_OFFSET = 10;
