@@ -1,9 +1,9 @@
 import { StaffIndex } from './StaffTypes';
 
-export type CellId = string;
+export type ChordId = string;
 
-export interface CellSpec {
-  id: CellId;
+export interface ChordSpec {
+  id: ChordId;
   staffIndex: StaffIndex;
   x: number;
 }

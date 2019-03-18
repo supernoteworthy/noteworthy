@@ -1,7 +1,7 @@
 import { action, computed, observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
 import { CHORD_GUIDELINE_WIDTH } from '../constants';
-import { CellId, CellSpec } from '../types/CellTypes';
+import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
 import { StaffIndex, StaffSpec } from '../types/StaffTypes';
@@ -17,41 +17,41 @@ export class ProjectStore {
     { index: 6 }
   ];
   @observable noteList: NoteSpec[] = [];
-  @observable cellList: CellSpec[] = [];
+  @observable chordList: ChordSpec[] = [];
 
   @action
-  addNote(newNote: NoteSpec, cell?: CellSpec) {
+  addNote(newNote: NoteSpec, chord?: ChordSpec) {
     this.noteList.push(newNote);
-    if (cell) {
-      this.cellList.push(cell);
+    if (chord) {
+      this.chordList.push(chord);
     }
   }
 
-  findAdjacentCell(x: number, staffIndex: StaffIndex, excludeCell?: CellId) {
-    const staffCells = this.cellList.filter(
-      cell => cell.staffIndex === staffIndex
+  findAdjacentChord(x: number, staffIndex: StaffIndex, excludeChord?: ChordId) {
+    const staffChords = this.chordList.filter(
+      chord => chord.staffIndex === staffIndex
     );
-    return staffCells.find(
-      cell =>
-        cell.id !== excludeCell &&
-        x > cell.x - CHORD_GUIDELINE_WIDTH / 2 &&
-        x < cell.x + CHORD_GUIDELINE_WIDTH / 2
+    return staffChords.find(
+      chord =>
+        chord.id !== excludeChord &&
+        x > chord.x - CHORD_GUIDELINE_WIDTH / 2 &&
+        x < chord.x + CHORD_GUIDELINE_WIDTH / 2
     );
   }
 
   @computed get getNotesForStaff() {
     return createTransformer(staffIndex =>
       this.noteList.filter(note => {
-        const cell = this.getCellById(note.cellId);
-        if (cell) {
-          return cell.staffIndex === staffIndex;
+        const chord = this.getChordById(note.chordId);
+        if (chord) {
+          return chord.staffIndex === staffIndex;
         }
       })
     );
   }
 
-  getCellsForStaff(staffIndex: StaffIndex) {
-    return this.cellList.filter(cell => cell.staffIndex === staffIndex);
+  getChordsForStaff(staffIndex: StaffIndex) {
+    return this.chordList.filter(chord => chord.staffIndex === staffIndex);
   }
 
   @computed get getNoteById() {
@@ -60,12 +60,12 @@ export class ProjectStore {
     );
   }
 
-  getNotesForCell(id: CellId) {
-    return this.noteList.filter(note => note.cellId === id);
+  getNotesForChord(id: ChordId) {
+    return this.noteList.filter(note => note.chordId === id);
   }
 
-  getCellById(id?: CellId) {
-    return this.cellList.find(cell => cell.id === id);
+  getChordById(id?: ChordId) {
+    return this.chordList.find(chord => chord.id === id);
   }
 
   @action setNotePosition(
@@ -78,36 +78,35 @@ export class ProjectStore {
     if (!note) {
       throw new Error(`Could not find note ${id} in setNotePosition.`);
     }
-    const cell = this.getCellById(note.cellId)!;
-    cell.x = x;
+    const chord = this.getChordById(note.chordId)!;
+    chord.x = x;
     const dy = y - note.y;
-    for (let cellNote of this.getNotesForCell(note.cellId!)) {
-      cellNote.y += dy;
+    for (let chordNote of this.getNotesForChord(note.chordId!)) {
+      chordNote.y += dy;
     }
     if (staffIndex !== undefined) {
-      cell.staffIndex = staffIndex;
+      chord.staffIndex = staffIndex;
     }
   }
 
-  @action updateNoteCell(id: NoteId, newCell: CellId) {
+  @action updateNoteChord(id: NoteId, newChord: ChordId) {
     const note = this.getNoteById(id)!;
-    if (newCell && note.cellId) {
-      note.cellId = newCell;
+    if (newChord && note.chordId) {
+      note.chordId = newChord;
     }
-    this.dropEmptyCells();
+    this.dropEmptyChords();
   }
 
-  dropEmptyCells() {
-    this.cellList = this.cellList.filter(cell =>
-      this.noteList.find(note => note.cellId === cell.id)
+  dropEmptyChords() {
+    this.chordList = this.chordList.filter(chord =>
+      this.noteList.find(note => note.chordId === chord.id)
     );
   }
 
-  @action deleteCell(id: CellId) {
-    const cell = this.getCellById(id);
-    const notes = this.getNotesForCell(id);
+  @action deleteChord(id: ChordId) {
+    const notes = this.getNotesForChord(id);
     notes.forEach(note => this.deleteNote(note.id));
-    this.dropEmptyCells();
+    this.dropEmptyChords();
   }
 
   @action deleteNote(id: NoteId) {

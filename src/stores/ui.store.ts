@@ -1,5 +1,5 @@
 import { computed, observable } from 'mobx';
-import { CellSpec } from '../types/CellTypes';
+import { ChordSpec } from '../types/ChordTypes';
 import { NoteSpec } from '../types/NoteTypes';
 import { StaffIndex } from '../types/StaffTypes';
 
@@ -29,7 +29,7 @@ export class UiStore {
   @observable insertStaffX: number = 0;
   @observable insertStaffY: number = 0;
 
-  @observable activeCell?: CellSpec;
+  @observable activeChord?: ChordSpec;
 
   @computed get activeStaff() {
     if (this.mouseMode === MouseMode.INSERT) {

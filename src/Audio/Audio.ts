@@ -1,5 +1,5 @@
 import { ProjectStore } from '../stores/project.store';
-import { CellId, CellSpec } from '../types/CellTypes';
+import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteLength, NoteSpec, NoteType } from '../types/NoteTypes';
 
 const audioLibrary: { [i: string]: ArrayBuffer } = {
@@ -225,12 +225,12 @@ class Audio {
     const sorted = list.slice();
 
     sorted.sort((a, b) => {
-      const cellA = this.projectStore!.getCellById(a.cellId!)!;
-      const cellB = this.projectStore!.getCellById(b.cellId!)!;
-      if (cellA.staffIndex < cellB.staffIndex) {
+      const chordA = this.projectStore!.getChordById(a.chordId!)!;
+      const chordB = this.projectStore!.getChordById(b.chordId!)!;
+      if (chordA.staffIndex < chordB.staffIndex) {
         return -1;
       }
-      return cellA.x - cellB.x;
+      return chordA.x - chordB.x;
     });
     const playNextNote = () => {
       if (currentIndex < sorted.length) {
@@ -246,36 +246,36 @@ class Audio {
     playNextNote();
   }
 
-  playCell(cellId: CellId) {
-    const notesInCell = this.projectStore!.getNotesForCell(cellId);
-    notesInCell.forEach(note => this.play(note)); // TODO: Optimize?
+  playChord(chordId: ChordId) {
+    const notesInChord = this.projectStore!.getNotesForChord(chordId);
+    notesInChord.forEach(note => this.play(note)); // TODO: Optimize?
   }
 
-  cellLength(cellId: CellId) {
-    const notesInCell = this.projectStore!.getNotesForCell(cellId);
-    const lengths = notesInCell.map(note =>
+  chordLength(chordId: ChordId) {
+    const notesInChord = this.projectStore!.getNotesForChord(chordId);
+    const lengths = notesInChord.map(note =>
       this.beatsToSeconds(this.noteSpecLengthToBeats(note.length))
     );
     return Math.max(...lengths);
   }
 
-  playCellList(list: CellSpec[]) {
+  playChordList(list: ChordSpec[]) {
     let currentIndex = 0;
     const sorted = list.slice();
 
     sorted.sort((a, b) => {
       return a.staffIndex * 10000 + a.x - (b.staffIndex * 10000 + b.x);
     });
-    const playNextCell = () => {
+    const playNextChord = () => {
       if (currentIndex < sorted.length) {
-        const currentCell = sorted[currentIndex];
-        this.playCell(currentCell.id);
-        const timeLength = this.cellLength(currentCell.id);
+        const currentChord = sorted[currentIndex];
+        this.playChord(currentChord.id);
+        const timeLength = this.chordLength(currentChord.id);
         currentIndex++;
-        setTimeout(playNextCell, timeLength * 1000);
+        setTimeout(playNextChord, timeLength * 1000);
       }
     };
-    playNextCell();
+    playNextChord();
   }
 
   playEffect(effect: string) {

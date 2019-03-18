@@ -14,7 +14,7 @@ import {
 import RenderNote from '../RenderNote/RenderNote';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
-import { CellSpec } from '../types/CellTypes';
+import { ChordSpec } from '../types/ChordTypes';
 import { NoteOrientation, NoteType } from '../types/NoteTypes';
 import { StaffIndex } from '../types/StaffTypes';
 
@@ -49,7 +49,7 @@ export default class CursorNote extends Component<CursorNoteProps> {
     uiStore.insertX = e.clientX;
     uiStore.insertY = e.clientY;
     const { x, yOnStaff, staffIndex } = this.clientPositionToSvgPosition()!;
-    uiStore.activeCell = projectStore.findAdjacentCell(x, staffIndex);
+    uiStore.activeChord = projectStore.findAdjacentChord(x, staffIndex);
     uiStore.insertStaffId = staffIndex;
     uiStore.insertStaffX = x;
     uiStore.insertStaffY = yOnStaff;
@@ -68,31 +68,31 @@ export default class CursorNote extends Component<CursorNoteProps> {
 
     const { projectStore } = this.injected;
     const { x, y, staffIndex } = this.clientPositionToSvgPosition()!;
-    const adjacentCell = projectStore.findAdjacentCell(x, staffIndex);
+    const adjacentChord = projectStore.findAdjacentChord(x, staffIndex);
     const staffY = this.svgYToStaffY(y, staffIndex);
 
-    let newCell: CellSpec | undefined;
-    if (!adjacentCell) {
-      newCell = {
+    let newChord: ChordSpec | undefined;
+    if (!adjacentChord) {
+      newChord = {
         id: uuid(),
         staffIndex,
         x
       };
     }
 
-    const cellId = adjacentCell ? adjacentCell.id : newCell!.id;
+    const chordId = adjacentChord ? adjacentChord.id : newChord!.id;
 
     projectStore.addNote(
       {
         ...cursorSpec,
         id: newNoteId,
         y: staffY,
-        cellId
+        chordId: chordId
       },
-      newCell
+      newChord
     );
 
-    Audio.playCell(cellId);
+    Audio.playChord(chordId);
 
     uiStore.mouseMode = MouseMode.DRAG;
     uiStore.dragNoteId = newNoteId;

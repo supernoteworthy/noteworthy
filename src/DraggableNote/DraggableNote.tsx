@@ -49,12 +49,12 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
 
   get x() {
     const { projectStore } = this.injected;
-    return projectStore.getCellById(this.noteSpec.cellId)!.x;
+    return projectStore.getChordById(this.noteSpec.chordId)!.x;
   }
 
   get staffIndex() {
     const { projectStore } = this.injected;
-    return projectStore.getCellById(this.noteSpec.cellId)!.staffIndex;
+    return projectStore.getChordById(this.noteSpec.chordId)!.staffIndex;
   }
 
   componentDidMount() {
@@ -107,15 +107,15 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
       staffIndexAndY.y,
       staffIndexAndY.staffIndex
     );
-    uiStore.activeCell = projectStore.findAdjacentCell(
+    uiStore.activeChord = projectStore.findAdjacentChord(
       x,
       staffIndexAndY.staffIndex,
-      this.noteSpec.cellId
+      this.noteSpec.chordId
     );
     uiStore.dragActiveStaffIndex = staffIndexAndY.staffIndex;
 
     if (positionChanged) {
-      Audio.playCell(this.noteSpec.cellId!);
+      Audio.playChord(this.noteSpec.chordId!);
     }
   };
 
@@ -135,20 +135,20 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
 
     if (noteDeleted) {
       Audio.playEffect('delete');
-      projectStore.deleteCell(this.noteSpec.cellId!);
+      projectStore.deleteChord(this.noteSpec.chordId!);
     } else if (noteTapped) {
-      Audio.playCell(this.noteSpec.cellId!);
+      Audio.playChord(this.noteSpec.chordId!);
     }
 
-    if (uiStore.activeCell) {
-      projectStore.updateNoteCell(this.noteSpec.id, uiStore.activeCell.id);
+    if (uiStore.activeChord) {
+      projectStore.updateNoteChord(this.noteSpec.id, uiStore.activeChord.id);
     }
 
     uiStore.dragNoteId = undefined;
     uiStore.dragStartX = undefined;
     uiStore.dragStartY = undefined;
     uiStore.dragStartStaffIndex = undefined;
-    uiStore.activeCell = undefined;
+    uiStore.activeChord = undefined;
     uiStore.dragStartClientX = undefined;
     uiStore.dragStartClientY = undefined;
 

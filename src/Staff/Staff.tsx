@@ -85,7 +85,7 @@ class Staff extends Component<StaffProps> {
 
     const notesAboveStaff = notes.filter(note => note.y < 0);
     for (let note of notesAboveStaff) {
-      const x = projectStore.getCellById(note.cellId)!.x;
+      const x = projectStore.getChordById(note.chordId)!.x;
       for (let y = -LINE_DY; y >= note.y; y -= LINE_DY) {
         ledgerLines.push(
           <line
@@ -103,7 +103,7 @@ class Staff extends Component<StaffProps> {
     const notesBelowStaff = notes.filter(note => note.y >= STAFF_HEIGHT);
     for (let note of notesBelowStaff) {
       for (let y = STAFF_HEIGHT; y <= note.y; y += LINE_DY) {
-        const x = projectStore.getCellById(note.cellId)!.x;
+        const x = projectStore.getChordById(note.chordId)!.x;
         ledgerLines.push(
           <line
             x1={x - 3}
@@ -175,18 +175,18 @@ class Staff extends Component<StaffProps> {
     );
   }
 
-  renderCellGuidelines() {
+  renderChordGuidelines() {
     const { uiStore } = this.injected;
-    const { activeCell } = uiStore;
-    if (activeCell && activeCell.staffIndex === this.props.spec.index) {
+    const { activeChord } = uiStore;
+    if (activeChord && activeChord.staffIndex === this.props.spec.index) {
       return (
         <g>
           <line
             x1={
-              activeCell.x - CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+              activeChord.x - CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
             }
             x2={
-              activeCell.x - CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+              activeChord.x - CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
             }
             y1={0}
             y2={STAFF_HEIGHT}
@@ -194,10 +194,10 @@ class Staff extends Component<StaffProps> {
           />
           <line
             x1={
-              activeCell.x + CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+              activeChord.x + CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
             }
             x2={
-              activeCell.x + CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
+              activeChord.x + CHORD_GUIDELINE_WIDTH / 2 + CHORD_GUIDELINE_OFFSET
             }
             y1={0}
             y2={STAFF_HEIGHT}
@@ -220,7 +220,7 @@ class Staff extends Component<StaffProps> {
     const startY = index * STAFF_HEIGHT + index * STAFF_MARGIN;
     return (
       <g transform={`translate(0, ${startY})`}>
-        {this.renderCellGuidelines()}
+        {this.renderChordGuidelines()}
         {this.renderLines()}
         {this.renderLedgerLines()}
         {clef !== undefined && <Clef x={10} y={-LINE_DY} />}

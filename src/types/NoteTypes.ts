@@ -1,4 +1,4 @@
-import { CellId } from './CellTypes';
+import { ChordId } from './ChordTypes';
 
 export type NoteId = string;
 
@@ -25,7 +25,7 @@ export interface NoteSpec {
   id: NoteId;
   type: NoteType;
   length: NoteLength;
-  cellId?: CellId;
+  chordId?: ChordId;
   y: number;
   isPlaying: boolean;
 }

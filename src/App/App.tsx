@@ -31,13 +31,13 @@ class App extends Component {
         e.preventDefault();
         const activeStaff = this.uiStore.activeStaff;
         if (activeStaff !== undefined) {
-          Audio.playCellList(this.projectStore.getCellsForStaff(activeStaff));
+          Audio.playChordList(this.projectStore.getChordsForStaff(activeStaff));
         }
       }
       // Enter -- play all.
       if (e.keyCode === 13) {
         e.preventDefault();
-        Audio.playCellList(this.projectStore.cellList);
+        Audio.playChordList(this.projectStore.chordList);
       }
     });
   }
