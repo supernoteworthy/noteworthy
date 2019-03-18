@@ -16,7 +16,7 @@ interface InjectedProps extends PaletteProps {
 @inject('uiStore')
 export default class Palette extends Component<PaletteProps> {
   state = {
-    selectedNote: 'EIGHTH'
+    selectedNote: 'QUARTER'
   };
 
   get injected() {

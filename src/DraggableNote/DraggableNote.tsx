@@ -175,8 +175,10 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
     const staffIndex = this.injected.uiStore.dragStartStaffIndex!;
     const absoluteY = y + (staffIndex || 0) * (STAFF_HEIGHT + STAFF_MARGIN);
     const bucketSize = STAFF_HEIGHT + STAFF_MARGIN;
-    const newStaffIndex = Math.round(
-      (absoluteY - STAFF_MARGIN / 2) / bucketSize
+    let newStaffIndex = Math.round((absoluteY - STAFF_MARGIN / 2) / bucketSize);
+    newStaffIndex = Math.max(
+      0,
+      Math.min(this.injected.projectStore.staffList.length - 1, newStaffIndex)
     );
     const finalY = absoluteY - newStaffIndex * (STAFF_HEIGHT + STAFF_MARGIN);
     return {

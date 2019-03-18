@@ -2,23 +2,127 @@ import { ProjectStore } from '../stores/project.store';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteLength, NoteSpec, NoteType } from '../types/NoteTypes';
 
-const audioLibrary: { [i: string]: ArrayBuffer } = {
-  B3: require('!arraybuffer-loader!../assets/B3.ogg'),
-  C4: require('!arraybuffer-loader!../assets/C4.ogg'),
-  D4: require('!arraybuffer-loader!../assets/D4.ogg'),
-  E4: require('!arraybuffer-loader!../assets/E4.ogg'),
-  F4: require('!arraybuffer-loader!../assets/F4.ogg'),
-  G4: require('!arraybuffer-loader!../assets/G4.ogg'),
-  A4: require('!arraybuffer-loader!../assets/A4.ogg'),
-  B4: require('!arraybuffer-loader!../assets/B4.ogg'),
-  C5: require('!arraybuffer-loader!../assets/C5.ogg'),
-  D5: require('!arraybuffer-loader!../assets/D5.ogg'),
-  E5: require('!arraybuffer-loader!../assets/E5.ogg'),
-  F5: require('!arraybuffer-loader!../assets/F5.ogg'),
-  G5: require('!arraybuffer-loader!../assets/G5.ogg'),
-  A5: require('!arraybuffer-loader!../assets/A5.ogg'),
-  B5: require('!arraybuffer-loader!../assets/B5.ogg'),
-  C6: require('!arraybuffer-loader!../assets/C6.ogg')
+interface BufferSpec {
+  midiBaseNote: number;
+  buffer: ArrayBuffer;
+}
+const audioLibrary: { [i: string]: BufferSpec } = {
+  A0: {
+    midiBaseNote: 21,
+    buffer: require('!arraybuffer-loader!../assets/A0.ogg')
+  },
+  A1: {
+    midiBaseNote: 33,
+    buffer: require('!arraybuffer-loader!../assets/A1.ogg')
+  },
+  A2: {
+    midiBaseNote: 45,
+    buffer: require('!arraybuffer-loader!../assets/A2.ogg')
+  },
+  A3: {
+    midiBaseNote: 57,
+    buffer: require('!arraybuffer-loader!../assets/A3.ogg')
+  },
+  A4: {
+    midiBaseNote: 69,
+    buffer: require('!arraybuffer-loader!../assets/A4.ogg')
+  },
+  A5: {
+    midiBaseNote: 81,
+    buffer: require('!arraybuffer-loader!../assets/A5.ogg')
+  },
+  A6: {
+    midiBaseNote: 93,
+    buffer: require('!arraybuffer-loader!../assets/A6.ogg')
+  },
+  A7: {
+    midiBaseNote: 105,
+    buffer: require('!arraybuffer-loader!../assets/A7.ogg')
+  },
+  C1: {
+    midiBaseNote: 24,
+    buffer: require('!arraybuffer-loader!../assets/C1.ogg')
+  },
+  C2: {
+    midiBaseNote: 36,
+    buffer: require('!arraybuffer-loader!../assets/C2.ogg')
+  },
+  C3: {
+    midiBaseNote: 48,
+    buffer: require('!arraybuffer-loader!../assets/C3.ogg')
+  },
+  C4: {
+    midiBaseNote: 60,
+    buffer: require('!arraybuffer-loader!../assets/C4.ogg')
+  },
+  C5: {
+    midiBaseNote: 72,
+    buffer: require('!arraybuffer-loader!../assets/C5.ogg')
+  },
+  C6: {
+    midiBaseNote: 84,
+    buffer: require('!arraybuffer-loader!../assets/C6.ogg')
+  },
+  C7: {
+    midiBaseNote: 96,
+    buffer: require('!arraybuffer-loader!../assets/C7.ogg')
+  },
+  C8: {
+    midiBaseNote: 108,
+    buffer: require('!arraybuffer-loader!../assets/C8.ogg')
+  },
+  Ds1: {
+    midiBaseNote: 27,
+    buffer: require('!arraybuffer-loader!../assets/Ds1.ogg')
+  },
+  Ds2: {
+    midiBaseNote: 39,
+    buffer: require('!arraybuffer-loader!../assets/Ds2.ogg')
+  },
+  Ds3: {
+    midiBaseNote: 51,
+    buffer: require('!arraybuffer-loader!../assets/Ds3.ogg')
+  },
+  Ds4: {
+    midiBaseNote: 63,
+    buffer: require('!arraybuffer-loader!../assets/Ds4.ogg')
+  },
+  Ds5: {
+    midiBaseNote: 75,
+    buffer: require('!arraybuffer-loader!../assets/Ds5.ogg')
+  },
+  Ds6: {
+    midiBaseNote: 87,
+    buffer: require('!arraybuffer-loader!../assets/Ds6.ogg')
+  },
+  Ds7: {
+    midiBaseNote: 99,
+    buffer: require('!arraybuffer-loader!../assets/Ds7.ogg')
+  },
+  Fs1: {
+    midiBaseNote: 30,
+    buffer: require('!arraybuffer-loader!../assets/Fs1.ogg')
+  },
+  Fs2: {
+    midiBaseNote: 42,
+    buffer: require('!arraybuffer-loader!../assets/Fs2.ogg')
+  },
+  Fs4: {
+    midiBaseNote: 66,
+    buffer: require('!arraybuffer-loader!../assets/Fs4.ogg')
+  },
+  Fs5: {
+    midiBaseNote: 78,
+    buffer: require('!arraybuffer-loader!../assets/Fs5.ogg')
+  },
+  Fs6: {
+    midiBaseNote: 90,
+    buffer: require('!arraybuffer-loader!../assets/Fs6.ogg')
+  },
+  Fs7: {
+    midiBaseNote: 102,
+    buffer: require('!arraybuffer-loader!../assets/Fs7.ogg')
+  }
 };
 
 const effects: { [i: string]: ArrayBuffer } = {
@@ -69,7 +173,7 @@ class Audio {
   async loadSounds() {
     for (let key of Object.keys(audioLibrary)) {
       this.bufferMap[key] = await this.audioContext.decodeAudioData(
-        audioLibrary[key]
+        audioLibrary[key].buffer
       );
     }
 
@@ -101,71 +205,66 @@ class Audio {
     }
   }
 
-  /** XXX: Replace this with something smarter! */
-  private yToNote(y: number) {
-    if (y === 110) {
-      return 'B3';
+  private positionToMidi(y: number, octave: number) {
+    // XXX: could be simplified a bit?
+    let octaveMidi = 12 + octave * 12;
+    while (y > 100) {
+      octaveMidi -= 12;
+      y -= 70;
     }
-    if (y === 100) {
-      return 'C4';
+    while (y < 40) {
+      octaveMidi += 12;
+      y += 70;
     }
-    if (y === 90) {
-      return 'D4';
+    switch (y) {
+      case 100: // Middle C
+        return octaveMidi;
+      case 90: // D
+        return octaveMidi + 2;
+      case 80: // E
+        return octaveMidi + 4;
+      case 70: // F
+        return octaveMidi + 5;
+      case 60: // G
+        return octaveMidi + 7;
+      case 50: // A
+        return octaveMidi + 9;
+      case 40: // B
+        return octaveMidi + 11;
     }
-    if (y === 80) {
-      return 'E4';
+    return 1;
+  }
+
+  private midiToPlaybackRate(midi: number, midiBaseNote: number) {
+    return Math.pow(2, (midi - midiBaseNote) / 12);
+  }
+
+  private closestLibrarySample(midi: number) {
+    let bestDistance = Infinity;
+    let bestSampleKey = null;
+    for (let sampleKey of Object.keys(audioLibrary)) {
+      const distance = midi - audioLibrary[sampleKey].midiBaseNote;
+      if (distance >= 0 && distance < bestDistance) {
+        bestDistance = distance;
+        bestSampleKey = sampleKey;
+      }
     }
-    if (y === 70) {
-      return 'F4';
+    console.log(bestSampleKey);
+    if (!bestSampleKey) {
+      return Object.keys(audioLibrary)[0];
     }
-    if (y === 60) {
-      return 'G4';
-    }
-    if (y === 50) {
-      return 'A4';
-    }
-    if (y === 40) {
-      return 'B4';
-    }
-    if (y === 30) {
-      return 'C5';
-    }
-    if (y == 20) {
-      return 'D5';
-    }
-    if (y == 10) {
-      return 'E5';
-    }
-    if (y == 0) {
-      return 'F5';
-    }
-    if (y == -10) {
-      return 'G5';
-    }
-    if (y == -20) {
-      return 'A5';
-    }
-    if (y == -30) {
-      return 'B5';
-    }
-    if (y == -40) {
-      return 'C6';
-    }
+    return bestSampleKey;
   }
 
   play(noteSpec: NoteSpec) {
     const { id, y, type, length } = noteSpec;
-    console.log(id, y, type, length);
+    const projectStore = this.projectStore!;
     const timeLength = this.beatsToSeconds(this.noteSpecLengthToBeats(length));
 
     if (type === NoteType.REST) {
-      if (this.projectStore) {
-        this.projectStore.setNotePlaying(id, true);
-      }
+      projectStore.setNotePlaying(id, true);
       setTimeout(() => {
-        if (this.projectStore) {
-          this.projectStore.setNotePlaying(id, false);
-        }
+        projectStore.setNotePlaying(id, false);
       }, timeLength * 1000);
       return;
     }
@@ -175,22 +274,27 @@ class Audio {
         EPSILON,
         this.audioContext.currentTime
       );
-      if (this.projectStore) {
-        this.projectStore.setNotePlaying(id, false);
-      }
+      projectStore.setNotePlaying(id, false);
     }
 
     const source = this.audioContext.createBufferSource();
-    const note = this.yToNote(y);
-    if (!note) {
-      console.warn(`Could not find note for ${y}`);
-      return;
+    const midiNote = this.positionToMidi(y, projectStore.getOctaveForNote(id));
+    const closestLibrarySample = this.closestLibrarySample(midiNote);
+    if (!closestLibrarySample) {
+      throw new Error(
+        `Could not find appropriate buffer for midi note. ${midiNote}`
+      );
     }
-    source.buffer = this.bufferMap[note];
+    source.buffer = this.bufferMap[closestLibrarySample];
+    source.playbackRate.value = this.midiToPlaybackRate(
+      midiNote,
+      audioLibrary[closestLibrarySample].midiBaseNote
+    );
     source.start();
 
     const gain = this.audioContext.createGain();
 
+    // XXX: make this sound nicer?
     gain.gain.setValueAtTime(
       1,
       this.audioContext.currentTime + timeLength * 0.7
