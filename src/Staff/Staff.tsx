@@ -10,6 +10,7 @@ import {
   STAFF_MARGIN
 } from '../constants';
 import DraggableNote from '../DraggableNote/DraggableNote';
+import OctaveSelector from '../OctaveSelector/OctaveSelector';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { NoteType } from '../types/NoteTypes';
@@ -137,9 +138,7 @@ class Staff extends Component<StaffProps> {
   renderLines() {
     const { uiStore } = this.injected;
     const width = uiStore.sheetWidth;
-    const className = classNames('StaffLine', {
-      'StaffLine--active': this.isActiveStaff()
-    });
+    const className = classNames('StaffLine');
     return (
       <Fragment>
         <line x1="0" x2={width} y1={0} y2={0} className={className} />
@@ -209,14 +208,8 @@ class Staff extends Component<StaffProps> {
     return <g />;
   }
 
-  isActiveStaff() {
-    /*const { uiStore } = this.injected;
-    return uiStore.activeStaff === this.props.spec.index;*/
-    return false;
-  }
-
   render() {
-    const { index, clef } = this.props.spec;
+    const { index, clef, octave } = this.props.spec;
     const startY = index * STAFF_HEIGHT + index * STAFF_MARGIN;
     return (
       <g transform={`translate(0, ${startY})`}>
@@ -224,6 +217,11 @@ class Staff extends Component<StaffProps> {
         {this.renderLines()}
         {this.renderLedgerLines()}
         {clef !== undefined && <Clef x={10} y={-LINE_DY} />}
+        <OctaveSelector
+          octave={octave}
+          hasClef={clef !== undefined}
+          staffIndex={index}
+        />
         {this.renderNotes()}
       </g>
     );

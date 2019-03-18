@@ -8,14 +8,14 @@ import { StaffIndex, StaffSpec } from '../types/StaffTypes';
 
 export class ProjectStore {
   @observable staffList: StaffSpec[] = [
-    { index: 0, clef: ClefType.TREBLE, octave: 1 },
-    { index: 1, octave: 2 },
-    { index: 2, octave: 3 },
+    { index: 0, clef: ClefType.TREBLE, octave: 4 },
+    { index: 1, octave: 4 },
+    { index: 2, octave: 4 },
     { index: 3, octave: 4 },
-    { index: 4, octave: 5 },
-    { index: 5, octave: 6 },
-    { index: 6, octave: 7 },
-    { index: 7, octave: 8 }
+    { index: 4, octave: 4 },
+    { index: 5, octave: 4 },
+    { index: 6, octave: 4 },
+    { index: 7, octave: 4 }
   ];
   @observable noteList: NoteSpec[] = [];
   @observable chordList: ChordSpec[] = [];
@@ -95,6 +95,10 @@ export class ProjectStore {
     if (staffIndex !== undefined) {
       chord.staffIndex = staffIndex;
     }
+  }
+
+  @action setOctave(staffIndex: StaffIndex, newOctave: number) {
+    this.staffList[staffIndex].octave = newOctave;
   }
 
   @action updateNoteChord(id: NoteId, newChord: ChordId) {

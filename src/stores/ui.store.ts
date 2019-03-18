@@ -5,7 +5,8 @@ import { StaffIndex } from '../types/StaffTypes';
 
 export enum MouseMode {
   INSERT,
-  DRAG
+  DRAG,
+  OCTAVE_SELECT
 }
 
 export class UiStore {

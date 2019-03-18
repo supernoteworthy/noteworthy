@@ -324,6 +324,37 @@ class Audio {
     }, timeLength * 1000);
   }
 
+  playSampleNote(midi: number) {
+    const timeLength = 0.5;
+
+    const source = this.audioContext.createBufferSource();
+    const closestLibrarySample = this.closestLibrarySample(midi);
+    source.buffer = this.bufferMap[closestLibrarySample];
+    source.playbackRate.value = this.midiToPlaybackRate(
+      midi,
+      audioLibrary[closestLibrarySample].midiBaseNote
+    );
+    source.start();
+
+    const gain = this.audioContext.createGain();
+    gain.gain.setValueAtTime(
+      1,
+      this.audioContext.currentTime + timeLength * 0.7
+    );
+    gain.gain.exponentialRampToValueAtTime(
+      EPSILON,
+      this.audioContext.currentTime + timeLength
+    );
+
+    source.connect(gain);
+    gain.connect(this.audioContext.destination);
+    setTimeout(() => {
+      source.stop();
+      source.disconnect();
+      gain.disconnect();
+    }, timeLength * 1000);
+  }
+
   playNoteList(list: NoteSpec[]) {
     let currentIndex = 0;
     const sorted = list.slice();

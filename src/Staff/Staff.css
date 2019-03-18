@@ -4,10 +4,6 @@
   pointer-events: none;
 }
 
-.StaffLine--active {
-  stroke: rgb(180, 145, 173);
-}
-
 .ChordGuideline {
   stroke: #ddd;
   pointer-events: none;

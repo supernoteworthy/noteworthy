@@ -1,0 +1,5 @@
+.OctaveSelector {
+  user-select: none;
+  fill: #ddd;
+  cursor: pointer;
+}
