@@ -1,7 +1,6 @@
 import { computed, observable } from 'mobx';
 import { ChordSpec } from '../types/ChordTypes';
-import { NoteSpec } from '../types/NoteTypes';
-import { StaffIndex } from '../types/StaffTypes';
+import { ElementId, StaffElement, StaffIndex } from '../types/StaffTypes';
 
 export enum MouseMode {
   INSERT,
@@ -11,11 +10,11 @@ export enum MouseMode {
 
 export class UiStore {
   @observable mouseMode = MouseMode.INSERT;
-  @observable cursorSpec?: NoteSpec;
+  @observable cursorSpec?: StaffElement;
   @observable sheetWidth: number = 0;
 
   /* Drag mode */
-  @observable dragNoteId?: string;
+  @observable dragElementId?: ElementId;
   @observable dragStartX?: number;
   @observable dragStartY?: number;
   @observable dragStartStaffIndex?: StaffIndex;

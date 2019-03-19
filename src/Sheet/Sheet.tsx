@@ -1,7 +1,7 @@
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { SHEET_MARGIN_TOP, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
-import CursorNote from '../CursorNote/CursorNote';
+import CursorElement from '../CursorElement/CursorElement';
 import Staff from '../Staff/Staff';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
@@ -78,7 +78,7 @@ class Sheet extends Component<SheetProps> {
         <svg width="100%" height={totalSVGHeight}>
           <g transform={`translate(0, ${SHEET_MARGIN_TOP})`}>
             {uiStore.mouseMode === MouseMode.INSERT && (
-              <CursorNote
+              <CursorElement
                 snapToStaff
                 currentSheetScroll={currentScroll}
                 getSheetBoundingX={this.getBoundingX}

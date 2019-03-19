@@ -1,6 +1,7 @@
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import uuid from 'uuid/v4';
+import Accidental from '../Accidental/Accidental';
 import Audio from '../Audio/Audio';
 import {
   CURSOR_COLOR,
@@ -12,26 +13,27 @@ import {
   STAFF_MARGIN
 } from '../constants';
 import RenderNote from '../RenderNote/RenderNote';
+import RepeatStartRender from '../Repeat/RepeatStartRender';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { ChordSpec } from '../types/ChordTypes';
 import { NoteOrientation, NoteType } from '../types/NoteTypes';
-import { StaffIndex } from '../types/StaffTypes';
+import { ElementId, StaffIndex } from '../types/StaffTypes';
 
-interface CursorNoteProps {
+interface CursorElementProps {
   snapToStaff: boolean;
   currentSheetScroll: number;
   getSheetBoundingX: () => number | undefined;
 }
 
-interface InjectedProps extends CursorNoteProps {
+interface InjectedProps extends CursorElementProps {
   projectStore: ProjectStore;
   uiStore: UiStore;
 }
 
 @inject('projectStore', 'uiStore')
 @observer
-export default class CursorNote extends Component<CursorNoteProps> {
+export default class CursorElement extends Component<CursorElementProps> {
   state = {
     justMounted: true
   };
@@ -61,41 +63,54 @@ export default class CursorNote extends Component<CursorNoteProps> {
 
     if (!cursorSpec) {
       throw new Error(
-        'Attempted to create cursor note with no spec available.'
+        'Attempted to create cursor element with no spec available.'
       );
     }
-    const newNoteId = uuid();
+    const newElementId = uuid() as ElementId;
 
     const { projectStore } = this.injected;
     const { x, y, staffIndex } = this.clientPositionToSvgPosition()!;
     const adjacentChord = projectStore.findAdjacentChord(x, staffIndex);
     const staffY = this.svgYToStaffY(y, staffIndex);
 
-    let newChord: ChordSpec | undefined;
-    if (!adjacentChord) {
-      newChord = {
-        id: uuid(),
-        staffIndex,
-        x
-      };
+    if (cursorSpec.kind === 'note') {
+      let newChord: ChordSpec | undefined;
+      if (!adjacentChord) {
+        newChord = {
+          id: uuid(),
+          staffIndex,
+          x
+        };
+      }
+
+      const chordId = adjacentChord ? adjacentChord.id : newChord!.id;
+
+      projectStore.addElement(
+        {
+          ...cursorSpec,
+          id: newElementId,
+          y: staffY,
+          chordId: chordId
+        },
+        newChord
+      );
+
+      Audio.playChord(chordId);
+    } else if (cursorSpec.kind === 'accidental') {
+      projectStore.addElement({
+        ...cursorSpec,
+        id: newElementId,
+        y: staffY
+      });
+    } else if (cursorSpec.kind === 'repeat') {
+      projectStore.addElement({
+        ...cursorSpec,
+        id: newElementId
+      });
     }
 
-    const chordId = adjacentChord ? adjacentChord.id : newChord!.id;
-
-    projectStore.addNote(
-      {
-        ...cursorSpec,
-        id: newNoteId,
-        y: staffY,
-        chordId: chordId
-      },
-      newChord
-    );
-
-    Audio.playChord(chordId);
-
     uiStore.mouseMode = MouseMode.DRAG;
-    uiStore.dragNoteId = newNoteId;
+    uiStore.dragElementId = newElementId;
     uiStore.dragStartClientX = e.clientX;
     uiStore.dragStartClientY = e.clientY;
     uiStore.dragStartStaffIndex = staffIndex;
@@ -128,7 +143,7 @@ export default class CursorNote extends Component<CursorNoteProps> {
       (y - SHEET_MARGIN_TOP - STAFF_MARGIN / 2) / bucketSize
     );
 
-    if (cursorSpec.type === NoteType.REST) {
+    if (cursorSpec.kind === 'note' && cursorSpec.type === NoteType.REST) {
       // Rests are fixed to the top of the staff.
       y = staffIndex * (STAFF_HEIGHT + STAFF_MARGIN) + SHEET_MARGIN_TOP;
     }
@@ -160,17 +175,24 @@ export default class CursorNote extends Component<CursorNoteProps> {
     if (x < 0) {
       return <g />;
     }
-    return (
-      <RenderNote
-        length={cursorSpec.length}
-        type={cursorSpec.type}
-        x={x}
-        y={y}
-        color={CURSOR_COLOR}
-        cssClass="CursorNote"
-        orientation={orientation}
-        onMainMouseDown={this.onMouseDown}
-      />
-    );
+    switch (cursorSpec.kind) {
+      case 'note':
+        return (
+          <RenderNote
+            length={cursorSpec.length}
+            type={cursorSpec.type}
+            x={x}
+            y={y}
+            color={CURSOR_COLOR}
+            cssClass="CursorNote"
+            orientation={orientation}
+            onMainMouseDown={this.onMouseDown}
+          />
+        );
+      case 'accidental':
+        return <Accidental x={x} y={y} type={cursorSpec.type} color="#ddd" />;
+      case 'repeat':
+        return <RepeatStartRender x={x} />;
+    }
   }
 }

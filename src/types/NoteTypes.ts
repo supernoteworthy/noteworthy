@@ -1,6 +1,7 @@
 import { ChordId } from './ChordTypes';
+import { ElementId } from './StaffTypes';
 
-export type NoteId = string;
+export type NoteId = ElementId;
 
 export enum NoteLength {
   SIXTEENTH,
@@ -22,10 +23,15 @@ export enum NoteOrientation {
 }
 
 export interface NoteSpec {
+  kind: 'note';
   id: NoteId;
   type: NoteType;
   length: NoteLength;
   chordId?: ChordId;
   y: number;
   isPlaying: boolean;
+}
+
+export interface PaletteNoteSpec extends NoteSpec {
+  tooltip: string;
 }

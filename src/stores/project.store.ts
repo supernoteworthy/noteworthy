@@ -4,7 +4,12 @@ import { CHORD_GUIDELINE_WIDTH } from '../constants';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
-import { StaffIndex, StaffSpec } from '../types/StaffTypes';
+import {
+  ElementId,
+  StaffElement,
+  StaffIndex,
+  StaffSpec
+} from '../types/StaffTypes';
 
 export class ProjectStore {
   @observable staffList: StaffSpec[] = [
@@ -17,12 +22,12 @@ export class ProjectStore {
     { index: 6, octave: 4 },
     { index: 7, octave: 4 }
   ];
-  @observable noteList: NoteSpec[] = [];
+  @observable elementList: StaffElement[] = [];
   @observable chordList: ChordSpec[] = [];
 
   @action
-  addNote(newNote: NoteSpec, chord?: ChordSpec) {
-    this.noteList.push(newNote);
+  addElement(newElement: StaffElement, chord?: ChordSpec) {
+    this.elementList.push(newElement);
     if (chord) {
       this.chordList.push(chord);
     }
@@ -40,19 +45,23 @@ export class ProjectStore {
     );
   }
 
-  @computed get getNotesForStaff() {
+  @computed get getElementsForStaff() {
     return createTransformer(staffIndex =>
-      this.noteList.filter(note => {
-        const chord = this.getChordById(note.chordId);
-        if (chord) {
-          return chord.staffIndex === staffIndex;
+      this.elementList.filter(el => {
+        if (el.kind === 'note') {
+          const chord = this.getChordById(el.chordId);
+          if (chord) {
+            return chord.staffIndex === staffIndex;
+          }
+        } else {
+          return el.staffIndex === staffIndex;
         }
       })
     );
   }
 
   getOctaveForNote(noteId: NoteId) {
-    const { chordId } = this.getNoteById(noteId)!;
+    const { chordId } = this.getElementById(noteId)! as NoteSpec;
     const { staffIndex } = this.getChordById(chordId)!;
     const staff = this.staffList[staffIndex];
     return staff.octave;
@@ -62,38 +71,48 @@ export class ProjectStore {
     return this.chordList.filter(chord => chord.staffIndex === staffIndex);
   }
 
-  @computed get getNoteById() {
-    return createTransformer(noteId =>
-      this.noteList.find(note => note.id === noteId)
+  @computed get getElementById() {
+    return createTransformer(elementId =>
+      this.elementList.find(element => element.id === elementId)
     );
   }
 
   getNotesForChord(id: ChordId) {
-    return this.noteList.filter(note => note.chordId === id);
+    return this.elementList.filter(
+      note => note.kind === 'note' && note.chordId === id
+    ) as NoteSpec[];
   }
 
   getChordById(id?: ChordId) {
     return this.chordList.find(chord => chord.id === id);
   }
 
-  @action setNotePosition(
-    id: NoteId,
+  @action setElementPosition(
+    id: ElementId,
     x: number,
     y: number,
     staffIndex?: StaffIndex
   ) {
-    const note = this.getNoteById(id);
-    if (!note) {
-      throw new Error(`Could not find note ${id} in setNotePosition.`);
+    const el = this.getElementById(id);
+    if (!el) {
+      throw new Error(`Could not find element ${id} in setNotePosition.`);
     }
-    const chord = this.getChordById(note.chordId)!;
-    chord.x = x;
-    const dy = y - note.y;
-    for (let chordNote of this.getNotesForChord(note.chordId!)) {
-      chordNote.y += dy;
-    }
-    if (staffIndex !== undefined) {
-      chord.staffIndex = staffIndex;
+    const dy = y - el.y;
+    if (el.kind === 'note') {
+      const chord = this.getChordById(el.chordId)!;
+      chord.x = x;
+      if (staffIndex !== undefined) {
+        chord.staffIndex = staffIndex;
+      }
+      for (let chordNote of this.getNotesForChord(el.chordId!)) {
+        chordNote.y += dy;
+      }
+    } else {
+      el.x = x;
+      el.y = y;
+      if (staffIndex !== undefined) {
+        el.staffIndex = staffIndex;
+      }
     }
   }
 
@@ -102,36 +121,41 @@ export class ProjectStore {
   }
 
   @action updateNoteChord(id: NoteId, newChord: ChordId) {
-    const note = this.getNoteById(id)!;
-    if (newChord && note.chordId) {
-      note.chordId = newChord;
+    const spec = this.getElementById(id)!;
+    if (spec.kind === 'note' && newChord && spec.chordId) {
+      spec.chordId = newChord;
     }
     this.dropEmptyChords();
   }
 
   dropEmptyChords() {
     this.chordList = this.chordList.filter(chord =>
-      this.noteList.find(note => note.chordId === chord.id)
+      this.elementList.find(el => el.kind === 'note' && el.chordId === chord.id)
     );
   }
 
-  @action deleteChord(id: ChordId) {
-    const notes = this.getNotesForChord(id);
-    notes.forEach(note => this.deleteNote(note.id));
-    this.dropEmptyChords();
+  @action deleteElement(id: ElementId) {
+    const spec = this.getElementById(id);
+    if (spec && spec.kind === 'note') {
+      const notes = this.getNotesForChord(id);
+      notes.forEach(note => this.spliceElement(note.id));
+      this.dropEmptyChords();
+    } else {
+      this.spliceElement(id);
+    }
   }
 
-  @action deleteNote(id: NoteId) {
-    const note = this.getNoteById(id);
+  @action spliceElement(id: ElementId) {
+    const note = this.getElementById(id);
     if (!note) {
-      throw new Error(`Could not find note ${id} in deleteNote.`);
+      throw new Error(`Could not find element ${id} in deleteElement.`);
     }
-    this.noteList.splice(this.noteList.indexOf(note), 1);
+    this.elementList.splice(this.elementList.indexOf(note), 1);
   }
 
   @action setNotePlaying(id: NoteId, isPlaying: boolean) {
-    const note = this.getNoteById(id);
-    if (!note) {
+    const note = this.getElementById(id);
+    if (!note || note.kind !== 'note') {
       return;
     }
     note.isPlaying = isPlaying;

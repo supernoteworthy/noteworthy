@@ -9,11 +9,11 @@ import {
   STAFF_HEIGHT,
   STAFF_MARGIN
 } from '../constants';
-import DraggableNote from '../DraggableNote/DraggableNote';
+import DraggableElement from '../DraggableElement/DraggableElement';
 import OctaveSelector from '../OctaveSelector/OctaveSelector';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
-import { NoteType } from '../types/NoteTypes';
+import { NoteSpec, NoteType } from '../types/NoteTypes';
 import { StaffSpec } from '../types/StaffTypes';
 import './Staff.css';
 
@@ -36,8 +36,10 @@ class Staff extends Component<StaffProps> {
   get notes() {
     const { index } = this.props.spec;
     const { projectStore } = this.injected;
-    const notes = projectStore.getNotesForStaff(index);
-    return notes!;
+    const notes = projectStore
+      .getElementsForStaff(index)
+      .filter(note => note.kind === 'note') as NoteSpec[];
+    return notes;
   }
 
   renderLedgerLines() {
@@ -51,6 +53,7 @@ class Staff extends Component<StaffProps> {
       uiStore.mouseMode === MouseMode.INSERT &&
       uiStore.insertStaffId === index &&
       uiStore.cursorSpec &&
+      uiStore.cursorSpec.kind === 'note' &&
       uiStore.cursorSpec.type !== NoteType.REST
     ) {
       if (uiStore.insertStaffY < 0) {
@@ -120,16 +123,14 @@ class Staff extends Component<StaffProps> {
     return ledgerLines;
   }
 
-  renderNotes() {
+  renderElements() {
     const { index } = this.props.spec;
     const { projectStore } = this.injected;
-    const notes = projectStore.getNotesForStaff(index);
-    return notes.map(note => (
-      <DraggableNote
-        key={`note_${note.id}`}
-        id={note.id}
-        type={note.type}
-        length={note.length}
+    const elements = projectStore.getElementsForStaff(index);
+    return elements.map(element => (
+      <DraggableElement
+        key={`element_${element.id}`}
+        id={element.id}
         snapToStaff
       />
     ));
@@ -222,7 +223,7 @@ class Staff extends Component<StaffProps> {
           hasClef={clef !== undefined}
           staffIndex={index}
         />
-        {this.renderNotes()}
+        {this.renderElements()}
       </g>
     );
   }

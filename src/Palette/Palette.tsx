@@ -53,7 +53,7 @@ export default class Palette extends Component<PaletteProps> {
               type={note.type}
               isSelected={selectedNote === note.id}
               orientation={NoteOrientation.UP}
-              x={note.x}
+              x={0}
               y={note.y}
               onMouseDown={() => {
                 this.setState({ selectedNote: note.id });

@@ -1,34 +1,29 @@
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
+import Accidental from '../Accidental/Accidental';
 import Audio from '../Audio/Audio';
 import { LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
 import RenderNote from '../RenderNote/RenderNote';
+import RepeatStartRender from '../Repeat/RepeatStartRender';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
-import {
-  NoteId,
-  NoteLength,
-  NoteOrientation,
-  NoteType
-} from '../types/NoteTypes';
-import './DraggableNote.css';
+import { NoteOrientation, NoteType } from '../types/NoteTypes';
+import { ElementId } from '../types/StaffTypes';
+import './DraggableElement.css';
 
-interface DraggableNoteProps {
-  id: NoteId;
-  length: NoteLength;
-  type: NoteType;
-  orientation?: NoteOrientation;
+interface DraggableElementProps {
+  id: ElementId;
   snapToStaff: boolean;
 }
 
-interface InjectedProps extends DraggableNoteProps {
+interface InjectedProps extends DraggableElementProps {
   projectStore: ProjectStore;
   uiStore: UiStore;
 }
 
 @inject('projectStore', 'uiStore')
 @observer
-export default class DraggableNote extends Component<DraggableNoteProps> {
+export default class DraggableElement extends Component<DraggableElementProps> {
   state = {
     justPlaced: false
   };
@@ -37,30 +32,48 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
     return this.props as InjectedProps;
   }
 
-  get noteSpec() {
+  get spec() {
     const { id } = this.props;
     const { projectStore } = this.injected;
-    const noteSpecInStore = projectStore.getNoteById(id);
-    if (noteSpecInStore === undefined) {
-      throw new Error(`NoteSpec for note ${id} not found in project store.`);
+    const specInStore = projectStore.getElementById(id);
+    if (specInStore === undefined) {
+      throw new Error(`Spec for element ${id} not found in project store.`);
     }
-    return noteSpecInStore;
+    return specInStore;
   }
 
   get x() {
     const { projectStore } = this.injected;
-    return projectStore.getChordById(this.noteSpec.chordId)!.x;
+    const spec = this.spec;
+    if (spec.kind === 'note') {
+      const chord = projectStore.getChordById(spec.chordId);
+      if (!chord) {
+        throw new Error(`Note ${this.props.id} exists outside chord.`);
+      }
+      return chord.x;
+    } else {
+      return spec.x;
+    }
   }
 
   get staffIndex() {
     const { projectStore } = this.injected;
-    return projectStore.getChordById(this.noteSpec.chordId)!.staffIndex;
+    const spec = this.spec;
+    if (spec.kind === 'note') {
+      const chord = projectStore.getChordById(spec.chordId);
+      if (!chord) {
+        throw new Error(`Note ${this.props.id} exists outside chord.`);
+      }
+      return chord.staffIndex;
+    } else {
+      return spec.x;
+    }
   }
 
   componentDidMount() {
-    // Catch drag events when this note was just created.
+    // Catch drag events when this element was just created.
     const { uiStore } = this.injected;
-    if (uiStore.dragNoteId === this.noteSpec.id) {
+    if (uiStore.dragElementId === this.spec.id) {
       document.addEventListener('mouseup', this.onMouseUp);
       document.addEventListener('mousemove', this.onMouseMove);
       this.setState({ justPlaced: true });
@@ -75,9 +88,9 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
   onMouseDown = (e: React.MouseEvent<SVGRectElement>) => {
     const { uiStore } = this.injected;
     uiStore.mouseMode = MouseMode.DRAG;
-    uiStore.dragNoteId = this.noteSpec.id;
+    uiStore.dragElementId = this.spec.id;
     uiStore.dragStartX = this.x;
-    uiStore.dragStartY = this.noteSpec.y;
+    uiStore.dragStartY = this.spec.y;
     uiStore.dragStartStaffIndex = this.staffIndex;
     uiStore.dragStartClientX = e.clientX;
     uiStore.dragStartClientY = e.clientY;
@@ -88,7 +101,7 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
   onMouseMove = (e: MouseEvent) => {
     const { id } = this.props;
     const { projectStore, uiStore } = this.injected;
-    const startingY = this.noteSpec.y;
+    const startingY = this.spec.y;
     const {
       dragStartX,
       dragStartY,
@@ -101,50 +114,51 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
     );
     const staffIndexAndY = this.getNewStaffIndexAndY(y);
     const positionChanged = staffIndexAndY.y !== startingY;
-    projectStore.setNotePosition(
+    projectStore.setElementPosition(
       id,
       x,
       staffIndexAndY.y,
       staffIndexAndY.staffIndex
     );
-    uiStore.activeChord = projectStore.findAdjacentChord(
-      x,
-      staffIndexAndY.staffIndex,
-      this.noteSpec.chordId
-    );
-    uiStore.dragActiveStaffIndex = staffIndexAndY.staffIndex;
-
-    if (positionChanged) {
-      Audio.playChord(this.noteSpec.chordId!);
+    if (this.spec.kind === 'note') {
+      uiStore.activeChord = projectStore.findAdjacentChord(
+        x,
+        staffIndexAndY.staffIndex,
+        this.spec.chordId
+      );
+      if (positionChanged) {
+        Audio.playChord(this.spec.chordId!);
+      }
     }
+    uiStore.dragActiveStaffIndex = staffIndexAndY.staffIndex;
   };
 
   onMouseUp = () => {
     const { uiStore, projectStore } = this.injected;
     uiStore.mouseMode = MouseMode.INSERT;
 
-    const noteDeleted = this.x < 0;
+    const deleted = this.x < 0;
 
-    const noteTapped =
+    const tapped =
       uiStore.dragStartX === this.x &&
-      uiStore.dragStartY === this.noteSpec.y &&
+      uiStore.dragStartY === this.spec.y &&
       uiStore.dragStartStaffIndex === this.staffIndex &&
       !this.state.justPlaced;
 
     this.setState({ justPlaced: false });
 
-    if (noteDeleted) {
+    if (deleted) {
       Audio.playEffect('delete');
-      projectStore.deleteChord(this.noteSpec.chordId!);
-    } else if (noteTapped) {
-      Audio.playChord(this.noteSpec.chordId!);
+      projectStore.deleteElement(this.spec.id);
+    } else if (tapped && this.spec.kind === 'note') {
+      Audio.playChord(this.spec.chordId!);
     }
 
-    if (uiStore.activeChord) {
-      projectStore.updateNoteChord(this.noteSpec.id, uiStore.activeChord.id);
+    if (this.spec.kind === 'note' && uiStore.activeChord) {
+      projectStore.updateNoteChord(this.spec.id, uiStore.activeChord.id);
     }
 
-    uiStore.dragNoteId = undefined;
+    uiStore.dragElementId = undefined;
     uiStore.dragStartX = undefined;
     uiStore.dragStartY = undefined;
     uiStore.dragStartStaffIndex = undefined;
@@ -157,11 +171,11 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
   };
 
   getXYSnappedToStaff(x: number, y: number) {
-    const { type, snapToStaff } = this.props;
+    const { snapToStaff } = this.props;
     if (!snapToStaff) {
       return { x, y };
     }
-    if (type === NoteType.REST) {
+    if (this.spec.kind === 'note' && this.spec.type === NoteType.REST) {
       return {
         x,
         y: 0
@@ -188,34 +202,43 @@ export default class DraggableNote extends Component<DraggableNoteProps> {
   }
 
   get orientation() {
-    const { y } = this.noteSpec;
+    const { y } = this.spec;
     return y >= STAFF_HEIGHT / 2 ? NoteOrientation.UP : NoteOrientation.DOWN;
   }
 
   render() {
     const { uiStore } = this.injected;
-    const { type, length } = this.props;
-    const { y, id, isPlaying } = this.noteSpec;
-    const dragging = uiStore.dragNoteId === id;
-    return (
-      <RenderNote
-        cssClass="DraggableNote"
-        length={length}
-        type={type}
-        color={isPlaying ? '#900' : '#000'}
-        x={this.x}
-        y={y}
-        orientation={this.orientation}
-        isSelected={dragging}
-        onMainMouseDown={this.onMouseDown}
-        onMainMouseEnter={() => {
-          uiStore.mouseMode = MouseMode.DRAG;
-          uiStore.dragActiveStaffIndex = this.staffIndex;
-        }}
-        onMainMouseLeave={() =>
-          !dragging && (uiStore.mouseMode = MouseMode.INSERT)
-        }
-      />
-    );
+    const spec = this.spec;
+    const { id } = spec;
+    const dragging = uiStore.dragElementId === id;
+    switch (spec.kind) {
+      case 'note':
+        return (
+          <RenderNote
+            cssClass="DraggableNote"
+            length={length}
+            type={spec.type}
+            color={spec.isPlaying ? '#900' : '#000'}
+            x={this.x}
+            y={spec.y}
+            orientation={this.orientation}
+            isSelected={dragging}
+            onMainMouseDown={this.onMouseDown}
+            onMainMouseEnter={() => {
+              uiStore.mouseMode = MouseMode.DRAG;
+              uiStore.dragActiveStaffIndex = this.staffIndex;
+            }}
+            onMainMouseLeave={() =>
+              !dragging && (uiStore.mouseMode = MouseMode.INSERT)
+            }
+          />
+        );
+      case 'accidental':
+        return (
+          <Accidental type={spec.type} x={spec.x} y={spec.y} color="#000" />
+        );
+      case 'repeat':
+        return <RepeatStartRender x={spec.x} />;
+    }
   }
 }
