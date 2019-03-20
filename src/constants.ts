@@ -10,3 +10,5 @@ export const CURSOR_COLOR = '#ddd';
 
 export const CHORD_GUIDELINE_WIDTH = 25;
 export const CHORD_GUIDELINE_OFFSET = 10;
+
+export const KEY_SIGNATURE_GUIDELINE_X = 175;

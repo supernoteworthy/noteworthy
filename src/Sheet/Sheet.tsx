@@ -1,6 +1,11 @@
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { SHEET_MARGIN_TOP, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
+import {
+  KEY_SIGNATURE_GUIDELINE_X,
+  SHEET_MARGIN_TOP,
+  STAFF_HEIGHT,
+  STAFF_MARGIN
+} from '../constants';
 import CursorElement from '../CursorElement/CursorElement';
 import Staff from '../Staff/Staff';
 import { ProjectStore } from '../stores/project.store';
@@ -36,7 +41,7 @@ class Sheet extends Component<SheetProps> {
     }
   }
 
-  onScroll = (e: UIEvent) => {
+  onScroll = () => {
     const { uiStore } = this.injected;
     const divRef = this.divRef.current;
     if (divRef) {
@@ -61,6 +66,25 @@ class Sheet extends Component<SheetProps> {
     }
   };
 
+  shouldDrawKeySignatureGuideline() {
+    const { uiStore, projectStore } = this.injected;
+    if (uiStore.mouseMode === MouseMode.DRAG) {
+      const dragElementId = uiStore.dragElementId;
+      if (!dragElementId) return false;
+      const dragSpec = projectStore.getElementById(dragElementId);
+      if (dragSpec && dragSpec.kind === 'accidental') {
+        return true;
+      }
+    }
+    if (uiStore.mouseMode === MouseMode.INSERT) {
+      const cursorSpec = uiStore.cursorSpec;
+      if (cursorSpec && cursorSpec.kind === 'accidental') {
+        return true;
+      }
+    }
+    return false;
+  }
+
   render() {
     const { projectStore, uiStore } = this.injected;
     const { staffList } = projectStore;
@@ -71,6 +95,15 @@ class Sheet extends Component<SheetProps> {
     return (
       <div className="Sheet" ref={this.divRef}>
         <svg width="100%" height={totalSVGHeight}>
+          {this.shouldDrawKeySignatureGuideline() && (
+            <line
+              x1={KEY_SIGNATURE_GUIDELINE_X}
+              x2={KEY_SIGNATURE_GUIDELINE_X}
+              y1={0}
+              y2={totalSVGHeight}
+              stroke="#ddd"
+            />
+          )}
           <g transform={`translate(0, ${SHEET_MARGIN_TOP})`}>
             {uiStore.mouseMode === MouseMode.INSERT && (
               <CursorElement
