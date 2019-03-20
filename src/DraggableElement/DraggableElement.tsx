@@ -244,7 +244,21 @@ export default class DraggableElement extends Component<DraggableElementProps> {
         );
       case 'accidental':
         return (
-          <Accidental type={spec.type} x={spec.x} y={spec.y} color="#000" />
+          <Accidental
+            type={spec.type}
+            x={spec.x}
+            y={spec.y}
+            color="#000"
+            onMainMouseDown={this.onMouseDown}
+            isSelected={dragging}
+            onMainMouseEnter={() => {
+              uiStore.mouseMode = MouseMode.DRAG;
+              uiStore.dragActiveStaffIndex = this.staffIndex;
+            }}
+            onMainMouseLeave={() =>
+              !dragging && (uiStore.mouseMode = MouseMode.INSERT)
+            }
+          />
         );
       case 'repeat':
         return (

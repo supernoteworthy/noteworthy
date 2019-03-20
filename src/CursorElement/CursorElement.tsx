@@ -111,7 +111,9 @@ export default class CursorElement extends Component<CursorElementProps> {
       projectStore.addElement({
         ...cursorSpec,
         id: newElementId,
-        y: staffY
+        x,
+        y: staffY,
+        staffIndex
       });
     } else if (cursorSpec.kind === 'repeat') {
       projectStore.addElement({

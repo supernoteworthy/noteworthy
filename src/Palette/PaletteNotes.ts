@@ -142,8 +142,8 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
   {
     kind: 'accidental',
     id: 'SHARP',
-    x: 10,
-    y: 960,
+    x: 5,
+    y: 985,
     type: AccidentalType.SHARP,
     tooltip: 'Sharp'
   },
@@ -151,7 +151,7 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     kind: 'accidental',
     id: 'FLAT',
     x: 10,
-    y: 1040,
+    y: 1060,
     type: AccidentalType.FLAT,
     tooltip: 'Flat'
   },
@@ -159,7 +159,7 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     kind: 'accidental',
     id: 'NATURAL',
     x: 10,
-    y: 1080,
+    y: 1120,
     type: AccidentalType.NATURAL,
     tooltip: 'Natural'
   }
