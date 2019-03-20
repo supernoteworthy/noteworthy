@@ -1,3 +1,19 @@
 .App {
-    display: flex;
+  display: flex;
+}
+
+.App--dragging {
+  cursor: grabbing;
+}
+
+.App--drag {
+  cursor: grab;
+}
+
+.App--select {
+  cursor: pointer;
+}
+
+.App--insert {
+  cursor: default;
 }

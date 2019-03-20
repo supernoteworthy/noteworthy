@@ -4,6 +4,7 @@
   overflow: auto;
   overflow-x: hidden;
 }
+
 .Palette > svg {
   width: 100px;
   height: 1200px;
@@ -12,14 +13,10 @@
   transform: scale(0.8);
 }
 
-.PaletteNote {
-  cursor: pointer;
-}
-
-.PaletteNote .MainBox {
-  cursor: pointer !important;
-}
-
 .PaletteTooltip {
   font-family: Avenir, Helvetica, Arial, sans-serif;
+}
+
+.PaletteItem {
+  cursor: pointer;
 }
