@@ -249,7 +249,6 @@ class Audio {
         bestSampleKey = sampleKey;
       }
     }
-    console.log(bestSampleKey);
     if (!bestSampleKey) {
       return Object.keys(audioLibrary)[0];
     }

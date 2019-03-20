@@ -13,7 +13,7 @@ import {
   STAFF_MARGIN
 } from '../constants';
 import RenderNote from '../RenderNote/RenderNote';
-import RepeatStartRender from '../Repeat/RepeatStartRender';
+import Repeat from '../Repeat/Repeat';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { ChordSpec } from '../types/ChordTypes';
@@ -22,7 +22,6 @@ import { ElementId, StaffIndex } from '../types/StaffTypes';
 
 interface CursorElementProps {
   snapToStaff: boolean;
-  currentSheetScroll: number;
   getSheetBoundingX: () => number | undefined;
 }
 
@@ -42,14 +41,17 @@ export default class CursorElement extends Component<CursorElementProps> {
   }
   componentDidMount() {
     document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mousedown', this.onMouseDown);
   }
   componentWillUnmount() {
     document.removeEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mousedown', this.onMouseDown);
   }
   onMouseMove = (e: MouseEvent) => {
     const { uiStore, projectStore } = this.injected;
     uiStore.insertX = e.clientX;
     uiStore.insertY = e.clientY;
+
     const { x, yOnStaff, staffIndex } = this.clientPositionToSvgPosition()!;
     uiStore.activeChord = projectStore.findAdjacentChord(x, staffIndex);
     uiStore.insertStaffId = staffIndex;
@@ -57,21 +59,30 @@ export default class CursorElement extends Component<CursorElementProps> {
     uiStore.insertStaffY = yOnStaff;
     this.setState({ justMounted: false });
   };
-  onMouseDown = (e: React.MouseEvent) => {
+  onMouseDown = (e: MouseEvent) => {
     const { uiStore } = this.injected;
     const { cursorSpec } = uiStore;
 
-    if (!cursorSpec) {
-      throw new Error(
-        'Attempted to create cursor element with no spec available.'
-      );
+    if (!cursorSpec || uiStore.mouseMode !== MouseMode.INSERT) {
+      return;
     }
     const newElementId = uuid() as ElementId;
 
     const { projectStore } = this.injected;
     const { x, y, staffIndex } = this.clientPositionToSvgPosition()!;
+    if (x < 0) {
+      return;
+    }
     const adjacentChord = projectStore.findAdjacentChord(x, staffIndex);
     const staffY = this.svgYToStaffY(y, staffIndex);
+
+    uiStore.mouseMode = MouseMode.DRAG;
+    uiStore.dragElementId = newElementId;
+    uiStore.dragStartClientX = e.clientX;
+    uiStore.dragStartClientY = e.clientY;
+    uiStore.dragStartStaffIndex = staffIndex;
+    uiStore.dragStartX = x;
+    uiStore.dragStartY = staffY;
 
     if (cursorSpec.kind === 'note') {
       let newChord: ChordSpec | undefined;
@@ -105,17 +116,12 @@ export default class CursorElement extends Component<CursorElementProps> {
     } else if (cursorSpec.kind === 'repeat') {
       projectStore.addElement({
         ...cursorSpec,
-        id: newElementId
+        id: newElementId,
+        x,
+        y: 0,
+        staffIndex
       });
     }
-
-    uiStore.mouseMode = MouseMode.DRAG;
-    uiStore.dragElementId = newElementId;
-    uiStore.dragStartClientX = e.clientX;
-    uiStore.dragStartClientY = e.clientY;
-    uiStore.dragStartStaffIndex = staffIndex;
-    uiStore.dragStartX = x;
-    uiStore.dragStartY = staffY;
   };
 
   svgYToStaffY(svgY: number, staffIndex: StaffIndex) {
@@ -125,14 +131,13 @@ export default class CursorElement extends Component<CursorElementProps> {
   clientPositionToSvgPosition() {
     const { uiStore } = this.injected;
     const { cursorSpec, insertX, insertY } = uiStore;
-    const { snapToStaff, currentSheetScroll, getSheetBoundingX } = this.props;
-
+    const { snapToStaff, getSheetBoundingX } = this.props;
     if (!cursorSpec) {
       return;
     }
 
     let x = insertX;
-    let y = insertY + currentSheetScroll;
+    let y = insertY + uiStore.sheetScroll;
 
     if (snapToStaff) {
       y = Math.round(y / (LINE_DY / 2)) * (LINE_DY / 2);
@@ -143,8 +148,11 @@ export default class CursorElement extends Component<CursorElementProps> {
       (y - SHEET_MARGIN_TOP - STAFF_MARGIN / 2) / bucketSize
     );
 
-    if (cursorSpec.kind === 'note' && cursorSpec.type === NoteType.REST) {
-      // Rests are fixed to the top of the staff.
+    if (
+      (cursorSpec.kind === 'note' && cursorSpec.type === NoteType.REST) ||
+      cursorSpec.kind === 'repeat'
+    ) {
+      // Rests and repeats are fixed to the top of the staff.
       y = staffIndex * (STAFF_HEIGHT + STAFF_MARGIN) + SHEET_MARGIN_TOP;
     }
 
@@ -186,13 +194,12 @@ export default class CursorElement extends Component<CursorElementProps> {
             color={CURSOR_COLOR}
             cssClass="CursorNote"
             orientation={orientation}
-            onMainMouseDown={this.onMouseDown}
           />
         );
       case 'accidental':
         return <Accidental x={x} y={y} type={cursorSpec.type} color="#ddd" />;
       case 'repeat':
-        return <RepeatStartRender x={x} />;
+        return <Repeat x={x} y={y} type={cursorSpec.type} color="#ddd" />;
     }
   }
 }

@@ -31,7 +31,3 @@ export interface NoteSpec {
   y: number;
   isPlaying: boolean;
 }
-
-export interface PaletteNoteSpec extends NoteSpec {
-  tooltip: string;
-}

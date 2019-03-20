@@ -6,10 +6,13 @@ interface AccidentalProps {
   x: number;
   y: number;
   color: string;
+  tooltip?: string;
+  onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
+  isSelected?: boolean;
 }
 export default class Accidental extends Component<AccidentalProps> {
   render() {
-    const { x, y, type, color } = this.props;
+    const { x, y, type, color, tooltip } = this.props;
     let renderPath;
     if (type === AccidentalType.FLAT) {
       renderPath =
@@ -22,7 +25,7 @@ export default class Accidental extends Component<AccidentalProps> {
         'M -3.963 0.913 C -3.562 0.713 -3.11 0.562 -2.659 0.562 C -2.207 0.562 -1.806 0.713 -1.404 0.913 L -1.555 10.095 L 3.764 9.091 L 3.914 9.091 C 4.416 9.091 4.818 9.443 4.818 9.944 L 5.168 38.543 C 4.767 38.743 4.366 38.894 3.914 38.894 C 3.463 38.894 3.061 38.743 2.66 38.543 L 2.811 29.361 L -2.508 30.365 L -2.659 30.365 C -3.16 30.365 -3.562 30.013 -3.562 29.512 Z M 3.011 14.109 L -1.604 14.961 L -1.755 25.347 L 2.86 24.494 Z';
     }
     return (
-      <g transform={`translate(${x}, ${y})`}>
+      <g transform={`translate(${x}, ${y})`} data-tip={tooltip}>
         <path d={renderPath} fill={color} />
       </g>
     );

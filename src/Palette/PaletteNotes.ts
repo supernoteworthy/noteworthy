@@ -1,5 +1,19 @@
-import { NoteLength, NoteType, PaletteNoteSpec } from '../types/NoteTypes';
-export const PALETTE_NOTES = [
+import { AccidentalType } from '../types/AccidentalTypes';
+import { NoteLength, NoteType } from '../types/NoteTypes';
+import { RepeatType } from '../types/RepeatTypes';
+import { ElementId } from '../types/StaffTypes';
+
+interface PaletteNoteSpec {
+  kind: string;
+  id: ElementId;
+  type?: NoteType | AccidentalType | RepeatType;
+  length?: NoteLength;
+  x: number;
+  y: number;
+  tooltip: string;
+}
+
+export const PALETTE_NOTES: PaletteNoteSpec[] = [
   {
     kind: 'note',
     id: 'DOUBLE_WHOLE',
@@ -7,9 +21,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.DOUBLEWHOLE,
     x: 0,
     y: 40,
-    isPlaying: false,
     tooltip: 'Double whole (8)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'WHOLE',
@@ -17,9 +30,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.WHOLE,
     x: 3,
     y: 80,
-    isPlaying: false,
     tooltip: 'Whole (4)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'HALF',
@@ -27,9 +39,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.HALF,
     x: 0,
     y: 160,
-    isPlaying: false,
     tooltip: 'Half (2)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'QUARTER',
@@ -37,9 +48,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.QUARTER,
     x: 0,
     y: 230,
-    isPlaying: false,
     tooltip: 'Quarter (1)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'EIGHTH',
@@ -47,9 +57,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.EIGHTH,
     x: 0,
     y: 310,
-    isPlaying: false,
     tooltip: 'Eighth (1/2)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'SIXTEENTH',
@@ -57,9 +66,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.SIXTEENTH,
     x: 0,
     y: 390,
-    isPlaying: false,
     tooltip: 'Sixteenth (1/4)'
-  } as PaletteNoteSpec,
+  },
 
   {
     kind: 'note',
@@ -68,9 +76,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.DOUBLEWHOLE,
     x: 0,
     y: 420,
-    isPlaying: false,
     tooltip: 'Double whole rest (8)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'REST_WHOLE',
@@ -78,9 +85,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.WHOLE,
     x: 0,
     y: 460,
-    isPlaying: false,
     tooltip: 'Whole rest (4)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'REST_HALF',
@@ -88,9 +94,8 @@ export const PALETTE_NOTES = [
     length: NoteLength.HALF,
     x: 0,
     y: 500,
-    isPlaying: false,
     tooltip: 'Half rest (2)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'REST_QUARTER',
@@ -98,27 +103,64 @@ export const PALETTE_NOTES = [
     length: NoteLength.QUARTER,
     x: 0,
     y: 550,
-    isPlaying: false,
     tooltip: 'Quarter rest (1)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'REST_EIGHTH',
     type: NoteType.REST,
     length: NoteLength.EIGHTH,
-    x: 10,
+    x: 5,
     y: 610,
-    isPlaying: false,
     tooltip: 'Eighth rest (1/2)'
-  } as PaletteNoteSpec,
+  },
   {
     kind: 'note',
     id: 'REST_SIXTEENTH',
     type: NoteType.REST,
     length: NoteLength.SIXTEENTH,
-    x: 10,
+    x: 5,
     y: 670,
-    isPlaying: false,
     tooltip: 'Sixteenth rest (1/16)'
-  } as PaletteNoteSpec
+  },
+  {
+    kind: 'repeat',
+    id: 'REPEAT_START',
+    type: RepeatType.START,
+    x: 5,
+    y: 760,
+    tooltip: 'Repeat start'
+  },
+  {
+    kind: 'repeat',
+    id: 'REPEAT_END',
+    type: RepeatType.END,
+    x: 5,
+    y: 860,
+    tooltip: 'Repeat end'
+  },
+  {
+    kind: 'accidental',
+    id: 'SHARP',
+    x: 10,
+    y: 960,
+    type: AccidentalType.SHARP,
+    tooltip: 'Sharp'
+  },
+  {
+    kind: 'accidental',
+    id: 'FLAT',
+    x: 10,
+    y: 1040,
+    type: AccidentalType.FLAT,
+    tooltip: 'Flat'
+  },
+  {
+    kind: 'accidental',
+    id: 'NATURAL',
+    x: 10,
+    y: 1080,
+    type: AccidentalType.NATURAL,
+    tooltip: 'Natural'
+  }
 ];

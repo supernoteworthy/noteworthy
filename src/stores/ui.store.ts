@@ -12,6 +12,7 @@ export class UiStore {
   @observable mouseMode = MouseMode.INSERT;
   @observable cursorSpec?: StaffElement;
   @observable sheetWidth: number = 0;
+  @observable sheetScroll: number = 0;
 
   /* Drag mode */
   @observable dragElementId?: ElementId;

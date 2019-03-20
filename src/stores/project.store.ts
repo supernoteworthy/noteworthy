@@ -137,7 +137,7 @@ export class ProjectStore {
   @action deleteElement(id: ElementId) {
     const spec = this.getElementById(id);
     if (spec && spec.kind === 'note') {
-      const notes = this.getNotesForChord(id);
+      const notes = this.getNotesForChord(spec.chordId!);
       notes.forEach(note => this.spliceElement(note.id));
       this.dropEmptyChords();
     } else {

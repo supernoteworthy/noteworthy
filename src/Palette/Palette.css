@@ -2,10 +2,11 @@
   width: 80px;
   height: 100vh;
   overflow: auto;
+  overflow-x: hidden;
 }
 .Palette > svg {
   width: 100px;
-  height: 750px;
+  height: 1200px;
   margin-left: 25px;
   transform-origin: top left;
   transform: scale(0.8);

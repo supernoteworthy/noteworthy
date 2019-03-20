@@ -18,11 +18,6 @@ interface InjectedProps extends SheetProps {
 @observer
 class Sheet extends Component<SheetProps> {
   private divRef: React.RefObject<HTMLDivElement>;
-
-  state = {
-    currentScroll: 0
-  };
-
   get injected() {
     return this.props as InjectedProps;
   }
@@ -42,9 +37,10 @@ class Sheet extends Component<SheetProps> {
   }
 
   onScroll = (e: UIEvent) => {
+    const { uiStore } = this.injected;
     const divRef = this.divRef.current;
     if (divRef) {
-      this.setState({ currentScroll: divRef.scrollTop });
+      uiStore.sheetScroll = divRef.scrollTop;
     }
   };
 
@@ -67,7 +63,6 @@ class Sheet extends Component<SheetProps> {
 
   render() {
     const { projectStore, uiStore } = this.injected;
-    const { currentScroll } = this.state;
     const { staffList } = projectStore;
     const staffs = staffList.map(staff => (
       <Staff key={`Staff_${staff.index}`} spec={staff} />
@@ -80,7 +75,6 @@ class Sheet extends Component<SheetProps> {
             {uiStore.mouseMode === MouseMode.INSERT && (
               <CursorElement
                 snapToStaff
-                currentSheetScroll={currentScroll}
                 getSheetBoundingX={this.getBoundingX}
               />
             )}

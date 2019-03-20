@@ -14,5 +14,5 @@ export interface AccidentalSpec {
   type: AccidentalType;
   x: number;
   y: number;
-  staffIndex: StaffIndex;
+  staffIndex?: StaffIndex;
 }

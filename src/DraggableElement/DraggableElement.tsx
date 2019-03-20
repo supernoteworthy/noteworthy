@@ -4,7 +4,7 @@ import Accidental from '../Accidental/Accidental';
 import Audio from '../Audio/Audio';
 import { LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
 import RenderNote from '../RenderNote/RenderNote';
-import RepeatStartRender from '../Repeat/RepeatStartRender';
+import Repeat from '../Repeat/Repeat';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { NoteOrientation, NoteType } from '../types/NoteTypes';
@@ -66,7 +66,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
       }
       return chord.staffIndex;
     } else {
-      return spec.x;
+      return spec.staffIndex;
     }
   }
 
@@ -147,16 +147,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
 
     this.setState({ justPlaced: false });
 
-    if (deleted) {
-      Audio.playEffect('delete');
-      projectStore.deleteElement(this.spec.id);
-    } else if (tapped && this.spec.kind === 'note') {
-      Audio.playChord(this.spec.chordId!);
-    }
-
-    if (this.spec.kind === 'note' && uiStore.activeChord) {
-      projectStore.updateNoteChord(this.spec.id, uiStore.activeChord.id);
-    }
+    const activeChord = uiStore.activeChord;
 
     uiStore.dragElementId = undefined;
     uiStore.dragStartX = undefined;
@@ -168,6 +159,18 @@ export default class DraggableElement extends Component<DraggableElementProps> {
 
     document.removeEventListener('mouseup', this.onMouseUp);
     document.removeEventListener('mousemove', this.onMouseMove);
+
+    if (deleted) {
+      Audio.playEffect('delete');
+      projectStore.deleteElement(this.spec.id);
+      return;
+    } else if (tapped && this.spec.kind === 'note') {
+      Audio.playChord(this.spec.chordId!);
+    }
+
+    if (this.spec.kind === 'note' && activeChord) {
+      projectStore.updateNoteChord(this.spec.id, activeChord.id);
+    }
   };
 
   getXYSnappedToStaff(x: number, y: number) {
@@ -175,7 +178,10 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     if (!snapToStaff) {
       return { x, y };
     }
-    if (this.spec.kind === 'note' && this.spec.type === NoteType.REST) {
+    if (
+      (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
+      this.spec.kind === 'repeat'
+    ) {
       return {
         x,
         y: 0
@@ -216,7 +222,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
         return (
           <RenderNote
             cssClass="DraggableNote"
-            length={length}
+            length={spec.length}
             type={spec.type}
             color={spec.isPlaying ? '#900' : '#000'}
             x={this.x}
@@ -238,7 +244,23 @@ export default class DraggableElement extends Component<DraggableElementProps> {
           <Accidental type={spec.type} x={spec.x} y={spec.y} color="#000" />
         );
       case 'repeat':
-        return <RepeatStartRender x={spec.x} />;
+        return (
+          <Repeat
+            x={spec.x}
+            y={spec.y}
+            type={spec.type}
+            color="#000"
+            onMainMouseDown={this.onMouseDown}
+            isSelected={dragging}
+            onMainMouseEnter={() => {
+              uiStore.mouseMode = MouseMode.DRAG;
+              uiStore.dragActiveStaffIndex = this.staffIndex;
+            }}
+            onMainMouseLeave={() =>
+              !dragging && (uiStore.mouseMode = MouseMode.INSERT)
+            }
+          />
+        );
     }
   }
 }
