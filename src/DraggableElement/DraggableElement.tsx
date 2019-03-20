@@ -182,10 +182,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
       (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
       this.spec.kind === 'repeat'
     ) {
-      return {
-        x,
-        y: 0
-      };
+      return { x, y };
     } else {
       return { x, y: Math.round(y / (LINE_DY / 2)) * (LINE_DY / 2) };
     }
@@ -200,7 +197,13 @@ export default class DraggableElement extends Component<DraggableElementProps> {
       0,
       Math.min(this.injected.projectStore.staffList.length - 1, newStaffIndex)
     );
-    const finalY = absoluteY - newStaffIndex * (STAFF_HEIGHT + STAFF_MARGIN);
+    let finalY = absoluteY - newStaffIndex * (STAFF_HEIGHT + STAFF_MARGIN);
+    if (
+      (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
+      this.spec.kind === 'repeat'
+    ) {
+      finalY = 0;
+    }
     return {
       staffIndex: newStaffIndex,
       y: finalY
