@@ -115,6 +115,7 @@ export default class CursorElement extends Component<CursorElementProps> {
         y: staffY,
         staffIndex
       });
+      Audio.playSampleAccidental(newElementId);
     } else if (cursorSpec.kind === 'repeat') {
       projectStore.addElement({
         ...cursorSpec,

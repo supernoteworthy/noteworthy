@@ -1,4 +1,9 @@
 import { ProjectStore } from '../stores/project.store';
+import {
+  AccidentalId,
+  AccidentalSpec,
+  AccidentalType
+} from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteLength, NoteSpec, NoteType } from '../types/NoteTypes';
 
@@ -205,32 +210,42 @@ class Audio {
     }
   }
 
-  private positionToMidi(y: number, octave: number) {
+  private positionToMidi(
+    y: number,
+    octave: number,
+    accidentalType: AccidentalType
+  ) {
     // XXX: could be simplified a bit?
-    let octaveMidi = 12 + octave * 12;
+    let midi = 12 + octave * 12;
     while (y > 100) {
-      octaveMidi -= 12;
+      midi -= 12;
       y -= 70;
     }
     while (y < 40) {
-      octaveMidi += 12;
+      midi += 12;
       y += 70;
+    }
+    if (accidentalType === AccidentalType.SHARP) {
+      midi += 1;
+    }
+    if (accidentalType === AccidentalType.FLAT) {
+      midi -= 1;
     }
     switch (y) {
       case 100: // Middle C
-        return octaveMidi;
+        return midi;
       case 90: // D
-        return octaveMidi + 2;
+        return midi + 2;
       case 80: // E
-        return octaveMidi + 4;
+        return midi + 4;
       case 70: // F
-        return octaveMidi + 5;
+        return midi + 5;
       case 60: // G
-        return octaveMidi + 7;
+        return midi + 7;
       case 50: // A
-        return octaveMidi + 9;
+        return midi + 9;
       case 40: // B
-        return octaveMidi + 11;
+        return midi + 11;
     }
     return 1;
   }
@@ -277,7 +292,11 @@ class Audio {
     }
 
     const source = this.audioContext.createBufferSource();
-    const midiNote = this.positionToMidi(y, projectStore.getOctaveForNote(id));
+    const midiNote = this.positionToMidi(
+      y,
+      projectStore.getOctaveForNote(id),
+      projectStore.getAccidentalForNote(id)
+    );
     const closestLibrarySample = this.closestLibrarySample(midiNote);
     if (!closestLibrarySample) {
       throw new Error(
@@ -352,6 +371,18 @@ class Audio {
       source.disconnect();
       gain.disconnect();
     }, timeLength * 1000);
+  }
+
+  playSampleAccidental(id: AccidentalId) {
+    const projectStore = this.projectStore!;
+    const accidental = projectStore.getElementById(id)! as AccidentalSpec;
+    this.playSampleNote(
+      this.positionToMidi(
+        accidental.y,
+        projectStore.getOctaveForAccidental(id),
+        accidental.type
+      )
+    );
   }
 
   playNoteList(list: NoteSpec[]) {

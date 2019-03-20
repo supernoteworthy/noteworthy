@@ -1,6 +1,6 @@
 import { ElementId, StaffIndex } from './StaffTypes';
 
-type AccidentalId = ElementId;
+export type AccidentalId = ElementId;
 
 export enum AccidentalType {
   FLAT,

@@ -130,6 +130,9 @@ export default class DraggableElement extends Component<DraggableElementProps> {
         Audio.playChord(this.spec.chordId!);
       }
     }
+    if (this.spec.kind === 'accidental' && positionChanged) {
+      Audio.playSampleAccidental(this.spec.id);
+    }
     uiStore.dragActiveStaffIndex = staffIndexAndY.staffIndex;
   };
 
@@ -166,6 +169,8 @@ export default class DraggableElement extends Component<DraggableElementProps> {
       return;
     } else if (tapped && this.spec.kind === 'note') {
       Audio.playChord(this.spec.chordId!);
+    } else if (tapped && this.spec.kind === 'accidental') {
+      Audio.playSampleAccidental(this.spec.id);
     }
 
     if (this.spec.kind === 'note' && activeChord) {

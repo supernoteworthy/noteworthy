@@ -1,6 +1,11 @@
 import { action, computed, observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
 import { CHORD_GUIDELINE_WIDTH } from '../constants';
+import {
+  AccidentalId,
+  AccidentalSpec,
+  AccidentalType
+} from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
@@ -65,6 +70,35 @@ export class ProjectStore {
     const { staffIndex } = this.getChordById(chordId)!;
     const staff = this.staffList[staffIndex];
     return staff.octave;
+  }
+
+  getOctaveForAccidental(accidentalId: AccidentalId) {
+    const { staffIndex } = this.getElementById(accidentalId) as AccidentalSpec;
+    const staff = this.staffList[staffIndex!];
+    return staff.octave;
+  }
+
+  getAccidentalForNote(id: NoteId) {
+    const note = this.getElementById(id);
+    if (!note || note.kind !== 'note') {
+      return AccidentalType.NATURAL;
+    }
+    const chord = this.getChordById(note.chordId);
+    if (!chord) {
+      return AccidentalType.NATURAL;
+    }
+    const accidentals = this.elementList.filter(
+      element =>
+        element.y === note.y &&
+        element.kind === 'accidental' &&
+        element.staffIndex === chord.staffIndex &&
+        element.x < chord.x
+    ) as AccidentalSpec[];
+    accidentals.sort((a, b) => b.x - a.x);
+    if (accidentals.length > 0) {
+      return accidentals[0].type;
+    }
+    return AccidentalType.NATURAL;
   }
 
   getChordsForStaff(staffIndex: StaffIndex) {
