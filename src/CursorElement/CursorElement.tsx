@@ -201,7 +201,15 @@ export default class CursorElement extends Component<CursorElementProps> {
       case 'accidental':
         return <Accidental x={x} y={y} type={cursorSpec.type} color="#ddd" />;
       case 'repeat':
-        return <Repeat x={x} y={y} type={cursorSpec.type} color="#ddd" />;
+        return (
+          <Repeat
+            x={x}
+            y={y}
+            type={cursorSpec.type}
+            color="#ddd"
+            shouldShowNumber={false}
+          />
+        );
     }
   }
 }

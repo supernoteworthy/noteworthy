@@ -263,6 +263,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
       case 'repeat':
         return (
           <Repeat
+            id={spec.id}
             x={spec.x}
             y={spec.y}
             type={spec.type}
@@ -276,6 +277,8 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             onMainMouseLeave={() =>
               !dragging && (uiStore.mouseMode = MouseMode.INSERT)
             }
+            shouldShowNumber
+            nRepeats={spec.nRepeats}
           />
         );
     }

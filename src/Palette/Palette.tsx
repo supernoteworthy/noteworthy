@@ -90,11 +90,15 @@ export default class Palette extends Component<PaletteProps> {
                       tooltip={note.tooltip}
                       onMouseDown={() => {
                         this.setState({ selectedNote: note.id });
-                        const spec = Object.assign({}, note) as RepeatSpec;
+                        const spec = Object.assign(
+                          { nRepeats: '1' },
+                          note
+                        ) as RepeatSpec;
                         uiStore.cursorSpec = spec;
                       }}
                       isSelected={selectedNote === note.id}
                       color="#fff"
+                      shouldShowNumber={false}
                     />
                   );
                 case 'accidental':

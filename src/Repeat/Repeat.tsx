@@ -1,14 +1,19 @@
 import classNames from 'classnames';
+import { inject } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
 import { LINE_DY, STAFF_HEIGHT } from '../constants';
-import { RepeatType } from '../types/RepeatTypes';
+import { ProjectStore } from '../stores/project.store';
+import { MouseMode, UiStore } from '../stores/ui.store';
+import { RepeatId, RepeatSpec, RepeatType } from '../types/RepeatTypes';
 import { StaffIndex } from '../types/StaffTypes';
+import './Repeat.css';
 
 interface RepeatProps {
+  id?: RepeatId;
   x: number;
   y: number;
   staffIndex?: StaffIndex;
-  nRepeats?: number;
+  nRepeats?: string;
   color: string;
   type: RepeatType;
   tooltip?: string;
@@ -19,8 +24,30 @@ interface RepeatProps {
   onMainMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMainMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
   isSelected?: boolean;
+  shouldShowNumber: boolean;
 }
+
+interface InjectedProps extends RepeatProps {
+  uiStore: UiStore;
+  projectStore: ProjectStore;
+}
+
+@inject('uiStore', 'projectStore')
 export default class Repeat extends Component<RepeatProps> {
+  get injected() {
+    return this.props as InjectedProps;
+  }
+  onChange = (event: React.FormEvent<HTMLInputElement>) => {
+    const { projectStore } = this.injected;
+    const element = projectStore.getElementById(this.props.id!) as RepeatSpec;
+    const target = event.target as HTMLInputElement;
+    element.nRepeats = target.value;
+  };
+  onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape' || event.key === 'Enter') {
+      (event.target as HTMLInputElement).blur();
+    }
+  };
   render() {
     const {
       x,
@@ -34,8 +61,11 @@ export default class Repeat extends Component<RepeatProps> {
       onMouseLeave,
       onMainMouseDown,
       onMainMouseEnter,
-      onMainMouseLeave
+      onMainMouseLeave,
+      shouldShowNumber,
+      nRepeats
     } = this.props;
+    const { uiStore } = this.injected;
     const selectBoxClasses = classNames('SelectBox', {
       'SelectBox--selected': isSelected
     });
@@ -103,6 +133,25 @@ export default class Repeat extends Component<RepeatProps> {
           onMouseEnter={onMainMouseEnter}
           onMouseLeave={onMainMouseLeave}
         />
+        {shouldShowNumber && type === RepeatType.END && (
+          <foreignObject x="-5" y="85" width="30" height="25">
+            <input
+              className="Repeat_NumberEditor"
+              onMouseEnter={() => {
+                uiStore.mouseMode = MouseMode.DRAG;
+              }}
+              onMouseLeave={() => {
+                uiStore.mouseMode = MouseMode.INSERT;
+              }}
+              onClick={event => {
+                (event.target as HTMLInputElement).select();
+              }}
+              value={nRepeats}
+              onChange={this.onChange}
+              onKeyDown={this.onKeyDown}
+            />
+          </foreignObject>
+        )}
       </g>
     );
   }
