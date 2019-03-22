@@ -5,7 +5,12 @@ import { ElementId, StaffElement, StaffIndex } from '../types/StaffTypes';
 export enum MouseMode {
   INSERT,
   DRAG,
-  OCTAVE_SELECT
+  POPOVER
+}
+
+export enum InspectorPanelMode {
+  PROJECT_OPTIONS,
+  STAFF_OPTIONS
 }
 
 export class UiStore {
@@ -31,6 +36,9 @@ export class UiStore {
   @observable insertStaffY: number = 0;
 
   @observable activeChord?: ChordSpec;
+
+  @observable inspectorPanelMode = InspectorPanelMode.PROJECT_OPTIONS;
+  @observable inspectorPanelStaffSelected: StaffIndex = 0;
 
   @computed get activeStaff() {
     if (this.mouseMode === MouseMode.INSERT) {

@@ -12,5 +12,5 @@ export interface RepeatSpec {
   y: 0;
   type: RepeatType;
   staffIndex?: StaffIndex;
-  nRepeats: string;
+  nRepeats?: number;
 }

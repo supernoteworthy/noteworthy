@@ -1,9 +1,13 @@
+@import '~antd/dist/antd.css';
+
 .App {
   display: flex;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 
 .App--dragging {
   cursor: grabbing;
+  user-select: none;
 }
 
 .App--drag {

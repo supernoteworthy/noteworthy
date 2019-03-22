@@ -7,7 +7,6 @@ interface AccidentalProps {
   x: number;
   y: number;
   color: string;
-  tooltip?: string;
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
@@ -23,7 +22,6 @@ export default class Accidental extends Component<AccidentalProps> {
       y,
       type,
       color,
-      tooltip,
       isSelected,
       onMainMouseDown,
       onMainMouseEnter,
@@ -139,10 +137,6 @@ export default class Accidental extends Component<AccidentalProps> {
         </Fragment>
       );
     }
-    return (
-      <g transform={`translate(${x}, ${y})`} data-tip={tooltip}>
-        {renderPath}
-      </g>
-    );
+    return <g transform={`translate(${x}, ${y})`}>{renderPath}</g>;
   }
 }

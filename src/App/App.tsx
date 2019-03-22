@@ -1,6 +1,7 @@
 import { observer, Provider } from 'mobx-react';
 import React, { Component } from 'react';
 import Audio from '../Audio/Audio';
+import InspectorPanel from '../InspectorPanel/InspectorPanel';
 import Palette from '../Palette/Palette';
 import Sheet from '../Sheet/Sheet';
 import { ProjectStore } from '../stores/project.store';
@@ -25,7 +26,7 @@ class App extends Component {
       case MouseMode.INSERT:
         mouseModeClass = '--insert';
         break;
-      case MouseMode.OCTAVE_SELECT:
+      case MouseMode.POPOVER:
         mouseModeClass = '--select';
         break;
     }
@@ -34,6 +35,7 @@ class App extends Component {
         <div className={`App App${mouseModeClass}`}>
           <Palette />
           <Sheet />
+          <InspectorPanel />
         </div>
       </Provider>
     );

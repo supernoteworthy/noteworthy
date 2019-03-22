@@ -1,15 +1,4 @@
-.Repeat_NumberEditor {
-  width: 20px;
-  border: none;
-  text-align: center;
-  font-size: 13px;
-  border: 1px solid rgba(0, 0, 0, 0);
+.Repeat {
+  text-anchor: middle;
   user-select: none;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-}
-
-input:focus.Repeat_NumberEditor {
-  border: 1px solid rgb(136, 188, 255);
-  border-radius: 12px;
-  outline: none;
 }

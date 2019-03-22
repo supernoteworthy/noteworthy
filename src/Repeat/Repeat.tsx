@@ -1,3 +1,4 @@
+import { InputNumber, Popover } from 'antd';
 import classNames from 'classnames';
 import { inject } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
@@ -13,10 +14,9 @@ interface RepeatProps {
   x: number;
   y: number;
   staffIndex?: StaffIndex;
-  nRepeats?: string;
+  nRepeats?: number;
   color: string;
   type: RepeatType;
-  tooltip?: string;
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
@@ -37,24 +37,12 @@ export default class Repeat extends Component<RepeatProps> {
   get injected() {
     return this.props as InjectedProps;
   }
-  onChange = (event: React.FormEvent<HTMLInputElement>) => {
-    const { projectStore } = this.injected;
-    const element = projectStore.getElementById(this.props.id!) as RepeatSpec;
-    const target = event.target as HTMLInputElement;
-    element.nRepeats = target.value;
-  };
-  onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Escape' || event.key === 'Enter') {
-      (event.target as HTMLInputElement).blur();
-    }
-  };
   render() {
     const {
       x,
       y,
       type,
       color,
-      tooltip,
       isSelected,
       onMouseDown,
       onMouseEnter,
@@ -65,7 +53,42 @@ export default class Repeat extends Component<RepeatProps> {
       shouldShowNumber,
       nRepeats
     } = this.props;
-    const { uiStore } = this.injected;
+    const { uiStore, projectStore } = this.injected;
+
+    const repeatEditor = (
+      <Popover
+        content={
+          <Fragment>
+            <InputNumber
+              autoFocus
+              min={1}
+              precision={0}
+              value={nRepeats || 1}
+              onChange={value => {
+                const element = projectStore.getElementById(
+                  this.props.id!
+                ) as RepeatSpec;
+                element.nRepeats = value;
+              }}
+            />{' '}
+            {nRepeats === 1 ? 'time' : 'times'}
+          </Fragment>
+        }
+        placement="bottom"
+        onVisibleChange={visible => {
+          if (visible) {
+            uiStore.mouseMode = MouseMode.POPOVER;
+          } else {
+            uiStore.mouseMode = MouseMode.INSERT;
+          }
+        }}
+      >
+        <text x={8} y={100}>
+          {nRepeats || 0}
+        </text>
+      </Popover>
+    );
+
     const selectBoxClasses = classNames('SelectBox', {
       'SelectBox--selected': isSelected
     });
@@ -107,7 +130,7 @@ export default class Repeat extends Component<RepeatProps> {
       );
     }
     return (
-      <g transform={`translate(${x}, ${y})`} data-tip={tooltip}>
+      <g transform={`translate(${x}, ${y})`} className="Repeat">
         {paths}
         <rect
           width="20"
@@ -133,25 +156,7 @@ export default class Repeat extends Component<RepeatProps> {
           onMouseEnter={onMainMouseEnter}
           onMouseLeave={onMainMouseLeave}
         />
-        {shouldShowNumber && type === RepeatType.END && (
-          <foreignObject x="-5" y="85" width="30" height="25">
-            <input
-              className="Repeat_NumberEditor"
-              onMouseEnter={() => {
-                uiStore.mouseMode = MouseMode.DRAG;
-              }}
-              onMouseLeave={() => {
-                uiStore.mouseMode = MouseMode.INSERT;
-              }}
-              onClick={event => {
-                (event.target as HTMLInputElement).select();
-              }}
-              value={nRepeats}
-              onChange={this.onChange}
-              onKeyDown={this.onKeyDown}
-            />
-          </foreignObject>
-        )}
+        {shouldShowNumber && type === RepeatType.END && repeatEditor}
       </g>
     );
   }

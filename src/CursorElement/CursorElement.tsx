@@ -22,7 +22,7 @@ import { ElementId, StaffIndex } from '../types/StaffTypes';
 
 interface CursorElementProps {
   snapToStaff: boolean;
-  getSheetBoundingX: () => number | undefined;
+  getSheetBoundingX: () => { left: number; right: number } | undefined;
 }
 
 interface InjectedProps extends CursorElementProps {
@@ -68,9 +68,10 @@ export default class CursorElement extends Component<CursorElementProps> {
     }
     const newElementId = uuid() as ElementId;
 
-    const { projectStore } = this.injected;
+    const { projectStore, getSheetBoundingX } = this.injected;
     const { x, y, staffIndex } = this.clientPositionToSvgPosition()!;
-    if (x < 0) {
+    const boundingX = getSheetBoundingX();
+    if (x < 0 || (boundingX && x + boundingX.left > boundingX.right)) {
       return;
     }
     const adjacentChord = projectStore.findAdjacentChord(x, staffIndex);
@@ -161,7 +162,7 @@ export default class CursorElement extends Component<CursorElementProps> {
 
     const sheetBoundingX = getSheetBoundingX();
     if (sheetBoundingX) {
-      x -= sheetBoundingX;
+      x -= sheetBoundingX.left;
     }
 
     y += MOUSE_OFFSET_Y;

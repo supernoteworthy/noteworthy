@@ -276,11 +276,15 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             onMainMouseDown={this.onMouseDown}
             isSelected={dragging}
             onMainMouseEnter={() => {
-              uiStore.mouseMode = MouseMode.DRAG;
-              uiStore.dragActiveStaffIndex = this.staffIndex;
+              if (uiStore.mouseMode !== MouseMode.POPOVER) {
+                uiStore.mouseMode = MouseMode.DRAG;
+                uiStore.dragActiveStaffIndex = this.staffIndex;
+              }
             }}
             onMainMouseLeave={() =>
-              !dragging && (uiStore.mouseMode = MouseMode.INSERT)
+              !dragging &&
+              uiStore.mouseMode == MouseMode.DRAG &&
+              (uiStore.mouseMode = MouseMode.INSERT)
             }
             shouldShowNumber
             nRepeats={spec.nRepeats}

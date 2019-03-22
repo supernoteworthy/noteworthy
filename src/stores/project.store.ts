@@ -17,6 +17,7 @@ import {
 } from '../types/StaffTypes';
 
 export class ProjectStore {
+  @observable bpm = 100;
   @observable staffList: StaffSpec[] = [
     { index: 0, clef: ClefType.TREBLE, octave: 4 },
     { index: 1, octave: 4 },

@@ -1,6 +1,6 @@
+import { Tooltip } from 'antd';
 import { inject } from 'mobx-react';
 import React, { Component } from 'react';
-import ReactTooltip from 'react-tooltip';
 import Accidental from '../Accidental/Accidental';
 import RenderNote from '../RenderNote/RenderNote';
 import Repeat from '../Repeat/Repeat';
@@ -47,76 +47,85 @@ export default class Palette extends Component<PaletteProps> {
     const { selectedNote } = this.state;
     return (
       <div className="Palette">
-        <ReactTooltip
-          place="right"
-          effect="solid"
-          className="PaletteTooltip"
-          type="info"
-        />
         <svg>
           <g className="PaletteItem">
             {PALETTE_NOTES.map(note => {
               switch (note.kind) {
                 case 'note':
                   return (
-                    <RenderNote
-                      tooltip={note.tooltip}
+                    <Tooltip
+                      title={note.tooltip}
+                      placement="right"
                       key={note.id}
-                      length={note.length!}
-                      type={note.type as NoteType}
-                      isSelected={selectedNote === note.id}
-                      orientation={NoteOrientation.UP}
-                      x={note.x}
-                      y={note.y}
-                      onMouseDown={() => {
-                        this.setState({ selectedNote: note.id });
-                        const spec = Object.assign(
-                          { isPlaying: false },
-                          note
-                        ) as NoteSpec;
-                        uiStore.cursorSpec = spec;
-                      }}
-                      color="#fff"
-                      cssClass="PaletteNote"
-                    />
+                    >
+                      <RenderNote
+                        length={note.length!}
+                        type={note.type as NoteType}
+                        isSelected={selectedNote === note.id}
+                        orientation={NoteOrientation.UP}
+                        x={note.x}
+                        y={note.y}
+                        onMouseDown={() => {
+                          this.setState({ selectedNote: note.id });
+                          const spec = Object.assign(
+                            { isPlaying: false },
+                            note
+                          ) as NoteSpec;
+                          uiStore.cursorSpec = spec;
+                        }}
+                        color="#fff"
+                        cssClass="PaletteNote"
+                      />
+                    </Tooltip>
                   );
                 case 'repeat':
                   return (
-                    <Repeat
+                    <Tooltip
+                      title={note.tooltip}
+                      placement="right"
                       key={note.id}
-                      x={note.x}
-                      y={note.y}
-                      type={note.type as RepeatType}
-                      tooltip={note.tooltip}
-                      onMouseDown={() => {
-                        this.setState({ selectedNote: note.id });
-                        const spec = Object.assign(
-                          { nRepeats: '1' },
-                          note
-                        ) as RepeatSpec;
-                        uiStore.cursorSpec = spec;
-                      }}
-                      isSelected={selectedNote === note.id}
-                      color="#fff"
-                      shouldShowNumber={false}
-                    />
+                    >
+                      <Repeat
+                        x={note.x}
+                        y={note.y}
+                        type={note.type as RepeatType}
+                        onMouseDown={() => {
+                          this.setState({ selectedNote: note.id });
+                          const spec = Object.assign(
+                            { nRepeats: 1 },
+                            note
+                          ) as RepeatSpec;
+                          uiStore.cursorSpec = spec;
+                        }}
+                        isSelected={selectedNote === note.id}
+                        color="#fff"
+                        shouldShowNumber={false}
+                      />
+                    </Tooltip>
                   );
                 case 'accidental':
                   return (
-                    <Accidental
+                    <Tooltip
+                      title={note.tooltip}
+                      placement="right"
                       key={note.id}
-                      x={note.x}
-                      y={note.y}
-                      color="#fff"
-                      tooltip={note.tooltip}
-                      onMouseDown={() => {
-                        this.setState({ selectedNote: note.id });
-                        const spec = Object.assign({}, note) as AccidentalSpec;
-                        uiStore.cursorSpec = spec;
-                      }}
-                      isSelected={selectedNote === note.id}
-                      type={note.type as AccidentalType}
-                    />
+                    >
+                      <Accidental
+                        x={note.x}
+                        y={note.y}
+                        color="#fff"
+                        onMouseDown={() => {
+                          this.setState({ selectedNote: note.id });
+                          const spec = Object.assign(
+                            {},
+                            note
+                          ) as AccidentalSpec;
+                          uiStore.cursorSpec = spec;
+                        }}
+                        isSelected={selectedNote === note.id}
+                        type={note.type as AccidentalType}
+                      />
+                    </Tooltip>
                   );
               }
             })}

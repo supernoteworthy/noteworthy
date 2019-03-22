@@ -18,7 +18,6 @@ interface RenderNoteProps {
   x: number;
   y: number;
   color?: string;
-  tooltip?: string;
 }
 
 export default function RenderNote(props: RenderNoteProps) {
@@ -27,7 +26,6 @@ export default function RenderNote(props: RenderNoteProps) {
     y,
     color,
     cssClass,
-    tooltip,
     type,
     length,
     orientation,
@@ -586,11 +584,7 @@ export default function RenderNote(props: RenderNoteProps) {
     }
   }
   // -20 hack: Aligns (y=0) for a note with the center of the top staff line.
-  return (
-    <g transform={`translate(${x}, ${y - 20})`} data-tip={tooltip}>
-      {innerSVG}
-    </g>
-  );
+  return <g transform={`translate(${x}, ${y - 20})`}>{innerSVG}</g>;
 }
 
 RenderNote.defaultProps = {

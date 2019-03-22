@@ -62,7 +62,7 @@ class Sheet extends Component<SheetProps> {
     const divRef = this.divRef.current;
     if (divRef) {
       const rect = divRef.getBoundingClientRect();
-      return rect.left;
+      return { left: rect.left, right: rect.right };
     }
   };
 

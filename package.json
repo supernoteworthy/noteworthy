@@ -8,9 +8,9 @@
     "@types/node": "11.10.4",
     "@types/react": "16.8.6",
     "@types/react-dom": "16.8.2",
-    "@types/react-tooltip": "^3.9.2",
     "@types/uuid": "^3.4.4",
     "@types/webaudioapi": "0.0.27",
+    "antd": "^3.15.1",
     "classnames": "^2.2.6",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
@@ -19,7 +19,6 @@
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-scripts": "2.1.5",
-    "react-tooltip": "^3.10.0",
     "typescript": "3.3.3333",
     "uuid": "^3.3.2"
   },

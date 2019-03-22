@@ -147,8 +147,6 @@ class Audio {
   private effectBufferMap: { [b: string]: AudioBuffer } = {};
   private sourcesForNoteId: { [b: string]: NotePlayer } = {};
 
-  private BPM = 100;
-
   public projectStore?: ProjectStore;
 
   init() {
@@ -190,7 +188,11 @@ class Audio {
   }
 
   private beatsToSeconds(beats: number) {
-    return (60 / this.BPM) * beats;
+    let bpm = 100;
+    if (this.projectStore) {
+      bpm = this.projectStore.bpm;
+    }
+    return (60 / bpm) * beats;
   }
 
   noteSpecLengthToBeats(noteLength: NoteLength) {
@@ -453,6 +455,14 @@ class Audio {
       source.stop();
       source.disconnect();
     };
+  }
+
+  playAll() {
+    this.playChordList(this.projectStore!.chordList);
+  }
+
+  stopAll() {
+    // TODO
   }
 }
 
