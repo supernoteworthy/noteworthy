@@ -1,7 +1,6 @@
 import { observer, Provider } from 'mobx-react';
 import React, { Component } from 'react';
 import Audio from '../Audio/Audio';
-import InspectorPanel from '../InspectorPanel/InspectorPanel';
 import Palette from '../Palette/Palette';
 import Sheet from '../Sheet/Sheet';
 import { ProjectStore } from '../stores/project.store';
@@ -35,7 +34,6 @@ class App extends Component {
         <div className={`App App${mouseModeClass}`}>
           <Palette />
           <Sheet />
-          <InspectorPanel />
         </div>
       </Provider>
     );
@@ -43,20 +41,20 @@ class App extends Component {
 
   async componentDidMount() {
     Audio.setProjectStore(this.projectStore);
-    await Audio.loadSounds();
+    await Audio.load();
     document.addEventListener('keypress', e => {
-      // Space -- play top staff.
+      // Space
       if (e.keyCode === 32) {
         e.preventDefault();
         const activeStaff = this.uiStore.activeStaff;
         if (activeStaff !== undefined) {
-          Audio.playChordList(this.projectStore.getChordsForStaff(activeStaff));
+          Audio.playStaff(activeStaff);
         }
       }
-      // Enter -- play all.
+      // Enter
       if (e.keyCode === 13) {
         e.preventDefault();
-        Audio.playChordList(this.projectStore.chordList);
+        Audio.playSheet();
       }
     });
   }

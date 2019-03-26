@@ -127,11 +127,12 @@ export default class DraggableElement extends Component<DraggableElementProps> {
         this.spec.chordId
       );
       if (positionChanged) {
+        Audio.stopChord(this.spec.chordId!);
         Audio.playChord(this.spec.chordId!);
       }
     }
     if (this.spec.kind === 'accidental' && positionChanged) {
-      Audio.playSampleAccidental(this.spec.id);
+      Audio.playAccidentalSample(this.spec.id);
     }
     uiStore.dragActiveStaffIndex = staffIndexAndY.staffIndex;
   };
@@ -163,18 +164,23 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     document.removeEventListener('mouseup', this.onMouseUp);
     document.removeEventListener('mousemove', this.onMouseMove);
 
-    if (deleted) {
-      Audio.playEffect('delete');
-      projectStore.deleteElement(this.spec.id);
-      return;
-    } else if (tapped && this.spec.kind === 'note') {
-      Audio.playChord(this.spec.chordId!);
-    } else if (tapped && this.spec.kind === 'accidental') {
-      Audio.playSampleAccidental(this.spec.id);
-    }
+    const chordChanged =
+      this.spec.kind === 'note' &&
+      activeChord &&
+      this.spec.chordId !== activeChord.id;
 
     if (this.spec.kind === 'note' && activeChord) {
       projectStore.updateNoteChord(this.spec.id, activeChord.id);
+    }
+
+    if (deleted) {
+      projectStore.deleteElement(this.spec.id);
+      return;
+    } else if (this.spec.kind === 'note' && (tapped || chordChanged)) {
+      Audio.stopChord(this.spec.chordId!);
+      Audio.playChord(this.spec.chordId!);
+    } else if (tapped && this.spec.kind === 'accidental') {
+      Audio.playAccidentalSample(this.spec.id);
     }
   };
 

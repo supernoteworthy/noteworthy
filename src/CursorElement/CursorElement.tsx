@@ -2,7 +2,6 @@ import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import uuid from 'uuid/v4';
 import Accidental from '../Accidental/Accidental';
-import Audio from '../Audio/Audio';
 import {
   CURSOR_COLOR,
   LINE_DY,
@@ -106,8 +105,6 @@ export default class CursorElement extends Component<CursorElementProps> {
         },
         newChord
       );
-
-      Audio.playChord(chordId);
     } else if (cursorSpec.kind === 'accidental') {
       projectStore.addElement({
         ...cursorSpec,
@@ -116,7 +113,6 @@ export default class CursorElement extends Component<CursorElementProps> {
         y: staffY,
         staffIndex
       });
-      Audio.playSampleAccidental(newElementId);
     } else if (cursorSpec.kind === 'repeat') {
       projectStore.addElement({
         ...cursorSpec,

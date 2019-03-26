@@ -10,7 +10,6 @@ import {
   STAFF_MARGIN
 } from '../constants';
 import DraggableElement from '../DraggableElement/DraggableElement';
-import StaffGear from '../StaffGear/StaffGear';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
@@ -218,7 +217,6 @@ class Staff extends Component<StaffProps> {
         {this.renderLines()}
         {this.renderLedgerLines()}
         {clef !== undefined && <Clef x={10} y={-LINE_DY} />}
-        <StaffGear hasClef={clef !== undefined} staffIndex={index} />
         {this.renderElements()}
       </g>
     );

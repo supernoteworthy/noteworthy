@@ -1,3 +1,4 @@
+// UI constants.
 export const SHEET_MARGIN_TOP = 20;
 
 export const STAFF_HEIGHT = 80;
@@ -12,3 +13,7 @@ export const CHORD_GUIDELINE_WIDTH = 25;
 export const CHORD_GUIDELINE_OFFSET = 10;
 
 export const KEY_SIGNATURE_GUIDELINE_X = 175;
+
+// Audio constants.
+export const SCHEDULER_INTERVAL_MS = 25;
+export const SCHEDULER_LOOKAHEAD_MS = 100;

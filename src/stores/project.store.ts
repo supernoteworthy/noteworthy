@@ -1,11 +1,7 @@
 import { action, computed, observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
 import { CHORD_GUIDELINE_WIDTH } from '../constants';
-import {
-  AccidentalId,
-  AccidentalSpec,
-  AccidentalType
-} from '../types/AccidentalTypes';
+import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
@@ -66,16 +62,18 @@ export class ProjectStore {
     );
   }
 
-  getOctaveForNote(noteId: NoteId) {
-    const { chordId } = this.getElementById(noteId)! as NoteSpec;
-    const { staffIndex } = this.getChordById(chordId)!;
+  getOctaveForElement(elementId: ElementId) {
+    const element = this.getElementById(elementId)!;
+    let staffIndex;
+    if (element.kind === 'note') {
+      staffIndex = this.getChordById(element.chordId)!.staffIndex;
+    } else if (element.kind === 'accidental') {
+      staffIndex = element.staffIndex;
+    }
+    if (!staffIndex) {
+      return 0;
+    }
     const staff = this.staffList[staffIndex];
-    return staff.octave;
-  }
-
-  getOctaveForAccidental(accidentalId: AccidentalId) {
-    const { staffIndex } = this.getElementById(accidentalId) as AccidentalSpec;
-    const staff = this.staffList[staffIndex!];
     return staff.octave;
   }
 
@@ -104,6 +102,42 @@ export class ProjectStore {
 
   getChordsForStaff(staffIndex: StaffIndex) {
     return this.chordList.filter(chord => chord.staffIndex === staffIndex);
+  }
+
+  getFirstChordForSheet() {
+    return this.sortedChords[0];
+  }
+
+  getFirstChordForStaff(staffIndex: StaffIndex) {
+    return this.sortedChords.find(chord => chord.staffIndex === staffIndex);
+  }
+
+  getNextChord(chordId: ChordId) {
+    const currentChord = this.getChordById(chordId);
+    if (!currentChord) {
+      return;
+    }
+    const sorted = this.sortedChords;
+    const chordIndex = sorted.indexOf(currentChord);
+    if (chordIndex < sorted.length) {
+      return sorted[chordIndex + 1];
+    }
+    return null;
+  }
+
+  get sortedChords() {
+    const chordsInOrder = this.chordList.slice();
+
+    chordsInOrder.sort((a, b) => {
+      if (a.staffIndex < b.staffIndex) {
+        return -1;
+      } else if (b.staffIndex < a.staffIndex) {
+        return 1;
+      }
+      return a.x - b.x;
+    });
+
+    return chordsInOrder;
   }
 
   @computed get getElementById() {
