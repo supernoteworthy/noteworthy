@@ -5,6 +5,7 @@ import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
+import { RepeatSpec } from '../types/RepeatTypes';
 import {
   ElementId,
   StaffElement,
@@ -26,6 +27,7 @@ export class ProjectStore {
   ];
   @observable elementList: StaffElement[] = [];
   @observable chordList: ChordSpec[] = [];
+  firstElement?: ElementId;
 
   @action
   addElement(newElement: StaffElement, chord?: ChordSpec) {
@@ -33,6 +35,7 @@ export class ProjectStore {
     if (chord) {
       this.chordList.push(chord);
     }
+    this.updateNextElements();
   }
 
   findAdjacentChord(x: number, staffIndex: StaffIndex, excludeChord?: ChordId) {
@@ -70,7 +73,7 @@ export class ProjectStore {
     } else if (element.kind === 'accidental') {
       staffIndex = element.staffIndex;
     }
-    if (!staffIndex) {
+    if (staffIndex === undefined) {
       return 0;
     }
     const staff = this.staffList[staffIndex];
@@ -100,49 +103,12 @@ export class ProjectStore {
     return AccidentalType.NATURAL;
   }
 
-  getChordsForStaff(staffIndex: StaffIndex) {
-    return this.chordList.filter(chord => chord.staffIndex === staffIndex);
-  }
-
-  getFirstChordForSheet() {
-    return this.sortedChords[0];
-  }
-
-  getFirstChordForStaff(staffIndex: StaffIndex) {
-    return this.sortedChords.find(chord => chord.staffIndex === staffIndex);
-  }
-
-  getNextChord(chordId: ChordId) {
-    const currentChord = this.getChordById(chordId);
-    if (!currentChord) {
-      return;
-    }
-    const sorted = this.sortedChords;
-    const chordIndex = sorted.indexOf(currentChord);
-    if (chordIndex < sorted.length) {
-      return sorted[chordIndex + 1];
-    }
-    return null;
-  }
-
-  get sortedChords() {
-    const chordsInOrder = this.chordList.slice();
-
-    chordsInOrder.sort((a, b) => {
-      if (a.staffIndex < b.staffIndex) {
-        return -1;
-      } else if (b.staffIndex < a.staffIndex) {
-        return 1;
-      }
-      return a.x - b.x;
-    });
-
-    return chordsInOrder;
-  }
-
   @computed get getElementById() {
-    return createTransformer(elementId =>
-      this.elementList.find(element => element.id === elementId)
+    return createTransformer(
+      (elementId: ElementId) =>
+        this.elementList.find(
+          (element: StaffElement) => element.id === elementId
+        ) || this.chordList.find(chord => chord.id === elementId)
     );
   }
 
@@ -166,6 +132,9 @@ export class ProjectStore {
     if (!el) {
       throw new Error(`Could not find element ${id} in setNotePosition.`);
     }
+    if (el.kind === 'chord') {
+      throw new Error('Unimplemented: set chord position');
+    }
     const dy = y - el.y;
     if (el.kind === 'note') {
       const chord = this.getChordById(el.chordId)!;
@@ -183,6 +152,7 @@ export class ProjectStore {
         el.staffIndex = staffIndex;
       }
     }
+    this.updateNextElements();
   }
 
   @action setOctave(staffIndex: StaffIndex, newOctave: number) {
@@ -195,6 +165,7 @@ export class ProjectStore {
       spec.chordId = newChord;
     }
     this.dropEmptyChords();
+    this.updateNextElements();
   }
 
   dropEmptyChords() {
@@ -212,14 +183,15 @@ export class ProjectStore {
     } else {
       this.spliceElement(id);
     }
+    this.updateNextElements();
   }
 
   @action spliceElement(id: ElementId) {
-    const note = this.getElementById(id);
-    if (!note) {
-      throw new Error(`Could not find element ${id} in deleteElement.`);
+    const element = this.getElementById(id);
+    if (!element) {
+      throw new Error(`Could not find element ${id} in spliceElement.`);
     }
-    this.elementList.splice(this.elementList.indexOf(note), 1);
+    this.elementList.splice(this.elementList.indexOf(element), 1);
   }
 
   @action setNotePlaying(id: NoteId, isPlaying: boolean) {
@@ -228,5 +200,39 @@ export class ProjectStore {
       return;
     }
     note.isPlaying = isPlaying;
+  }
+
+  private updateNextElements() {
+    type Sortable = ChordSpec | AccidentalSpec | RepeatSpec;
+    const inOrder: Sortable[] = [
+      ...this.chordList,
+      ...this.elementList.filter(el => el.kind !== 'note')
+    ] as Sortable[];
+
+    if (inOrder.length === 0) {
+      return;
+    }
+
+    inOrder.sort((a, b) => {
+      if (a.staffIndex === undefined || b.staffIndex === undefined) {
+        throw new Error('Element in project list without staff index');
+      }
+      if (a.staffIndex < b.staffIndex) {
+        return -1;
+      } else if (b.staffIndex < a.staffIndex) {
+        return 1;
+      }
+      return a.x - b.x;
+    });
+
+    this.firstElement = inOrder[0].id;
+    let previous = inOrder[0];
+    inOrder.forEach(item => {
+      if (item.id !== this.firstElement) {
+        previous.nextElement = item.id;
+      }
+      previous = item;
+    });
+    inOrder[inOrder.length - 1].nextElement = undefined;
   }
 }

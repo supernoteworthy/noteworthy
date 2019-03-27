@@ -15,4 +15,5 @@ export interface AccidentalSpec {
   x: number;
   y: number;
   staffIndex?: StaffIndex;
+  nextElement?: ElementId;
 }

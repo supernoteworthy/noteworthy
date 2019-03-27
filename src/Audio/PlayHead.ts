@@ -2,6 +2,7 @@ import { ProjectStore } from '../stores/project.store';
 import { AccidentalSpec } from '../types/AccidentalTypes';
 import { ChordSpec } from '../types/ChordTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
+import { ElementId } from '../types/StaffTypes';
 import {
   beatsToSeconds,
   noteLengthToBeats,
@@ -9,13 +10,8 @@ import {
 } from './AudioMath';
 import SampleLibrary from './SampleLibrary';
 
-export enum PlayHeadType {
-  CHORD,
-  SAMPLE_NOTE
-}
-
 export enum EndCondition {
-  END_OF_CHORD,
+  SAMPLE_ELEMENT,
   END_OF_STAFF,
   END_OF_SHEET
 }
@@ -27,10 +23,9 @@ export default class PlayHead {
   private gain?: GainNode;
   private source?: AudioBufferSourceNode;
   private projectStore: ProjectStore;
-  private type: PlayHeadType;
   private instrument: SampleLibrary;
+  private currentElement: ElementId;
   public currentChord?: ChordSpec;
-  private sampleSpec?: NoteSpec | AccidentalSpec;
   public endTime?: number;
   public endCondition: EndCondition;
 
@@ -39,57 +34,61 @@ export default class PlayHead {
     projectStore: ProjectStore,
     instrument: SampleLibrary,
     endCondition: EndCondition,
-    type: PlayHeadType,
-    currentChord?: ChordSpec,
-    sampleSpec?: NoteSpec | AccidentalSpec
+    currentElement: ElementId
   ) {
     this.context = context;
     this.projectStore = projectStore;
-    this.type = type;
-    this.currentChord = currentChord;
-    this.sampleSpec = sampleSpec;
+    this.currentElement = currentElement;
     this.instrument = instrument;
     this.endCondition = endCondition;
   }
 
-  start() {
-    if (this.type === PlayHeadType.CHORD) {
-      this.playChord(this.currentChord!, this.context.currentTime);
+  playCurrent() {
+    const element = this.projectStore.getElementById(this.currentElement);
+    if (!element) {
+      return;
     }
-    if (this.type === PlayHeadType.SAMPLE_NOTE) {
-      const spec = this.sampleSpec!;
-      let time = 0.5;
-      if (spec.kind === 'note') {
-        time = beatsToSeconds(noteLengthToBeats(spec.length), BPM);
-      }
-      this.playElement(
-        this.sampleSpec!,
-        this.context.currentTime,
-        this.context.currentTime + time
-      );
-      this.endTime = this.context.currentTime + time;
+    switch (element.kind) {
+      case 'chord':
+        this.currentChord = element;
+        this.playChord(element, this.context.currentTime);
+        break;
+      case 'accidental':
+      case 'note':
+        if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
+          let time = 0.5;
+          if (element.kind === 'note') {
+            time = beatsToSeconds(noteLengthToBeats(element.length), BPM);
+          }
+          this.playElement(
+            element,
+            this.context.currentTime,
+            this.context.currentTime + time
+          );
+          this.endTime = this.context.currentTime + time;
+        } else {
+          this.next();
+        }
+        break;
+      case 'repeat':
+        break;
     }
   }
 
-  scheduleNextChord() {
-    if (this.type !== PlayHeadType.CHORD) {
+  next() {
+    if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
       return false;
     }
-    if (this.endCondition === EndCondition.END_OF_CHORD) {
+    const element = this.projectStore.getElementById(this.currentElement);
+    if (!element || !element.nextElement) {
       return false;
     }
-    const nextChord = this.projectStore.getNextChord(this.currentChord!.id);
-    if (!nextChord) {
+    const nextElement = this.projectStore.getElementById(element.nextElement);
+    if (!nextElement) {
       return false;
     }
-    if (
-      this.endCondition === EndCondition.END_OF_STAFF &&
-      nextChord.staffIndex !== this.currentChord!.staffIndex
-    ) {
-      return false;
-    }
-    this.currentChord = nextChord;
-    this.playChord(this.currentChord, this.endTime!);
+    this.currentElement = nextElement.id;
+    this.playCurrent();
     return true;
   }
 

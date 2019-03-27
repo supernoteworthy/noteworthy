@@ -88,9 +88,11 @@ export default class CursorElement extends Component<CursorElementProps> {
       let newChord: ChordSpec | undefined;
       if (!adjacentChord) {
         newChord = {
+          kind: 'chord',
           id: uuid(),
           staffIndex,
-          x
+          x,
+          y: 0
         };
       }
 

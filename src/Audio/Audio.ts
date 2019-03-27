@@ -1,10 +1,9 @@
 import { ProjectStore } from '../stores/project.store';
-import { AccidentalId, AccidentalSpec } from '../types/AccidentalTypes';
+import { AccidentalId } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteId } from '../types/NoteTypes';
-import { StaffIndex } from '../types/StaffTypes';
 import { Piano } from './Instruments/Piano';
-import PlayHead, { EndCondition, PlayHeadType } from './PlayHead';
+import PlayHead, { EndCondition } from './PlayHead';
 import SampleLibrary from './SampleLibrary';
 import Scheduler from './Scheduler';
 
@@ -37,34 +36,17 @@ class Audio {
     if (!this.projectStore) {
       throw new Error('Must call setProjectStore before other Audio methods.');
     }
+    const firstElement = this.projectStore.firstElement;
+    if (!firstElement) {
+      return;
+    }
 
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
       this.instruments.piano,
       EndCondition.END_OF_SHEET,
-      PlayHeadType.CHORD,
-      this.projectStore.getFirstChordForSheet()
-    );
-    this.scheduler.pushPlayHead(playHead);
-    this.scheduler.start();
-  }
-
-  public playStaff(staffIndex: StaffIndex) {
-    if (!this.projectStore) {
-      throw new Error('Must call setProjectStore before other Audio methods.');
-    }
-    const chord = this.projectStore.getFirstChordForStaff(staffIndex);
-    if (!chord) {
-      return;
-    }
-    const playHead = new PlayHead(
-      this.context,
-      this.projectStore,
-      this.instruments.piano,
-      EndCondition.END_OF_STAFF,
-      PlayHeadType.CHORD,
-      chord
+      firstElement
     );
     this.scheduler.pushPlayHead(playHead);
     this.scheduler.start();
@@ -74,17 +56,12 @@ class Audio {
     if (!this.projectStore) {
       throw new Error('Must call setProjectStore before other Audio methods.');
     }
-    const chord = this.projectStore.getChordById(chordId);
-    if (!chord) {
-      return;
-    }
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
       this.instruments.piano,
-      EndCondition.END_OF_CHORD,
-      PlayHeadType.CHORD,
-      chord
+      EndCondition.SAMPLE_ELEMENT,
+      chordId
     );
     this.scheduler.pushPlayHead(playHead);
     this.scheduler.start();
@@ -94,17 +71,12 @@ class Audio {
     if (!this.projectStore) {
       throw new Error('Must call setProjectStore before other Audio methods.');
     }
-    const accidental = this.projectStore.getElementById(
-      accidentalId
-    )! as AccidentalSpec;
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
       this.instruments.piano,
-      EndCondition.END_OF_CHORD,
-      PlayHeadType.SAMPLE_NOTE,
-      undefined,
-      accidental
+      EndCondition.SAMPLE_ELEMENT,
+      accidentalId
     );
     this.scheduler.pushPlayHead(playHead);
     this.scheduler.start();

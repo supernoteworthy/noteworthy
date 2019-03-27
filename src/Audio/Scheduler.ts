@@ -37,7 +37,7 @@ export default class Scheduler {
       if (
         playHead.currentChord &&
         playHead.currentChord.id === chordId &&
-        playHead.endCondition === EndCondition.END_OF_CHORD
+        playHead.endCondition === EndCondition.SAMPLE_ELEMENT
       ) {
         playHead.stop();
         this.dropPlayHead(playHead);
@@ -59,12 +59,12 @@ export default class Scheduler {
 
     for (let playHead of this.playHeads) {
       if (!playHead.endTime) {
-        playHead.start();
+        playHead.playCurrent();
       } else if (
         playHead.endTime >= startWindow &&
         playHead.endTime <= endWindow
       ) {
-        const scheduled = playHead.scheduleNextChord();
+        const scheduled = playHead.next();
         if (!scheduled) {
           this.dropPlayHead(playHead);
         }

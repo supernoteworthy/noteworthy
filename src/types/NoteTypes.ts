@@ -30,4 +30,5 @@ export interface NoteSpec {
   chordId?: ChordId;
   y: number;
   isPlaying: boolean;
+  nextElement: undefined; // Note's next is set in chord.
 }

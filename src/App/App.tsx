@@ -48,7 +48,7 @@ class App extends Component {
         e.preventDefault();
         const activeStaff = this.uiStore.activeStaff;
         if (activeStaff !== undefined) {
-          Audio.playStaff(activeStaff);
+          //Audio.playStaff(activeStaff);
         }
       }
       // Enter

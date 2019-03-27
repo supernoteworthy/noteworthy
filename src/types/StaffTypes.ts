@@ -1,4 +1,5 @@
 import { AccidentalSpec } from './AccidentalTypes';
+import { ChordSpec } from './ChordTypes';
 import { ClefType } from './ClefTypes';
 import { NoteSpec } from './NoteTypes';
 import { RepeatSpec } from './RepeatTypes';
@@ -12,4 +13,4 @@ export interface StaffSpec {
 }
 
 export type ElementId = string;
-export type StaffElement = NoteSpec | AccidentalSpec | RepeatSpec;
+export type StaffElement = NoteSpec | AccidentalSpec | RepeatSpec | ChordSpec;

@@ -68,7 +68,7 @@ export default class Palette extends Component<PaletteProps> {
                         onMouseDown={() => {
                           this.setState({ selectedNote: note.id });
                           const spec = Object.assign(
-                            { isPlaying: false },
+                            { isPlaying: false, nextElement: undefined },
                             note
                           ) as NoteSpec;
                           uiStore.cursorSpec = spec;
