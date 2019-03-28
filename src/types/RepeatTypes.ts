@@ -1,7 +1,7 @@
 import { ElementId, StaffIndex } from './StaffTypes';
 
 export type RepeatId = ElementId;
-export enum RepeatType {
+export enum MatchType {
   START,
   END
 }
@@ -10,8 +10,9 @@ export interface RepeatSpec {
   id: RepeatId;
   x: number;
   y: 0;
-  type: RepeatType;
+  type: MatchType;
   staffIndex?: StaffIndex;
   nRepeats?: number;
   nextElement?: ElementId;
+  matchElement?: ElementId;
 }

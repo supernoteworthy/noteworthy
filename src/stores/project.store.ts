@@ -5,7 +5,7 @@ import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
-import { RepeatSpec } from '../types/RepeatTypes';
+import { MatchType, RepeatSpec } from '../types/RepeatTypes';
 import {
   ElementId,
   StaffElement,
@@ -36,6 +36,7 @@ export class ProjectStore {
       this.chordList.push(chord);
     }
     this.updateNextElements();
+    this.updateMatchElements();
   }
 
   findAdjacentChord(x: number, staffIndex: StaffIndex, excludeChord?: ChordId) {
@@ -153,6 +154,7 @@ export class ProjectStore {
       }
     }
     this.updateNextElements();
+    this.updateMatchElements();
   }
 
   @action setOctave(staffIndex: StaffIndex, newOctave: number) {
@@ -166,6 +168,7 @@ export class ProjectStore {
     }
     this.dropEmptyChords();
     this.updateNextElements();
+    this.updateMatchElements();
   }
 
   dropEmptyChords() {
@@ -184,6 +187,7 @@ export class ProjectStore {
       this.spliceElement(id);
     }
     this.updateNextElements();
+    this.updateMatchElements();
   }
 
   @action spliceElement(id: ElementId) {
@@ -234,5 +238,43 @@ export class ProjectStore {
       previous = item;
     });
     inOrder[inOrder.length - 1].nextElement = undefined;
+  }
+
+  private updateMatchElements() {
+    type Matchable = RepeatSpec;
+    const inOrder: Matchable[] = this.elementList.filter(
+      el => el.kind === 'repeat'
+    ) as RepeatSpec[];
+
+    if (inOrder.length === 0) {
+      return;
+    }
+
+    inOrder.sort((a, b) => {
+      if (a.staffIndex === undefined || b.staffIndex === undefined) {
+        throw new Error('Element in project list without staff index');
+      }
+      if (a.staffIndex < b.staffIndex) {
+        return -1;
+      } else if (b.staffIndex < a.staffIndex) {
+        return 1;
+      }
+      return a.x - b.x;
+    });
+
+    const stack = [];
+    for (let el of inOrder) {
+      if (el.type === MatchType.START) {
+        stack.push(el);
+      } else {
+        if (stack.length > 0) {
+          const match = stack.shift()!;
+          match.matchElement = el.id;
+          el.matchElement = match.id;
+        } else {
+          el.matchElement = undefined;
+        }
+      }
+    }
   }
 }

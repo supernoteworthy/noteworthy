@@ -2,6 +2,7 @@ import { ProjectStore } from '../stores/project.store';
 import { AccidentalSpec } from '../types/AccidentalTypes';
 import { ChordSpec } from '../types/ChordTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
+import { MatchType } from '../types/RepeatTypes';
 import { ElementId } from '../types/StaffTypes';
 import {
   beatsToSeconds,
@@ -28,6 +29,7 @@ export default class PlayHead {
   public currentChord?: ChordSpec;
   public endTime?: number;
   public endCondition: EndCondition;
+  private repeatCounters: { [counter: string]: number } = {};
 
   constructor(
     context: AudioContext,
@@ -71,6 +73,35 @@ export default class PlayHead {
         }
         break;
       case 'repeat':
+        if (element.type === MatchType.START) {
+          if (element.nextElement === element.matchElement) {
+            // Repeat block is empty.
+            return;
+          }
+          this.next(); // Start repeat -- no-op; go to next note.
+        } else {
+          // End repeat. Go to start repeat!
+          if (this.repeatCounters[element.id] === undefined) {
+            this.repeatCounters[element.id] = 1;
+          } else {
+            this.repeatCounters[element.id]++;
+          }
+          if (
+            element.nRepeats === undefined ||
+            this.repeatCounters[element.id] >= element.nRepeats
+          ) {
+            delete this.repeatCounters[element.id];
+            return;
+          }
+          let startRepeat = element.matchElement;
+          if (!startRepeat) {
+            startRepeat = this.projectStore.firstElement;
+          }
+          if (startRepeat) {
+            this.currentElement = startRepeat;
+            this.playCurrent();
+          }
+        }
         break;
     }
   }

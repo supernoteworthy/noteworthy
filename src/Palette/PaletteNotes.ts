@@ -1,12 +1,12 @@
 import { AccidentalType } from '../types/AccidentalTypes';
 import { NoteLength, NoteType } from '../types/NoteTypes';
-import { RepeatType } from '../types/RepeatTypes';
+import { MatchType } from '../types/RepeatTypes';
 import { ElementId } from '../types/StaffTypes';
 
 interface PaletteNoteSpec {
   kind: string;
   id: ElementId;
-  type?: NoteType | AccidentalType | RepeatType;
+  type?: NoteType | AccidentalType | MatchType;
   length?: NoteLength;
   x: number;
   y: number;
@@ -126,7 +126,7 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
   {
     kind: 'repeat',
     id: 'REPEAT_START',
-    type: RepeatType.START,
+    type: MatchType.START,
     x: 5,
     y: 760,
     tooltip: 'Repeat start'
@@ -134,7 +134,7 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
   {
     kind: 'repeat',
     id: 'REPEAT_END',
-    type: RepeatType.END,
+    type: MatchType.END,
     x: 5,
     y: 860,
     tooltip: 'Repeat end'

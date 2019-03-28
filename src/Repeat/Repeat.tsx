@@ -5,7 +5,7 @@ import React, { Component, Fragment } from 'react';
 import { LINE_DY, STAFF_HEIGHT } from '../constants';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
-import { RepeatId, RepeatSpec, RepeatType } from '../types/RepeatTypes';
+import { MatchType, RepeatId, RepeatSpec } from '../types/RepeatTypes';
 import { StaffIndex } from '../types/StaffTypes';
 import './Repeat.css';
 
@@ -16,7 +16,7 @@ interface RepeatProps {
   staffIndex?: StaffIndex;
   nRepeats?: number;
   color: string;
-  type: RepeatType;
+  type: MatchType;
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
@@ -61,17 +61,17 @@ export default class Repeat extends Component<RepeatProps> {
           <Fragment>
             <InputNumber
               autoFocus
-              min={1}
+              min={2}
               precision={0}
-              value={nRepeats || 1}
+              value={nRepeats || 2}
               onChange={value => {
                 const element = projectStore.getElementById(
                   this.props.id!
                 ) as RepeatSpec;
-                element.nRepeats = value;
+                element.nRepeats = value || 2;
               }}
-            />{' '}
-            {nRepeats === 1 ? 'time' : 'times'}
+            />
+            {' times'}
           </Fragment>
         }
         placement="bottom"
@@ -84,7 +84,7 @@ export default class Repeat extends Component<RepeatProps> {
         }}
       >
         <text x={8} y={100}>
-          {nRepeats || 0}
+          {nRepeats || 2}
         </text>
       </Popover>
     );
@@ -96,7 +96,7 @@ export default class Repeat extends Component<RepeatProps> {
       'MainBox--selected': isSelected
     });
     let paths;
-    if (type === RepeatType.START) {
+    if (type === MatchType.START) {
       paths = (
         <Fragment>
           <line x1={5} x2={5} y1={0} y2={STAFF_HEIGHT} stroke={color} />
@@ -156,7 +156,7 @@ export default class Repeat extends Component<RepeatProps> {
           onMouseEnter={onMainMouseEnter}
           onMouseLeave={onMainMouseLeave}
         />
-        {shouldShowNumber && type === RepeatType.END && repeatEditor}
+        {shouldShowNumber && type === MatchType.END && repeatEditor}
       </g>
     );
   }

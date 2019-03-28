@@ -7,7 +7,7 @@ import Repeat from '../Repeat/Repeat';
 import { UiStore } from '../stores/ui.store';
 import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { NoteOrientation, NoteSpec, NoteType } from '../types/NoteTypes';
-import { RepeatSpec, RepeatType } from '../types/RepeatTypes';
+import { MatchType, RepeatSpec } from '../types/RepeatTypes';
 import { StaffElement } from '../types/StaffTypes';
 import './Palette.css';
 import { PALETTE_NOTES } from './PaletteNotes';
@@ -88,11 +88,11 @@ export default class Palette extends Component<PaletteProps> {
                       <Repeat
                         x={note.x}
                         y={note.y}
-                        type={note.type as RepeatType}
+                        type={note.type as MatchType}
                         onMouseDown={() => {
                           this.setState({ selectedNote: note.id });
                           const spec = Object.assign(
-                            { nRepeats: 1 },
+                            { nRepeats: 2 },
                             note
                           ) as RepeatSpec;
                           uiStore.cursorSpec = spec;
