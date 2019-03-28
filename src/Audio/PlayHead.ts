@@ -4,6 +4,7 @@ import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordSpec } from '../types/ChordTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
 import { MatchType } from '../types/RepeatTypes';
+import { SetterType } from '../types/SetterTypes';
 import { ElementId } from '../types/StaffTypes';
 import {
   beatsToSeconds,
@@ -18,8 +19,6 @@ export enum EndCondition {
   END_OF_SHEET
 }
 
-const BPM = 100;
-
 export default class PlayHead {
   private context: AudioContext;
   private gain?: GainNode;
@@ -32,6 +31,9 @@ export default class PlayHead {
   public endCondition: EndCondition;
   private repeatCounters: { [counter: string]: number } = {};
   private workingAccidentals: { [y: number]: AccidentalType } = {};
+  private workingSetterProperties: {
+    [prop: string]: number | string | undefined;
+  } = {};
 
   constructor(
     context: AudioContext,
@@ -65,7 +67,7 @@ export default class PlayHead {
         if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
           let time = 0.5;
           if (element.kind === 'note') {
-            time = beatsToSeconds(noteLengthToBeats(element.length), BPM);
+            time = beatsToSeconds(noteLengthToBeats(element.length), 100);
           }
           this.playElement(
             element,
@@ -108,7 +110,22 @@ export default class PlayHead {
           }
         }
         break;
+      case 'setter':
+        this.workingSetterProperties[element.type] = element.value;
+        this.next();
+        break;
     }
+  }
+
+  private getSetterProperty(type: SetterType) {
+    const workingValue = this.workingSetterProperties[type];
+    if (workingValue) {
+      return workingValue;
+    }
+    if (!this.currentChord) {
+      return null;
+    }
+    return this.projectStore.getBacktrackSetter(type, this.currentChord.id);
   }
 
   next() {
@@ -130,13 +147,14 @@ export default class PlayHead {
 
   playChord(chord: ChordSpec, startTime: number) {
     const notes = this.projectStore.getNotesForChord(chord.id);
+    const bpm = (this.getSetterProperty(SetterType.BPM) as number) || 100;
     const noteTimes = notes.map(note =>
-      beatsToSeconds(noteLengthToBeats(note.length), BPM)
+      beatsToSeconds(noteLengthToBeats(note.length), bpm)
     );
     const chordTime = Math.max(...noteTimes);
     this.endTime = startTime + chordTime;
     notes.forEach(note => {
-      const noteTime = beatsToSeconds(noteLengthToBeats(note.length), BPM);
+      const noteTime = beatsToSeconds(noteLengthToBeats(note.length), bpm);
       this.playElement(note, startTime, startTime + noteTime);
     });
   }
@@ -150,11 +168,12 @@ export default class PlayHead {
       this.workingAccidentals[spec.y] ||
       this.projectStore.getKeySignatureForNote(spec.id);
     if (this.workingAccidentals[spec.y]) {
+      // Accidentals are applied to only one note.
       delete this.workingAccidentals[spec.y];
     }
     const midiNote = staffPositionToMidi(
       spec.y,
-      this.projectStore.getOctaveForElement(spec.id),
+      (this.getSetterProperty(SetterType.OCTAVE) as number) || 0,
       spec.kind === 'note' ? accidental : spec.type
     );
     const { buffer, playbackRate } = this.instrument.getBufferAndRateForMidi(

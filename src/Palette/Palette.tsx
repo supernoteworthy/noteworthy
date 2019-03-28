@@ -4,10 +4,12 @@ import React, { Component } from 'react';
 import Accidental from '../Accidental/Accidental';
 import RenderNote from '../RenderNote/RenderNote';
 import Repeat from '../Repeat/Repeat';
+import Setter from '../Setter/Setter';
 import { UiStore } from '../stores/ui.store';
 import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { NoteOrientation, NoteSpec, NoteType } from '../types/NoteTypes';
 import { MatchType, RepeatSpec } from '../types/RepeatTypes';
+import { setterDefaults, SetterSpec, SetterType } from '../types/SetterTypes';
 import { StaffElement } from '../types/StaffTypes';
 import './Palette.css';
 import { PALETTE_NOTES } from './PaletteNotes';
@@ -124,6 +126,32 @@ export default class Palette extends Component<PaletteProps> {
                         }}
                         isSelected={selectedNote === note.id}
                         type={note.type as AccidentalType}
+                      />
+                    </Tooltip>
+                  );
+                case 'setter':
+                  return (
+                    <Tooltip
+                      title={note.tooltip}
+                      placement="right"
+                      key={note.id}
+                    >
+                      <Setter
+                        x={note.x}
+                        y={note.y}
+                        color="#fff"
+                        onMouseDown={() => {
+                          this.setState({ selectedNote: note.id });
+                          const spec = Object.assign(
+                            {
+                              value: setterDefaults[note.type!]
+                            },
+                            note
+                          ) as SetterSpec;
+                          uiStore.cursorSpec = spec;
+                        }}
+                        isSelected={selectedNote === note.id}
+                        type={note.type as SetterType}
                       />
                     </Tooltip>
                   );

@@ -13,6 +13,7 @@ import {
 } from '../constants';
 import RenderNote from '../RenderNote/RenderNote';
 import Repeat from '../Repeat/Repeat';
+import Setter from '../Setter/Setter';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { ChordSpec } from '../types/ChordTypes';
@@ -123,6 +124,14 @@ export default class CursorElement extends Component<CursorElementProps> {
         y: 0,
         staffIndex
       });
+    } else if (cursorSpec.kind === 'setter') {
+      projectStore.addElement({
+        ...cursorSpec,
+        id: newElementId,
+        x,
+        y: 0,
+        staffIndex
+      });
     }
   };
 
@@ -152,9 +161,10 @@ export default class CursorElement extends Component<CursorElementProps> {
 
     if (
       (cursorSpec.kind === 'note' && cursorSpec.type === NoteType.REST) ||
-      cursorSpec.kind === 'repeat'
+      cursorSpec.kind === 'repeat' ||
+      cursorSpec.kind === 'setter'
     ) {
-      // Rests and repeats are fixed to the top of the staff.
+      // Rests, repeats, setters are fixed to the top of the staff.
       y = staffIndex * (STAFF_HEIGHT + STAFF_MARGIN) + SHEET_MARGIN_TOP;
     }
 
@@ -210,6 +220,8 @@ export default class CursorElement extends Component<CursorElementProps> {
             shouldShowNumber={false}
           />
         );
+      case 'setter':
+        return <Setter x={x} y={y} type={cursorSpec.type} color="#ddd" />;
     }
   }
 }

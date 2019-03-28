@@ -1,12 +1,13 @@
 import { AccidentalType } from '../types/AccidentalTypes';
 import { NoteLength, NoteType } from '../types/NoteTypes';
 import { MatchType } from '../types/RepeatTypes';
+import { SetterType } from '../types/SetterTypes';
 import { ElementId } from '../types/StaffTypes';
 
 interface PaletteNoteSpec {
   kind: string;
   id: ElementId;
-  type?: NoteType | AccidentalType | MatchType;
+  type?: NoteType | AccidentalType | MatchType | SetterType;
   length?: NoteLength;
   x: number;
   y: number;
@@ -162,5 +163,37 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     y: 1120,
     type: AccidentalType.NATURAL,
     tooltip: 'Natural'
+  },
+  {
+    kind: 'setter',
+    id: 'SET_OCTAVE',
+    x: 0,
+    y: 1140,
+    type: SetterType.OCTAVE,
+    tooltip: 'Set octave'
+  },
+  {
+    kind: 'setter',
+    id: 'SET_VOLUME',
+    x: 0,
+    y: 1200,
+    type: SetterType.VOLUME,
+    tooltip: 'Set volume'
+  },
+  {
+    kind: 'setter',
+    id: 'SET_BPM',
+    x: 0,
+    y: 1260,
+    type: SetterType.BPM,
+    tooltip: 'Set beats per minute'
+  },
+  {
+    kind: 'setter',
+    id: 'SET_INSTRUMENT',
+    x: 0,
+    y: 1320,
+    type: SetterType.INSTRUMENT,
+    tooltip: 'Set instrument'
   }
 ];

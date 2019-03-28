@@ -1,7 +1,8 @@
 import { ProjectStore } from '../stores/project.store';
-import { AccidentalId } from '../types/AccidentalTypes';
+import { AccidentalId, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
-import { NoteId } from '../types/NoteTypes';
+import { NoteId, NoteSpec } from '../types/NoteTypes';
+import { staffPositionToMidi } from './AudioMath';
 import { Piano } from './Instruments/Piano';
 import PlayHead, { EndCondition } from './PlayHead';
 import SampleLibrary from './SampleLibrary';
@@ -80,6 +81,30 @@ class Audio {
     );
     this.scheduler.pushPlayHead(playHead);
     this.scheduler.start();
+  }
+
+  public playNoteSample(
+    note: NoteSpec,
+    accidental: AccidentalType,
+    octave: number
+  ) {
+    const source = this.context.createBufferSource();
+    const midiNote = staffPositionToMidi(note.y, octave, accidental);
+    const {
+      buffer,
+      playbackRate
+    } = this.instruments.piano.getBufferAndRateForMidi(midiNote);
+    source.buffer = buffer;
+    source.playbackRate.value = playbackRate;
+    const start = this.context.currentTime;
+    const stop = this.context.currentTime + 1;
+    source.start(start);
+    source.stop(stop);
+    const gain = this.context.createGain();
+    source.connect(gain);
+    gain.gain.setValueAtTime(1, start + (stop - start) * 0.7);
+    gain.gain.linearRampToValueAtTime(0.000001, stop);
+    gain.connect(this.context.destination);
   }
 
   public stopChord(chordId: ChordId) {

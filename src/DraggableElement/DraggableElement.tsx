@@ -5,6 +5,7 @@ import Audio from '../Audio/Audio';
 import { LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
 import RenderNote from '../RenderNote/RenderNote';
 import Repeat from '../Repeat/Repeat';
+import Setter from '../Setter/Setter';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { NoteOrientation, NoteType } from '../types/NoteTypes';
@@ -191,7 +192,8 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     }
     if (
       (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
-      this.spec.kind === 'repeat'
+      this.spec.kind === 'repeat' ||
+      this.spec.kind === 'setter'
     ) {
       return { x, y };
     } else {
@@ -211,7 +213,8 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     let finalY = absoluteY - newStaffIndex * (STAFF_HEIGHT + STAFF_MARGIN);
     if (
       (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
-      this.spec.kind === 'repeat'
+      this.spec.kind === 'repeat' ||
+      this.spec.kind === 'setter'
     ) {
       finalY = 0;
     }
@@ -294,6 +297,31 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             }
             shouldShowNumber
             nRepeats={spec.nRepeats}
+          />
+        );
+      case 'setter':
+        return (
+          <Setter
+            id={spec.id}
+            x={spec.x}
+            y={spec.y}
+            type={spec.type}
+            color="#000"
+            onMainMouseDown={this.onMouseDown}
+            isSelected={dragging}
+            onMainMouseEnter={() => {
+              if (uiStore.mouseMode !== MouseMode.POPOVER) {
+                uiStore.mouseMode = MouseMode.DRAG;
+                uiStore.dragActiveStaffIndex = this.staffIndex;
+              }
+            }}
+            onMainMouseLeave={() =>
+              !dragging &&
+              uiStore.mouseMode == MouseMode.DRAG &&
+              (uiStore.mouseMode = MouseMode.INSERT)
+            }
+            shouldShowValue
+            value={spec.value}
           />
         );
     }

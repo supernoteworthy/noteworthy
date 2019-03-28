@@ -6,6 +6,7 @@ import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
 import { MatchType, RepeatSpec } from '../types/RepeatTypes';
+import { SetterSpec, SetterType } from '../types/SetterTypes';
 import {
   ElementId,
   StaffElement,
@@ -206,8 +207,8 @@ export class ProjectStore {
   }
 
   private elementCompare(
-    a: ChordSpec | AccidentalSpec | RepeatSpec,
-    b: ChordSpec | AccidentalSpec | RepeatSpec
+    a: ChordSpec | AccidentalSpec | RepeatSpec | SetterSpec,
+    b: ChordSpec | AccidentalSpec | RepeatSpec | SetterSpec
   ) {
     if (a.staffIndex === undefined || b.staffIndex === undefined) {
       throw new Error('Element in project list without staff index');
@@ -270,5 +271,30 @@ export class ProjectStore {
         }
       }
     }
+  }
+
+  public getBacktrackSetter(type: SetterType, chordId: ChordId) {
+    const chord = this.getChordById(chordId)!;
+    const setters = this.elementList.filter(
+      setter =>
+        setter.kind === 'setter' &&
+        setter.type === type &&
+        setter.staffIndex! <= chord.staffIndex &&
+        setter.x <= chord.x
+    ) as SetterSpec[];
+    setters.sort(this.elementCompare);
+    if (setters.length === 0) {
+      switch (type) {
+        case SetterType.BPM:
+          return 100;
+        case SetterType.INSTRUMENT:
+          return 'Piano';
+        case SetterType.OCTAVE:
+          return 4;
+        case SetterType.VOLUME:
+          return 100;
+      }
+    }
+    return setters[setters.length - 1].value;
   }
 }

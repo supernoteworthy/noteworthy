@@ -3,6 +3,7 @@ import { ChordSpec } from './ChordTypes';
 import { ClefType } from './ClefTypes';
 import { NoteSpec } from './NoteTypes';
 import { RepeatSpec } from './RepeatTypes';
+import { SetterSpec } from './SetterTypes';
 
 export type StaffIndex = number;
 
@@ -13,4 +14,9 @@ export interface StaffSpec {
 }
 
 export type ElementId = string;
-export type StaffElement = NoteSpec | AccidentalSpec | RepeatSpec | ChordSpec;
+export type StaffElement =
+  | NoteSpec
+  | AccidentalSpec
+  | RepeatSpec
+  | ChordSpec
+  | SetterSpec;
