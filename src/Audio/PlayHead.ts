@@ -1,5 +1,6 @@
+import { KEY_SIGNATURE_GUIDELINE_X } from '../constants';
 import { ProjectStore } from '../stores/project.store';
-import { AccidentalSpec } from '../types/AccidentalTypes';
+import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordSpec } from '../types/ChordTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
 import { MatchType } from '../types/RepeatTypes';
@@ -30,6 +31,7 @@ export default class PlayHead {
   public endTime?: number;
   public endCondition: EndCondition;
   private repeatCounters: { [counter: string]: number } = {};
+  private workingAccidentals: { [y: number]: AccidentalType } = {};
 
   constructor(
     context: AudioContext,
@@ -56,6 +58,9 @@ export default class PlayHead {
         this.playChord(element, this.context.currentTime);
         break;
       case 'accidental':
+        if (element.x > KEY_SIGNATURE_GUIDELINE_X) {
+          this.workingAccidentals[element.y] = element.type;
+        }
       case 'note':
         if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
           let time = 0.5;
@@ -141,12 +146,16 @@ export default class PlayHead {
       return;
     }
     const source = this.context.createBufferSource();
+    const accidental =
+      this.workingAccidentals[spec.y] ||
+      this.projectStore.getKeySignatureForNote(spec.id);
+    if (this.workingAccidentals[spec.y]) {
+      delete this.workingAccidentals[spec.y];
+    }
     const midiNote = staffPositionToMidi(
       spec.y,
       this.projectStore.getOctaveForElement(spec.id),
-      spec.kind === 'note'
-        ? this.projectStore.getAccidentalForNote(spec.id)
-        : spec.type
+      spec.kind === 'note' ? accidental : spec.type
     );
     const { buffer, playbackRate } = this.instrument.getBufferAndRateForMidi(
       midiNote

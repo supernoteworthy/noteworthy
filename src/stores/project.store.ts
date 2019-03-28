@@ -1,6 +1,6 @@
 import { action, computed, observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
-import { CHORD_GUIDELINE_WIDTH } from '../constants';
+import { CHORD_GUIDELINE_WIDTH, KEY_SIGNATURE_GUIDELINE_X } from '../constants';
 import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { ClefType } from '../types/ClefTypes';
@@ -81,7 +81,7 @@ export class ProjectStore {
     return staff.octave;
   }
 
-  getAccidentalForNote(id: NoteId) {
+  getKeySignatureForNote(id: NoteId) {
     const note = this.getElementById(id);
     if (!note || note.kind !== 'note') {
       return AccidentalType.NATURAL;
@@ -92,14 +92,13 @@ export class ProjectStore {
     }
     const accidentals = this.elementList.filter(
       element =>
-        element.y === note.y &&
         element.kind === 'accidental' &&
-        element.staffIndex === chord.staffIndex &&
-        element.x < chord.x
+        element.y === note.y &&
+        element.x <= KEY_SIGNATURE_GUIDELINE_X
     ) as AccidentalSpec[];
-    accidentals.sort((a, b) => b.x - a.x);
+    accidentals.sort(this.elementCompare);
     if (accidentals.length > 0) {
-      return accidentals[0].type;
+      return accidentals[accidentals.length - 1].type;
     }
     return AccidentalType.NATURAL;
   }
@@ -206,6 +205,21 @@ export class ProjectStore {
     note.isPlaying = isPlaying;
   }
 
+  private elementCompare(
+    a: ChordSpec | AccidentalSpec | RepeatSpec,
+    b: ChordSpec | AccidentalSpec | RepeatSpec
+  ) {
+    if (a.staffIndex === undefined || b.staffIndex === undefined) {
+      throw new Error('Element in project list without staff index');
+    }
+    if (a.staffIndex < b.staffIndex) {
+      return -1;
+    } else if (b.staffIndex < a.staffIndex) {
+      return 1;
+    }
+    return a.x - b.x;
+  }
+
   private updateNextElements() {
     type Sortable = ChordSpec | AccidentalSpec | RepeatSpec;
     const inOrder: Sortable[] = [
@@ -217,17 +231,7 @@ export class ProjectStore {
       return;
     }
 
-    inOrder.sort((a, b) => {
-      if (a.staffIndex === undefined || b.staffIndex === undefined) {
-        throw new Error('Element in project list without staff index');
-      }
-      if (a.staffIndex < b.staffIndex) {
-        return -1;
-      } else if (b.staffIndex < a.staffIndex) {
-        return 1;
-      }
-      return a.x - b.x;
-    });
+    inOrder.sort(this.elementCompare);
 
     this.firstElement = inOrder[0].id;
     let previous = inOrder[0];
@@ -250,17 +254,7 @@ export class ProjectStore {
       return;
     }
 
-    inOrder.sort((a, b) => {
-      if (a.staffIndex === undefined || b.staffIndex === undefined) {
-        throw new Error('Element in project list without staff index');
-      }
-      if (a.staffIndex < b.staffIndex) {
-        return -1;
-      } else if (b.staffIndex < a.staffIndex) {
-        return 1;
-      }
-      return a.x - b.x;
-    });
+    inOrder.sort(this.elementCompare);
 
     const stack = [];
     for (let el of inOrder) {
