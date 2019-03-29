@@ -89,6 +89,7 @@ export default class Setter extends Component<SetterProps> {
             <Select.Option value="Piano">Piano</Select.Option>
             <Select.Option value="Sine">Sine</Select.Option>
             <Select.Option value="Sawtooth">Sawtooth</Select.Option>
+            <Select.Option value="Snare">Snare</Select.Option>
           </Select>
         );
         break;

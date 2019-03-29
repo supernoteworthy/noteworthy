@@ -263,7 +263,7 @@ export class ProjectStore {
         stack.push(el);
       } else {
         if (stack.length > 0) {
-          const match = stack.shift()!;
+          const match = stack.pop()!;
           match.matchElement = el.id;
           el.matchElement = match.id;
         } else {

@@ -6,6 +6,7 @@ import { staffPositionToMidi } from './AudioMath';
 import { Piano } from './Instruments/Piano';
 import { Sawtooth } from './Instruments/Sawtooth';
 import { Sine } from './Instruments/Sine';
+import { Snare } from './Instruments/Snare';
 import PlayHead, { EndCondition } from './PlayHead';
 import SampleLibrary from './SampleLibrary';
 import Scheduler from './Scheduler';
@@ -22,7 +23,8 @@ class Audio {
     this.instruments = {
       Piano: new SampleLibrary(this.context, Piano),
       Sine: new SampleLibrary(this.context, Sine),
-      Sawtooth: new SampleLibrary(this.context, Sawtooth)
+      Sawtooth: new SampleLibrary(this.context, Sawtooth),
+      Snare: new SampleLibrary(this.context, Snare)
     };
     this.scheduler = new Scheduler(this.context, this.onUpdateFeedback);
   }
