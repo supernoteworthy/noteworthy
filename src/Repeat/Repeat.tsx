@@ -84,7 +84,7 @@ export default class Repeat extends Component<RepeatProps> {
         }}
       >
         <text x={8} y={100}>
-          {nRepeats || 2}
+          {nRepeats || 2} times
         </text>
       </Popover>
     );

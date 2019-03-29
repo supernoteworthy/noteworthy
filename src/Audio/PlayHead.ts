@@ -24,7 +24,7 @@ export default class PlayHead {
   private gain?: GainNode;
   private source?: AudioBufferSourceNode;
   private projectStore: ProjectStore;
-  private instrument: SampleLibrary;
+  private instruments: { [instrumentName: string]: SampleLibrary };
   private currentElement: ElementId;
   public currentChord?: ChordSpec;
   public endTime?: number;
@@ -38,14 +38,14 @@ export default class PlayHead {
   constructor(
     context: AudioContext,
     projectStore: ProjectStore,
-    instrument: SampleLibrary,
+    instruments: { [instrumentName: string]: SampleLibrary },
     endCondition: EndCondition,
     currentElement: ElementId
   ) {
     this.context = context;
     this.projectStore = projectStore;
     this.currentElement = currentElement;
-    this.instrument = instrument;
+    this.instruments = instruments;
     this.endCondition = endCondition;
   }
 
@@ -122,10 +122,12 @@ export default class PlayHead {
     if (workingValue) {
       return workingValue;
     }
-    if (!this.currentChord) {
-      return null;
+    if (this.currentElement) {
+      return this.projectStore.getBacktrackSetter(type, this.currentElement);
+    } else if (this.currentChord) {
+      return this.projectStore.getBacktrackSetter(type, this.currentChord.id);
     }
-    return this.projectStore.getBacktrackSetter(type, this.currentChord.id);
+    return null;
   }
 
   next() {
@@ -176,16 +178,22 @@ export default class PlayHead {
       (this.getSetterProperty(SetterType.OCTAVE) as number) || 0,
       spec.kind === 'note' ? accidental : spec.type
     );
-    const { buffer, playbackRate } = this.instrument.getBufferAndRateForMidi(
-      midiNote
-    );
+    const instrument = this.getSetterProperty(SetterType.INSTRUMENT) || 'Piano';
+    const { buffer, playbackRate } = this.instruments[
+      instrument
+    ].getBufferAndRateForMidi(midiNote);
     source.buffer = buffer;
     source.playbackRate.value = playbackRate;
     source.start(start);
     source.stop(stop);
+
+    const volume =
+      ((this.getSetterProperty(SetterType.VOLUME) as number) || 100) / 100;
+
     const gain = this.context.createGain();
     source.connect(gain);
-    gain.gain.setValueAtTime(1, start + (stop - start) * 0.7);
+    gain.gain.setValueAtTime(volume, start);
+    gain.gain.setValueAtTime(volume, start + (stop - start) * 0.7);
     gain.gain.linearRampToValueAtTime(0.000001, stop);
     gain.connect(this.context.destination);
     this.source = source;

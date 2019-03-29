@@ -4,6 +4,8 @@ import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
 import { staffPositionToMidi } from './AudioMath';
 import { Piano } from './Instruments/Piano';
+import { Sawtooth } from './Instruments/Sawtooth';
+import { Sine } from './Instruments/Sine';
 import PlayHead, { EndCondition } from './PlayHead';
 import SampleLibrary from './SampleLibrary';
 import Scheduler from './Scheduler';
@@ -18,7 +20,9 @@ class Audio {
   constructor() {
     this.context = new window.AudioContext();
     this.instruments = {
-      piano: new SampleLibrary(this.context, Piano)
+      Piano: new SampleLibrary(this.context, Piano),
+      Sine: new SampleLibrary(this.context, Sine),
+      Sawtooth: new SampleLibrary(this.context, Sawtooth)
     };
     this.scheduler = new Scheduler(this.context, this.onUpdateFeedback);
   }
@@ -45,7 +49,7 @@ class Audio {
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
-      this.instruments.piano,
+      this.instruments,
       EndCondition.END_OF_SHEET,
       firstElement
     );
@@ -60,7 +64,7 @@ class Audio {
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
-      this.instruments.piano,
+      this.instruments,
       EndCondition.SAMPLE_ELEMENT,
       chordId
     );
@@ -75,7 +79,7 @@ class Audio {
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
-      this.instruments.piano,
+      this.instruments,
       EndCondition.SAMPLE_ELEMENT,
       accidentalId
     );
@@ -93,7 +97,7 @@ class Audio {
     const {
       buffer,
       playbackRate
-    } = this.instruments.piano.getBufferAndRateForMidi(midiNote);
+    } = this.instruments.Piano.getBufferAndRateForMidi(midiNote);
     source.buffer = buffer;
     source.playbackRate.value = playbackRate;
     const start = this.context.currentTime;

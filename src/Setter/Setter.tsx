@@ -58,6 +58,7 @@ export default class Setter extends Component<SetterProps> {
 
     let editorContent;
     let label = '';
+    let prefix = '';
 
     switch (type) {
       case SetterType.BPM:
@@ -86,6 +87,8 @@ export default class Setter extends Component<SetterProps> {
             }}
           >
             <Select.Option value="Piano">Piano</Select.Option>
+            <Select.Option value="Sine">Sine</Select.Option>
+            <Select.Option value="Sawtooth">Sawtooth</Select.Option>
           </Select>
         );
         break;
@@ -119,6 +122,7 @@ export default class Setter extends Component<SetterProps> {
             }}
           />
         );
+        prefix = 'Octave ';
         break;
       case SetterType.VOLUME:
         editorContent = (
@@ -152,6 +156,7 @@ export default class Setter extends Component<SetterProps> {
         }}
       >
         <text x={20} y={105}>
+          {prefix}
           {value}
           {label}
         </text>

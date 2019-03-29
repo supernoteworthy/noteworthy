@@ -273,15 +273,21 @@ export class ProjectStore {
     }
   }
 
-  public getBacktrackSetter(type: SetterType, chordId: ChordId) {
-    const chord = this.getChordById(chordId)!;
-    const setters = this.elementList.filter(
-      setter =>
-        setter.kind === 'setter' &&
-        setter.type === type &&
-        setter.staffIndex! <= chord.staffIndex &&
-        setter.x <= chord.x
-    ) as SetterSpec[];
+  public getBacktrackSetter(type: SetterType, elementId: ElementId) {
+    let element = this.getElementById(elementId) as ChordSpec | AccidentalSpec;
+    const setters = this.elementList.filter(setter => {
+      if (
+        setter.kind !== 'setter' ||
+        setter.type !== type ||
+        setter.staffIndex! > element.staffIndex!
+      ) {
+        return false;
+      }
+      if (setter.staffIndex! === element.staffIndex && setter.x > element.x) {
+        return false;
+      }
+      return true;
+    }) as SetterSpec[];
     setters.sort(this.elementCompare);
     if (setters.length === 0) {
       switch (type) {
