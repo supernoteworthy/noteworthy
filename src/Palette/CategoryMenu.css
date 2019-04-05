@@ -1,5 +1,7 @@
 .CategoryMenu {
-  margin-top: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background: rgb(87, 105, 127);
 }
 
 .CategoryMenu button {

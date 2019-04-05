@@ -1,16 +1,21 @@
 .Palette {
   flex: 0 0 100px;
   height: 100vh;
-  overflow: auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.Palette > svg {
-  width: 100px;
-  height: 1800px;
+.Palette_scroll > svg {
+  width: 50px;
   margin-left: 35px;
   transform-origin: top left;
   transform: scale(0.8);
+}
+
+.Palette_scroll {
+  flex: 1;
+  overflow: auto;
+  overflow-x: hidden;
 }
 
 .PaletteItem {
