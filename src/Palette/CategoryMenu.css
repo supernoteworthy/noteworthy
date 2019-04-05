@@ -1,0 +1,21 @@
+.CategoryMenu {
+  margin-top: 5px;
+}
+
+.CategoryMenu button {
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  display: block;
+  margin: auto;
+  background: rgb(0, 0, 0, 0);
+  color: #fff;
+}
+
+.CategoryMenu button.Selected {
+  color: rgb(152, 220, 255);
+}
+
+.CategoryMenu button:focus {
+  outline: 0;
+}

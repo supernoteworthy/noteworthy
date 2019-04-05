@@ -4,25 +4,28 @@ import { MatchType } from '../types/RepeatTypes';
 import { SetterType } from '../types/SetterTypes';
 import { ElementId } from '../types/StaffTypes';
 
-interface PaletteNoteSpec {
+interface PaletteElementSpec {
   kind: string;
   id: ElementId;
   type?: NoteType | AccidentalType | MatchType | SetterType;
   length?: NoteLength;
   x: number;
-  y: number;
+  yOffset?: number;
+  height: number;
   tooltip: string;
+  category: string;
 }
 
-export const PALETTE_NOTES: PaletteNoteSpec[] = [
+export const PALETTE_ELEMENTS: PaletteElementSpec[] = [
   {
     kind: 'note',
     id: 'DOUBLE_WHOLE',
     type: NoteType.TONE,
     length: NoteLength.DOUBLEWHOLE,
     x: 0,
-    y: 40,
-    tooltip: 'Double whole (8)'
+    height: 50,
+    tooltip: 'Double whole (8)',
+    category: 'Notes'
   },
   {
     kind: 'note',
@@ -30,8 +33,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.TONE,
     length: NoteLength.WHOLE,
     x: 3,
-    y: 80,
-    tooltip: 'Whole (4)'
+    height: 50,
+    yOffset: 25,
+    tooltip: 'Whole (4)',
+    category: 'Notes'
   },
   {
     kind: 'note',
@@ -39,8 +44,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.TONE,
     length: NoteLength.HALF,
     x: 0,
-    y: 160,
-    tooltip: 'Half (2)'
+    yOffset: 50,
+    height: 50,
+    tooltip: 'Half (2)',
+    category: 'Notes'
   },
   {
     kind: 'note',
@@ -48,8 +55,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.TONE,
     length: NoteLength.QUARTER,
     x: 0,
-    y: 230,
-    tooltip: 'Quarter (1)'
+    yOffset: 50,
+    height: 50,
+    tooltip: 'Quarter (1)',
+    category: 'Notes'
   },
   {
     kind: 'note',
@@ -57,8 +66,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.TONE,
     length: NoteLength.EIGHTH,
     x: 0,
-    y: 310,
-    tooltip: 'Eighth (1/2)'
+    yOffset: 50,
+    height: 50,
+    tooltip: 'Eighth (1/2)',
+    category: 'Notes'
   },
   {
     kind: 'note',
@@ -66,18 +77,20 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.TONE,
     length: NoteLength.SIXTEENTH,
     x: 0,
-    y: 390,
-    tooltip: 'Sixteenth (1/4)'
+    yOffset: 50,
+    height: 50,
+    tooltip: 'Sixteenth (1/4)',
+    category: 'Notes'
   },
-
   {
     kind: 'note',
     id: 'REST_DOUBLEWHOLE',
     type: NoteType.REST,
     length: NoteLength.DOUBLEWHOLE,
     x: 0,
-    y: 420,
-    tooltip: 'Double whole rest (8)'
+    height: 40,
+    tooltip: 'Double whole rest (8)',
+    category: 'Rests'
   },
   {
     kind: 'note',
@@ -85,8 +98,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.REST,
     length: NoteLength.WHOLE,
     x: 0,
-    y: 460,
-    tooltip: 'Whole rest (4)'
+    height: 40,
+    yOffset: 30,
+    tooltip: 'Whole rest (4)',
+    category: 'Rests'
   },
   {
     kind: 'note',
@@ -94,8 +109,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.REST,
     length: NoteLength.HALF,
     x: 0,
-    y: 500,
-    tooltip: 'Half rest (2)'
+    height: 40,
+    yOffset: 30,
+    tooltip: 'Half rest (2)',
+    category: 'Rests'
   },
   {
     kind: 'note',
@@ -103,8 +120,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.REST,
     length: NoteLength.QUARTER,
     x: 0,
-    y: 550,
-    tooltip: 'Quarter rest (1)'
+    height: 45,
+    yOffset: 40,
+    tooltip: 'Quarter rest (1)',
+    category: 'Rests'
   },
   {
     kind: 'note',
@@ -112,8 +131,10 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.REST,
     length: NoteLength.EIGHTH,
     x: 5,
-    y: 610,
-    tooltip: 'Eighth rest (1/2)'
+    height: 35,
+    yOffset: 40,
+    tooltip: 'Eighth rest (1/2)',
+    category: 'Rests'
   },
   {
     kind: 'note',
@@ -121,79 +142,96 @@ export const PALETTE_NOTES: PaletteNoteSpec[] = [
     type: NoteType.REST,
     length: NoteLength.SIXTEENTH,
     x: 5,
-    y: 670,
-    tooltip: 'Sixteenth rest (1/16)'
+    height: 50,
+    yOffset: 40,
+    tooltip: 'Sixteenth rest (1/16)',
+    category: 'Rests'
   },
   {
     kind: 'repeat',
     id: 'REPEAT_START',
     type: MatchType.START,
     x: 5,
-    y: 760,
-    tooltip: 'Repeat start'
+    height: 80,
+    tooltip: 'Repeat start',
+    category: 'Flow'
   },
   {
     kind: 'repeat',
     id: 'REPEAT_END',
     type: MatchType.END,
     x: 5,
-    y: 860,
-    tooltip: 'Repeat end'
+    height: 80,
+    yOffset: 30,
+    tooltip: 'Repeat end',
+    category: 'Flow'
   },
   {
     kind: 'accidental',
     id: 'SHARP',
     x: 5,
-    y: 985,
+    height: 40,
     type: AccidentalType.SHARP,
-    tooltip: 'Sharp'
+    tooltip: 'Sharp',
+    category: 'Accidentals'
   },
   {
     kind: 'accidental',
     id: 'FLAT',
     x: 10,
-    y: 1060,
+    height: 40,
+    yOffset: 50,
     type: AccidentalType.FLAT,
-    tooltip: 'Flat'
+    tooltip: 'Flat',
+    category: 'Accidentals'
   },
   {
     kind: 'accidental',
     id: 'NATURAL',
     x: 10,
-    y: 1120,
+    height: 40,
+    yOffset: 30,
     type: AccidentalType.NATURAL,
-    tooltip: 'Natural'
+    tooltip: 'Natural',
+    category: 'Accidentals'
   },
   {
     kind: 'setter',
     id: 'SET_OCTAVE',
     x: 0,
-    y: 1140,
+    height: 40,
     type: SetterType.OCTAVE,
-    tooltip: 'Set octave'
+    tooltip: 'Set octave',
+    category: 'Modifiers'
   },
   {
     kind: 'setter',
     id: 'SET_VOLUME',
     x: 0,
-    y: 1200,
+    height: 40,
+    yOffset: 30,
     type: SetterType.VOLUME,
-    tooltip: 'Set volume'
+    tooltip: 'Set volume',
+    category: 'Modifiers'
   },
   {
     kind: 'setter',
     id: 'SET_BPM',
     x: 0,
-    y: 1260,
+    height: 40,
+    yOffset: 30,
     type: SetterType.BPM,
-    tooltip: 'Set beats per minute'
+    tooltip: 'Set beats per minute',
+    category: 'Modifiers'
   },
   {
     kind: 'setter',
     id: 'SET_INSTRUMENT',
     x: 0,
-    y: 1320,
+    height: 40,
+    yOffset: 30,
     type: SetterType.INSTRUMENT,
-    tooltip: 'Set instrument'
+    tooltip: 'Set instrument',
+    category: 'Modifiers'
   }
 ];

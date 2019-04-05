@@ -11,8 +11,9 @@ import { NoteOrientation, NoteSpec, NoteType } from '../types/NoteTypes';
 import { MatchType, RepeatSpec } from '../types/RepeatTypes';
 import { setterDefaults, SetterSpec, SetterType } from '../types/SetterTypes';
 import { StaffElement } from '../types/StaffTypes';
+import CategoryMenu from './CategoryMenu';
 import './Palette.css';
-import { PALETTE_NOTES } from './PaletteNotes';
+import { PALETTE_ELEMENTS } from './PaletteElements';
 
 interface PaletteProps {}
 
@@ -23,7 +24,8 @@ interface InjectedProps extends PaletteProps {
 @inject('uiStore')
 export default class Palette extends Component<PaletteProps> {
   state = {
-    selectedNote: 'EIGHTH'
+    selectedNote: 'EIGHTH',
+    currentCategory: 'Notes'
   };
 
   get injected() {
@@ -32,12 +34,13 @@ export default class Palette extends Component<PaletteProps> {
 
   componentDidMount() {
     const { uiStore } = this.injected;
-    const noteSpec = PALETTE_NOTES.find(
+    const noteSpec = PALETTE_ELEMENTS.find(
       note => note.id === this.state.selectedNote
     );
     if (noteSpec) {
       const cursorSpec = {
         ...noteSpec,
+        y: 0,
         staffIndex: 0
       } as StaffElement;
       uiStore.cursorSpec = cursorSpec;
@@ -46,32 +49,46 @@ export default class Palette extends Component<PaletteProps> {
 
   render() {
     const { uiStore } = this.injected;
-    const { selectedNote } = this.state;
+    const { selectedNote, currentCategory } = this.state;
+    let currentY = 50;
     return (
       <div className="Palette">
+        <CategoryMenu
+          options={PALETTE_ELEMENTS.map(element => element.category).filter(
+            (value, index, array) => array.indexOf(value) === index
+          )}
+          onChange={newCategory =>
+            this.setState({ currentCategory: newCategory })
+          }
+          currentCategory={currentCategory}
+        />
         <svg>
           <g className="PaletteItem">
-            {PALETTE_NOTES.map(note => {
-              switch (note.kind) {
+            {PALETTE_ELEMENTS.filter(
+              element => element.category === currentCategory
+            ).map(element => {
+              const y = currentY + (element.yOffset || 0);
+              currentY += element.height + (element.yOffset || 0);
+              switch (element.kind) {
                 case 'note':
                   return (
                     <Tooltip
-                      title={note.tooltip}
+                      title={element.tooltip}
                       placement="right"
-                      key={note.id}
+                      key={element.id}
                     >
                       <RenderNote
-                        length={note.length!}
-                        type={note.type as NoteType}
-                        isSelected={selectedNote === note.id}
+                        length={element.length!}
+                        type={element.type as NoteType}
+                        isSelected={selectedNote === element.id}
                         orientation={NoteOrientation.UP}
-                        x={note.x}
-                        y={note.y}
+                        x={element.x}
+                        y={y}
                         onMouseDown={() => {
-                          this.setState({ selectedNote: note.id });
+                          this.setState({ selectedNote: element.id });
                           const spec = Object.assign(
-                            { isPlaying: false, nextElement: undefined },
-                            note
+                            { isPlaying: false, nextElement: undefined, y: 0 },
+                            element
                           ) as NoteSpec;
                           uiStore.cursorSpec = spec;
                         }}
@@ -83,23 +100,23 @@ export default class Palette extends Component<PaletteProps> {
                 case 'repeat':
                   return (
                     <Tooltip
-                      title={note.tooltip}
+                      title={element.tooltip}
                       placement="right"
-                      key={note.id}
+                      key={element.id}
                     >
                       <Repeat
-                        x={note.x}
-                        y={note.y}
-                        type={note.type as MatchType}
+                        x={element.x}
+                        y={y}
+                        type={element.type as MatchType}
                         onMouseDown={() => {
-                          this.setState({ selectedNote: note.id });
+                          this.setState({ selectedNote: element.id });
                           const spec = Object.assign(
-                            { nRepeats: 2 },
-                            note
+                            { nRepeats: 2, y: 0 },
+                            element
                           ) as RepeatSpec;
                           uiStore.cursorSpec = spec;
                         }}
-                        isSelected={selectedNote === note.id}
+                        isSelected={selectedNote === element.id}
                         color="#fff"
                         shouldShowNumber={false}
                       />
@@ -108,50 +125,51 @@ export default class Palette extends Component<PaletteProps> {
                 case 'accidental':
                   return (
                     <Tooltip
-                      title={note.tooltip}
+                      title={element.tooltip}
                       placement="right"
-                      key={note.id}
+                      key={element.id}
                     >
                       <Accidental
-                        x={note.x}
-                        y={note.y}
+                        x={element.x}
+                        y={y}
                         color="#fff"
                         onMouseDown={() => {
-                          this.setState({ selectedNote: note.id });
+                          this.setState({ selectedNote: element.id });
                           const spec = Object.assign(
-                            {},
-                            note
+                            { y: 0 },
+                            element
                           ) as AccidentalSpec;
                           uiStore.cursorSpec = spec;
                         }}
-                        isSelected={selectedNote === note.id}
-                        type={note.type as AccidentalType}
+                        isSelected={selectedNote === element.id}
+                        type={element.type as AccidentalType}
                       />
                     </Tooltip>
                   );
                 case 'setter':
                   return (
                     <Tooltip
-                      title={note.tooltip}
+                      title={element.tooltip}
                       placement="right"
-                      key={note.id}
+                      key={element.id}
                     >
                       <Setter
-                        x={note.x}
-                        y={note.y}
+                        x={element.x}
+                        y={y}
                         color="#fff"
                         onMouseDown={() => {
-                          this.setState({ selectedNote: note.id });
+                          this.setState({ selectedNote: element.id });
                           const spec = Object.assign(
                             {
-                              value: setterDefaults[note.type!]
+                              value: setterDefaults[element.type!],
+                              y: 0
                             },
-                            note
+                            element
                           ) as SetterSpec;
                           uiStore.cursorSpec = spec;
                         }}
-                        isSelected={selectedNote === note.id}
-                        type={note.type as SetterType}
+                        isSelected={selectedNote === element.id}
+                        type={element.type as SetterType}
                       />
                     </Tooltip>
                   );
