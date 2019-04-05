@@ -2,6 +2,7 @@ import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import uuid from 'uuid/v4';
 import Accidental from '../Accidental/Accidental';
+import Block from '../Block/Block';
 import {
   CURSOR_COLOR,
   LINE_DY,
@@ -132,6 +133,14 @@ export default class CursorElement extends Component<CursorElementProps> {
         y: 0,
         staffIndex
       });
+    } else if (cursorSpec.kind === 'block') {
+      projectStore.addElement({
+        ...cursorSpec,
+        id: newElementId,
+        x,
+        y: 0,
+        staffIndex
+      });
     }
   };
 
@@ -162,7 +171,8 @@ export default class CursorElement extends Component<CursorElementProps> {
     if (
       (cursorSpec.kind === 'note' && cursorSpec.type === NoteType.REST) ||
       cursorSpec.kind === 'repeat' ||
-      cursorSpec.kind === 'setter'
+      cursorSpec.kind === 'setter' ||
+      cursorSpec.kind === 'block'
     ) {
       // Rests, repeats, setters are fixed to the top of the staff.
       y = staffIndex * (STAFF_HEIGHT + STAFF_MARGIN) + SHEET_MARGIN_TOP;
@@ -218,6 +228,17 @@ export default class CursorElement extends Component<CursorElementProps> {
             type={cursorSpec.type}
             color="#ddd"
             shouldShowNumber={false}
+          />
+        );
+      case 'block':
+        return (
+          <Block
+            x={x}
+            y={y}
+            type={cursorSpec.type}
+            color="#ddd"
+            blockName=""
+            shouldShowLabel={false}
           />
         );
       case 'setter':

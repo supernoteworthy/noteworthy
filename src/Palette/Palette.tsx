@@ -2,11 +2,13 @@ import { Tooltip } from 'antd';
 import { inject } from 'mobx-react';
 import React, { Component } from 'react';
 import Accidental from '../Accidental/Accidental';
+import Block from '../Block/Block';
 import RenderNote from '../RenderNote/RenderNote';
 import Repeat from '../Repeat/Repeat';
 import Setter from '../Setter/Setter';
 import { UiStore } from '../stores/ui.store';
 import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
+import { BlockMatchType, BlockSpec } from '../types/BlockTypes';
 import { NoteOrientation, NoteSpec, NoteType } from '../types/NoteTypes';
 import { MatchType, RepeatSpec } from '../types/RepeatTypes';
 import { setterDefaults, SetterSpec, SetterType } from '../types/SetterTypes';
@@ -131,6 +133,32 @@ export default class Palette extends Component<PaletteProps> {
                           isSelected={selectedNote === element.id}
                           color="#fff"
                           shouldShowNumber={false}
+                        />
+                      </Tooltip>
+                    );
+                  case 'block':
+                    return (
+                      <Tooltip
+                        title={element.tooltip}
+                        placement="right"
+                        key={element.id}
+                      >
+                        <Block
+                          x={element.x}
+                          y={y}
+                          type={element.type as BlockMatchType}
+                          onMouseDown={() => {
+                            this.setState({ selectedNote: element.id });
+                            const spec = Object.assign(
+                              { blockName: '...', y: 0 },
+                              element
+                            ) as BlockSpec;
+                            uiStore.cursorSpec = spec;
+                          }}
+                          isSelected={selectedNote === element.id}
+                          color="#fff"
+                          shouldShowLabel={false}
+                          blockName=""
                         />
                       </Tooltip>
                     );
