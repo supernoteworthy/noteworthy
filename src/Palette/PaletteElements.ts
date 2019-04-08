@@ -235,7 +235,7 @@ export const PALETTE_ELEMENTS: PaletteElementSpec[] = [
     tooltip: 'Set instrument',
     category: 'Modifiers'
   },
-  {
+  /*{
     kind: 'block',
     id: 'BLOCK_START',
     type: BlockMatchType.START,
@@ -264,5 +264,5 @@ export const PALETTE_ELEMENTS: PaletteElementSpec[] = [
     height: 30,
     tooltip: 'Play block',
     category: 'Flow'
-  }
+  }*/
 ];
