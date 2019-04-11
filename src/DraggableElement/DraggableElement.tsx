@@ -249,12 +249,12 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             y={spec.y}
             orientation={this.orientation}
             isSelected={dragging}
-            onMainMouseDown={this.onMouseDown}
-            onMainMouseEnter={() => {
+            onHitBoxMouseDown={this.onMouseDown}
+            onHitBoxMouseEnter={() => {
               uiStore.mouseMode = MouseMode.DRAG;
               uiStore.dragActiveStaffIndex = this.staffIndex;
             }}
-            onMainMouseLeave={() =>
+            onHitBoxMouseLeave={() =>
               !dragging && (uiStore.mouseMode = MouseMode.INSERT)
             }
           />
@@ -266,13 +266,13 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             x={spec.x}
             y={spec.y}
             color="#000"
-            onMainMouseDown={this.onMouseDown}
+            onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
-            onMainMouseEnter={() => {
+            onHitBoxMouseEnter={() => {
               uiStore.mouseMode = MouseMode.DRAG;
               uiStore.dragActiveStaffIndex = this.staffIndex;
             }}
-            onMainMouseLeave={() =>
+            onHitBoxMouseLeave={() =>
               !dragging && (uiStore.mouseMode = MouseMode.INSERT)
             }
           />
@@ -285,15 +285,15 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             y={spec.y}
             type={spec.type}
             color="#000"
-            onMainMouseDown={this.onMouseDown}
+            onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
-            onMainMouseEnter={() => {
+            onHitBoxMouseEnter={() => {
               if (uiStore.mouseMode !== MouseMode.POPOVER) {
                 uiStore.mouseMode = MouseMode.DRAG;
                 uiStore.dragActiveStaffIndex = this.staffIndex;
               }
             }}
-            onMainMouseLeave={() =>
+            onHitBoxMouseLeave={() =>
               !dragging &&
               uiStore.mouseMode == MouseMode.DRAG &&
               (uiStore.mouseMode = MouseMode.INSERT)
@@ -310,15 +310,15 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             y={spec.y}
             type={spec.type}
             color="#000"
-            onMainMouseDown={this.onMouseDown}
+            onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
-            onMainMouseEnter={() => {
+            onHitBoxMouseEnter={() => {
               if (uiStore.mouseMode !== MouseMode.POPOVER) {
                 uiStore.mouseMode = MouseMode.DRAG;
                 uiStore.dragActiveStaffIndex = this.staffIndex;
               }
             }}
-            onMainMouseLeave={() =>
+            onHitBoxMouseLeave={() =>
               !dragging &&
               uiStore.mouseMode == MouseMode.DRAG &&
               (uiStore.mouseMode = MouseMode.INSERT)
@@ -335,15 +335,15 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             y={spec.y}
             type={spec.type}
             color="#000"
-            onMainMouseDown={this.onMouseDown}
+            onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
-            onMainMouseEnter={() => {
+            onHitBoxMouseEnter={() => {
               if (uiStore.mouseMode !== MouseMode.POPOVER) {
                 uiStore.mouseMode = MouseMode.DRAG;
                 uiStore.dragActiveStaffIndex = this.staffIndex;
               }
             }}
-            onMainMouseLeave={() =>
+            onHitBoxMouseLeave={() =>
               !dragging &&
               uiStore.mouseMode == MouseMode.DRAG &&
               (uiStore.mouseMode = MouseMode.INSERT)

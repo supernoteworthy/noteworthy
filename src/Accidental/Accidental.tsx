@@ -10,9 +10,9 @@ interface AccidentalProps {
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
   isSelected?: boolean;
 }
 export default class Accidental extends Component<AccidentalProps> {
@@ -23,9 +23,9 @@ export default class Accidental extends Component<AccidentalProps> {
       type,
       color,
       isSelected,
-      onMainMouseDown,
-      onMainMouseEnter,
-      onMainMouseLeave,
+      onHitBoxMouseDown,
+      onHitBoxMouseEnter,
+      onHitBoxMouseLeave,
       onMouseDown,
       onMouseEnter,
       onMouseLeave
@@ -64,9 +64,9 @@ export default class Accidental extends Component<AccidentalProps> {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -97,9 +97,9 @@ export default class Accidental extends Component<AccidentalProps> {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -130,9 +130,9 @@ export default class Accidental extends Component<AccidentalProps> {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );

@@ -20,9 +20,9 @@ interface RepeatProps {
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
   isSelected?: boolean;
   shouldShowNumber: boolean;
 }
@@ -47,9 +47,9 @@ export default class Repeat extends Component<RepeatProps> {
       onMouseDown,
       onMouseEnter,
       onMouseLeave,
-      onMainMouseDown,
-      onMainMouseEnter,
-      onMainMouseLeave,
+      onHitBoxMouseDown,
+      onHitBoxMouseEnter,
+      onHitBoxMouseLeave,
       shouldShowNumber,
       nRepeats
     } = this.props;
@@ -152,9 +152,9 @@ export default class Repeat extends Component<RepeatProps> {
           rx="3"
           ry="3"
           className={mainBoxClasses}
-          onMouseDown={onMainMouseDown}
-          onMouseEnter={onMainMouseEnter}
-          onMouseLeave={onMainMouseLeave}
+          onMouseDown={onHitBoxMouseDown}
+          onMouseEnter={onHitBoxMouseEnter}
+          onMouseLeave={onHitBoxMouseLeave}
         />
         {shouldShowNumber && type === MatchType.END && repeatEditor}
       </g>

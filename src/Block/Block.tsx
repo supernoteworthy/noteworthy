@@ -19,9 +19,9 @@ interface BlockProps {
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
   isSelected?: boolean;
   shouldShowLabel: boolean;
 }
@@ -46,9 +46,9 @@ export default class Block extends Component<BlockProps> {
       onMouseDown,
       onMouseEnter,
       onMouseLeave,
-      onMainMouseDown,
-      onMainMouseEnter,
-      onMainMouseLeave,
+      onHitBoxMouseDown,
+      onHitBoxMouseEnter,
+      onHitBoxMouseLeave,
       shouldShowLabel,
       blockName
     } = this.props;
@@ -114,9 +114,9 @@ export default class Block extends Component<BlockProps> {
           rx="3"
           ry="3"
           className={mainBoxClasses}
-          onMouseDown={onMainMouseDown}
-          onMouseEnter={onMainMouseEnter}
-          onMouseLeave={onMainMouseLeave}
+          onMouseDown={onHitBoxMouseDown}
+          onMouseEnter={onHitBoxMouseEnter}
+          onMouseLeave={onHitBoxMouseLeave}
         />
       </Fragment>
     );
@@ -158,9 +158,9 @@ export default class Block extends Component<BlockProps> {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );

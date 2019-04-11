@@ -12,9 +12,9 @@ interface RenderNoteProps {
   onMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
-  onMainMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseDown?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseEnter?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onHitBoxMouseLeave?: (e: React.MouseEvent<SVGRectElement>) => void;
   x: number;
   y: number;
   color?: string;
@@ -33,9 +33,9 @@ export default function RenderNote(props: RenderNoteProps) {
     onMouseDown,
     onMouseEnter,
     onMouseLeave,
-    onMainMouseDown,
-    onMainMouseEnter,
-    onMainMouseLeave
+    onHitBoxMouseDown,
+    onHitBoxMouseEnter,
+    onHitBoxMouseLeave
   } = props;
   const selectBoxClasses = classNames('SelectBox', cssClass, {
     'SelectBox--selected': isSelected
@@ -70,9 +70,9 @@ export default function RenderNote(props: RenderNoteProps) {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -100,9 +100,9 @@ export default function RenderNote(props: RenderNoteProps) {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -130,9 +130,9 @@ export default function RenderNote(props: RenderNoteProps) {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -163,9 +163,9 @@ export default function RenderNote(props: RenderNoteProps) {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -196,9 +196,9 @@ export default function RenderNote(props: RenderNoteProps) {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -229,9 +229,9 @@ export default function RenderNote(props: RenderNoteProps) {
             rx="3"
             ry="3"
             className={mainBoxClasses}
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -264,9 +264,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="10"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -297,9 +297,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="10"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -333,9 +333,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="8"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -367,9 +367,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="10"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -402,9 +402,9 @@ export default function RenderNote(props: RenderNoteProps) {
           y="10"
           rx="3"
           ry="3"
-          onMouseDown={onMainMouseDown}
-          onMouseEnter={onMainMouseEnter}
-          onMouseLeave={onMainMouseLeave}
+          onMouseDown={onHitBoxMouseDown}
+          onMouseEnter={onHitBoxMouseEnter}
+          onMouseLeave={onHitBoxMouseLeave}
         />
       </Fragment>
     );
@@ -440,9 +440,9 @@ export default function RenderNote(props: RenderNoteProps) {
           y="6"
           rx="3"
           ry="3"
-          onMouseDown={onMainMouseDown}
-          onMouseEnter={onMainMouseEnter}
-          onMouseLeave={onMainMouseLeave}
+          onMouseDown={onHitBoxMouseDown}
+          onMouseEnter={onHitBoxMouseEnter}
+          onMouseLeave={onHitBoxMouseLeave}
         />
       </Fragment>
     );
@@ -474,9 +474,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="5"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -507,9 +507,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="5"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -542,9 +542,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="5"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
@@ -575,9 +575,9 @@ export default function RenderNote(props: RenderNoteProps) {
             y="10"
             rx="3"
             ry="3"
-            onMouseDown={onMainMouseDown}
-            onMouseEnter={onMainMouseEnter}
-            onMouseLeave={onMainMouseLeave}
+            onMouseDown={onHitBoxMouseDown}
+            onMouseEnter={onHitBoxMouseEnter}
+            onMouseLeave={onHitBoxMouseLeave}
           />
         </Fragment>
       );
