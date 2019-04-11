@@ -3,7 +3,12 @@ import React, { Component } from 'react';
 import Accidental from '../Accidental/Accidental';
 import Audio from '../Audio/Audio';
 import Block from '../Block/Block';
-import { LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
+import {
+  DRAGGABLE_COLOR,
+  LINE_DY,
+  STAFF_HEIGHT,
+  STAFF_MARGIN
+} from '../constants';
 import RenderNote from '../RenderNote/RenderNote';
 import Repeat from '../Repeat/Repeat';
 import Setter from '../Setter/Setter';
@@ -244,7 +249,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             cssClass="DraggableNote"
             length={spec.length}
             type={spec.type}
-            color={spec.isPlaying ? '#900' : '#000'}
+            color={spec.isPlaying ? '#900' : DRAGGABLE_COLOR}
             x={this.x}
             y={spec.y}
             orientation={this.orientation}
@@ -265,7 +270,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             type={spec.type}
             x={spec.x}
             y={spec.y}
-            color="#000"
+            color={DRAGGABLE_COLOR}
             onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
             onHitBoxMouseEnter={() => {
@@ -284,7 +289,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             x={spec.x}
             y={spec.y}
             type={spec.type}
-            color="#000"
+            color={DRAGGABLE_COLOR}
             onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
             onHitBoxMouseEnter={() => {
@@ -309,7 +314,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             x={spec.x}
             y={spec.y}
             type={spec.type}
-            color="#000"
+            color={DRAGGABLE_COLOR}
             onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
             onHitBoxMouseEnter={() => {
@@ -334,7 +339,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             x={spec.x}
             y={spec.y}
             type={spec.type}
-            color="#000"
+            color={DRAGGABLE_COLOR}
             onHitBoxMouseDown={this.onMouseDown}
             isSelected={dragging}
             onHitBoxMouseEnter={() => {
