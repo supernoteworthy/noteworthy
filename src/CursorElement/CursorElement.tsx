@@ -226,7 +226,7 @@ export default class CursorElement extends Component<CursorElementProps> {
             x={x}
             y={y}
             type={cursorSpec.type}
-            color="#ddd"
+            color={CURSOR_COLOR}
             shouldShowNumber={false}
           />
         );
@@ -236,13 +236,15 @@ export default class CursorElement extends Component<CursorElementProps> {
             x={x}
             y={y}
             type={cursorSpec.type}
-            color="#ddd"
+            color={CURSOR_COLOR}
             blockName=""
             shouldShowLabel={false}
           />
         );
       case 'setter':
-        return <Setter x={x} y={y} type={cursorSpec.type} color="#ddd" />;
+        return (
+          <Setter x={x} y={y} type={cursorSpec.type} color={CURSOR_COLOR} />
+        );
     }
   }
 }
