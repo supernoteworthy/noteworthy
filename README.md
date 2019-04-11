@@ -1,5 +1,7 @@
 Noteworthy is an in-progress music editor with a sheet music interface. It is written in TypeScript, and uses React, MobX, and the Web Audio API.
 
+Try it out here! https://tmickel.github.io/noteworthy/
+
 <img width="680" alt="Screen Shot 2019-04-08 at 12 41 50 PM" src="https://user-images.githubusercontent.com/120403/55741610-b3388580-59fb-11e9-925f-3ef375581760.png">
 
 Currently, it supports:
