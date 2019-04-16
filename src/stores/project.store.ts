@@ -67,21 +67,6 @@ export class ProjectStore {
     );
   }
 
-  getOctaveForElement(elementId: ElementId) {
-    const element = this.getElementById(elementId)!;
-    let staffIndex;
-    if (element.kind === 'note') {
-      staffIndex = this.getChordById(element.chordId)!.staffIndex;
-    } else if (element.kind === 'accidental') {
-      staffIndex = element.staffIndex;
-    }
-    if (staffIndex === undefined) {
-      return 0;
-    }
-    const staff = this.staffList[staffIndex];
-    return staff.octave;
-  }
-
   getKeySignatureForNote(id: NoteId) {
     const note = this.getElementById(id);
     if (!note || note.kind !== 'note') {
@@ -155,10 +140,6 @@ export class ProjectStore {
     }
     this.updateNextElements();
     this.updateMatchElements();
-  }
-
-  @action setOctave(staffIndex: StaffIndex, newOctave: number) {
-    this.staffList[staffIndex].octave = newOctave;
   }
 
   @action updateNoteChord(id: NoteId, newChord: ChordId) {

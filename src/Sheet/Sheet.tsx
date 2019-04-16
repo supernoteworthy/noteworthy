@@ -33,8 +33,8 @@ class Sheet extends Component<SheetProps> {
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.updateWidth);
-    this.updateWidth();
+    window.addEventListener('resize', this.updateSheetBounds);
+    this.updateSheetBounds();
     const divRef = this.divRef.current;
     if (divRef) {
       divRef.addEventListener('scroll', this.onScroll);
@@ -49,7 +49,7 @@ class Sheet extends Component<SheetProps> {
     }
   };
 
-  updateWidth = () => {
+  updateSheetBounds = () => {
     const { uiStore } = this.injected;
     const divRef = this.divRef.current;
     if (divRef) {

@@ -1,3 +1,4 @@
+import { Button, Tabs } from 'antd';
 import { observer, Provider } from 'mobx-react';
 import React, { Component } from 'react';
 import Audio from '../Audio/Audio';
@@ -34,7 +35,14 @@ class App extends Component {
       <Provider projectStore={this.projectStore} uiStore={this.uiStore}>
         <div className={`App App${mouseModeClass}`}>
           <Palette />
-          <Sheet />
+          <Tabs tabBarExtraContent={<Button>New sheet</Button>}>
+            <Tabs.TabPane tab="Piano" key="1">
+              <Sheet />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Sine" key="2">
+              <Sheet />
+            </Tabs.TabPane>
+          </Tabs>
           <PlayControls />
         </div>
       </Provider>

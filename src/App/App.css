@@ -21,3 +21,9 @@
 .App--insert {
   cursor: default;
 }
+
+.ant-tabs {
+  width: 100%;
+  background: #fff;
+  user-select: none;
+}

@@ -1,7 +1,7 @@
 .PlayControls {
   position: fixed;
-  top: 1em;
-  right: 1em;
+  top: 65px;
+  right: 15px;
 }
 
 .PlayControls button {

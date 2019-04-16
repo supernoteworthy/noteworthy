@@ -148,7 +148,7 @@ export default class CursorElement extends Component<CursorElementProps> {
     }
 
     let x = insertX;
-    let y = insertY + uiStore.sheetScroll;
+    let y = insertY + uiStore.sheetScroll - 60; // HACK: -60 for tab height.
 
     if (snapToStaff) {
       y = Math.round(y / (LINE_DY / 2)) * (LINE_DY / 2);
