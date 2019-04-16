@@ -14,6 +14,7 @@ export default class CategoryMenu extends Component<CategoryMenuProps> {
       <div className="CategoryMenu">
         {options.map(option => (
           <button
+            key={`Category_${option}`}
             onClick={() => onChange(option)}
             className={currentCategory === option ? 'Selected' : ''}
           >
