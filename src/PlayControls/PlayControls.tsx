@@ -4,6 +4,15 @@ import Audio from '../Audio/Audio';
 import './PlayControls.css';
 
 export default class PlayControls extends Component {
+  componentDidMount() {
+    document.addEventListener('keypress', e => {
+      // Enter
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        Audio.playSheet();
+      }
+    });
+  }
   render() {
     return (
       <div className="PlayControls">

@@ -44,21 +44,6 @@ class App extends Component {
   async componentDidMount() {
     Audio.setProjectStore(this.projectStore);
     await Audio.load();
-    document.addEventListener('keypress', e => {
-      // Space
-      if (e.keyCode === 32) {
-        e.preventDefault();
-        const activeStaff = this.uiStore.activeStaff;
-        if (activeStaff !== undefined) {
-          //Audio.playStaff(activeStaff);
-        }
-      }
-      // Enter
-      if (e.keyCode === 13) {
-        e.preventDefault();
-        Audio.playSheet();
-      }
-    });
   }
 }
 
