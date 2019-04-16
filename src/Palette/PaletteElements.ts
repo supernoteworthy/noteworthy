@@ -1,5 +1,4 @@
 import { AccidentalType } from '../types/AccidentalTypes';
-import { BlockMatchType } from '../types/BlockTypes';
 import { NoteLength, NoteType } from '../types/NoteTypes';
 import { MatchType } from '../types/RepeatTypes';
 import { SetterType } from '../types/SetterTypes';
@@ -8,7 +7,7 @@ import { ElementId } from '../types/StaffTypes';
 interface PaletteElementSpec {
   kind: string;
   id: ElementId;
-  type?: NoteType | AccidentalType | MatchType | SetterType | BlockMatchType;
+  type?: NoteType | AccidentalType | MatchType | SetterType;
   length?: NoteLength;
   x: number;
   yOffset?: number;
@@ -234,35 +233,5 @@ export const PALETTE_ELEMENTS: PaletteElementSpec[] = [
     type: SetterType.INSTRUMENT,
     tooltip: 'Set instrument',
     category: 'Modifiers'
-  },
-  /*{
-    kind: 'block',
-    id: 'BLOCK_START',
-    type: BlockMatchType.START,
-    x: 0,
-    yOffset: 20,
-    height: 80,
-    tooltip: 'Block start',
-    category: 'Flow'
-  },
-  {
-    kind: 'block',
-    id: 'BLOCK_END',
-    type: BlockMatchType.END,
-    x: 0,
-    yOffset: 20,
-    height: 80,
-    tooltip: 'Block end',
-    category: 'Flow'
-  },
-  {
-    kind: 'block',
-    id: 'BLOCK_PLAY',
-    type: BlockMatchType.PLAY,
-    x: 0,
-    yOffset: 20,
-    height: 30,
-    tooltip: 'Play block',
-    category: 'Flow'
-  }*/
+  }
 ];

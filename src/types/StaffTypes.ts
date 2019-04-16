@@ -1,5 +1,4 @@
 import { AccidentalSpec } from './AccidentalTypes';
-import { BlockSpec } from './BlockTypes';
 import { ChordSpec } from './ChordTypes';
 import { ClefType } from './ClefTypes';
 import { NoteSpec } from './NoteTypes';
@@ -20,5 +19,4 @@ export type StaffElement =
   | AccidentalSpec
   | RepeatSpec
   | ChordSpec
-  | SetterSpec
-  | BlockSpec;
+  | SetterSpec;

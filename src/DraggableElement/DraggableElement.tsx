@@ -2,7 +2,6 @@ import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import Accidental from '../Accidental/Accidental';
 import Audio from '../Audio/Audio';
-import Block from '../Block/Block';
 import {
   DRAGGABLE_COLOR,
   LINE_DY,
@@ -199,8 +198,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     if (
       (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
       this.spec.kind === 'repeat' ||
-      this.spec.kind === 'setter' ||
-      this.spec.kind === 'block'
+      this.spec.kind === 'setter'
     ) {
       return { x, y };
     } else {
@@ -221,8 +219,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     if (
       (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
       this.spec.kind === 'repeat' ||
-      this.spec.kind === 'setter' ||
-      this.spec.kind === 'block'
+      this.spec.kind === 'setter'
     ) {
       finalY = 0;
     }
@@ -330,31 +327,6 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             }
             shouldShowValue
             value={spec.value}
-          />
-        );
-      case 'block':
-        return (
-          <Block
-            id={spec.id}
-            x={spec.x}
-            y={spec.y}
-            type={spec.type}
-            color={DRAGGABLE_COLOR}
-            onHitBoxMouseDown={this.onMouseDown}
-            isSelected={dragging}
-            onHitBoxMouseEnter={() => {
-              if (uiStore.mouseMode !== MouseMode.POPOVER) {
-                uiStore.mouseMode = MouseMode.DRAG;
-                uiStore.dragActiveStaffIndex = this.staffIndex;
-              }
-            }}
-            onHitBoxMouseLeave={() =>
-              !dragging &&
-              uiStore.mouseMode == MouseMode.DRAG &&
-              (uiStore.mouseMode = MouseMode.INSERT)
-            }
-            shouldShowLabel
-            blockName={spec.blockName}
           />
         );
     }
