@@ -2,6 +2,7 @@ import { observer, Provider } from 'mobx-react';
 import React, { Component } from 'react';
 import Audio from '../Audio/Audio';
 import Palette from '../Palette/Palette';
+import PlayControls from '../PlayControls/PlayControls';
 import Sheet from '../Sheet/Sheet';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
@@ -34,6 +35,7 @@ class App extends Component {
         <div className={`App App${mouseModeClass}`}>
           <Palette />
           <Sheet />
+          <PlayControls />
         </div>
       </Provider>
     );

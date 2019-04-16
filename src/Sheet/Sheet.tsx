@@ -94,7 +94,16 @@ class Sheet extends Component<SheetProps> {
     const totalSVGHeight = (STAFF_HEIGHT + STAFF_MARGIN) * staffs.length;
     return (
       <div className="Sheet" ref={this.divRef}>
-        <svg width="100%" height={totalSVGHeight}>
+        <svg
+          width="100%"
+          height={totalSVGHeight}
+          onMouseLeave={() => {
+            uiStore.mouseMode = MouseMode.POPOVER;
+          }}
+          onMouseEnter={() => {
+            uiStore.mouseMode = MouseMode.INSERT;
+          }}
+        >
           {this.shouldDrawKeySignatureGuideline() && (
             <line
               x1={KEY_SIGNATURE_GUIDELINE_X}
