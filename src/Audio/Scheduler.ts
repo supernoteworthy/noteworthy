@@ -29,6 +29,7 @@ export default class Scheduler {
       clearInterval(this.scheduleInterval);
       this.scheduleInterval = undefined;
     }
+    this.playHeads.forEach(playHead => playHead.stop());
     this.playHeads = [];
   }
 
