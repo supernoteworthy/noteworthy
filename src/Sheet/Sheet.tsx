@@ -57,14 +57,11 @@ class Sheet extends Component<SheetProps> {
       if (bottomStaffScroll > this.props.spec.staffCount) {
         this.props.spec.staffCount++;
       }
-      const greatestElementStaffIndex = projectStore.getGreatestStaffIndexForSheet(
-        this.props.spec.id
-      );
-      console.log(bottomStaffScroll, greatestElementStaffIndex);
-      if (
-        bottomStaffScroll < greatestElementStaffIndex &&
-        bottomStaffScroll >= 10 // TODO: move to constants.
-      ) {
+      const greatestElementStaffIndex = Math.max(
+        projectStore.getGreatestStaffIndexForSheet(this.props.spec.id),
+        10
+      ); // TODO: move to constants.
+      if (bottomStaffScroll < greatestElementStaffIndex) {
         this.props.spec.staffCount = greatestElementStaffIndex + 1;
       }
     }
