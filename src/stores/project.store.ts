@@ -3,27 +3,19 @@ import { createTransformer } from 'mobx-utils';
 import { CHORD_GUIDELINE_WIDTH, KEY_SIGNATURE_GUIDELINE_X } from '../constants';
 import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
-import { ClefType } from '../types/ClefTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
 import { MatchType, RepeatSpec } from '../types/RepeatTypes';
 import { SetterSpec, SetterType } from '../types/SetterTypes';
-import {
-  ElementId,
-  StaffElement,
-  StaffIndex,
-  StaffSpec
-} from '../types/StaffTypes';
+import { SheetSpec } from '../types/SheetTypes';
+import { ElementId, StaffElement, StaffIndex } from '../types/StaffTypes';
 
 export class ProjectStore {
-  @observable staffList: StaffSpec[] = [
-    { index: 0, clef: ClefType.TREBLE, octave: 4 },
-    { index: 1, octave: 4 },
-    { index: 2, octave: 4 },
-    { index: 3, octave: 4 },
-    { index: 4, octave: 4 },
-    { index: 5, octave: 4 },
-    { index: 6, octave: 4 },
-    { index: 7, octave: 4 }
+  @observable sheetList: SheetSpec[] = [
+    {
+      id: 'abc',
+      label: 'Piano',
+      staffCount: 10
+    }
   ];
   @observable elementList: StaffElement[] = [];
   @observable chordList: ChordSpec[] = [];

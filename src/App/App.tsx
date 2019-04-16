@@ -36,12 +36,14 @@ class App extends Component {
         <div className={`App App${mouseModeClass}`}>
           <Palette />
           <Tabs tabBarExtraContent={<Button>New sheet</Button>}>
-            <Tabs.TabPane tab="Piano" key="1">
-              <Sheet />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="Sine" key="2">
-              <Sheet />
-            </Tabs.TabPane>
+            {this.projectStore.sheetList.map(sheetSpec => (
+              <Tabs.TabPane
+                tab={sheetSpec.label}
+                key={`Sheet_${sheetSpec.label}`}
+              >
+                <Sheet spec={sheetSpec} />
+              </Tabs.TabPane>
+            ))}
           </Tabs>
           <PlayControls />
         </div>

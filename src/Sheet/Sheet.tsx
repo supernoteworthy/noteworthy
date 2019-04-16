@@ -10,9 +10,12 @@ import CursorElement from '../CursorElement/CursorElement';
 import Staff from '../Staff/Staff';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
+import { SheetSpec } from '../types/SheetTypes';
 import './Sheet.css';
 
-interface SheetProps {}
+interface SheetProps {
+  spec: SheetSpec;
+}
 
 interface InjectedProps extends SheetProps {
   projectStore: ProjectStore;
@@ -86,11 +89,12 @@ class Sheet extends Component<SheetProps> {
   }
 
   render() {
-    const { projectStore, uiStore } = this.injected;
-    const { staffList } = projectStore;
-    const staffs = staffList.map(staff => (
-      <Staff key={`Staff_${staff.index}`} spec={staff} />
-    ));
+    const { uiStore } = this.injected;
+    const { staffCount } = this.props.spec;
+    const staffs = [];
+    for (let i = 0; i < staffCount; i++) {
+      staffs.push(<Staff key={`Staff_${i}`} index={i} />);
+    }
     const totalSVGHeight = (STAFF_HEIGHT + STAFF_MARGIN) * staffs.length;
     return (
       <div className="Sheet" ref={this.divRef}>

@@ -12,12 +12,13 @@ import {
 import DraggableElement from '../DraggableElement/DraggableElement';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
+import { ClefType } from '../types/ClefTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
-import { StaffSpec } from '../types/StaffTypes';
 import './Staff.css';
 
 interface StaffProps {
-  spec: StaffSpec;
+  index: number;
+  clef?: ClefType;
 }
 
 interface InjectedProps extends StaffProps {
@@ -33,7 +34,7 @@ class Staff extends Component<StaffProps> {
   }
 
   get notes() {
-    const { index } = this.props.spec;
+    const { index } = this.props;
     const { projectStore } = this.injected;
     const notes = projectStore
       .getElementsForStaff(index)
@@ -42,7 +43,7 @@ class Staff extends Component<StaffProps> {
   }
 
   renderLedgerLines() {
-    const { index } = this.props.spec;
+    const { index } = this.props;
     const { uiStore, projectStore } = this.injected;
     let ledgerLines = [];
 
@@ -123,7 +124,7 @@ class Staff extends Component<StaffProps> {
   }
 
   renderElements() {
-    const { index } = this.props.spec;
+    const { index } = this.props;
     const { projectStore } = this.injected;
     const elements = projectStore.getElementsForStaff(index);
     return elements.map(element => (
@@ -177,7 +178,7 @@ class Staff extends Component<StaffProps> {
   renderChordGuidelines() {
     const { uiStore } = this.injected;
     const { activeChord } = uiStore;
-    if (activeChord && activeChord.staffIndex === this.props.spec.index) {
+    if (activeChord && activeChord.staffIndex === this.props.index) {
       return (
         <g>
           <line
@@ -209,7 +210,7 @@ class Staff extends Component<StaffProps> {
   }
 
   render() {
-    const { index, clef, octave } = this.props.spec;
+    const { index, clef } = this.props;
     const startY = index * STAFF_HEIGHT + index * STAFF_MARGIN;
     return (
       <g transform={`translate(0, ${startY})`}>

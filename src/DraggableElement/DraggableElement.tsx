@@ -211,10 +211,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     const absoluteY = y + (staffIndex || 0) * (STAFF_HEIGHT + STAFF_MARGIN);
     const bucketSize = STAFF_HEIGHT + STAFF_MARGIN;
     let newStaffIndex = Math.round((absoluteY - STAFF_MARGIN / 2) / bucketSize);
-    newStaffIndex = Math.max(
-      0,
-      Math.min(this.injected.projectStore.staffList.length - 1, newStaffIndex)
-    );
+    newStaffIndex = Math.max(0, newStaffIndex);
     let finalY = absoluteY - newStaffIndex * (STAFF_HEIGHT + STAFF_MARGIN);
     if (
       (this.spec.kind === 'note' && this.spec.type === NoteType.REST) ||
