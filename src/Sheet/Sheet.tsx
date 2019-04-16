@@ -45,10 +45,28 @@ class Sheet extends Component<SheetProps> {
   }
 
   onScroll = () => {
-    const { uiStore } = this.injected;
+    const { uiStore, projectStore } = this.injected;
     const divRef = this.divRef.current;
     if (divRef) {
       uiStore.sheetScroll = divRef.scrollTop;
+      // Infinite scroll: increase staff count as needed.
+      const bottomStaffScroll = Math.ceil(
+        (uiStore.sheetScroll + divRef.clientHeight) /
+          (STAFF_HEIGHT + STAFF_MARGIN)
+      );
+      if (bottomStaffScroll > this.props.spec.staffCount) {
+        this.props.spec.staffCount++;
+      }
+      const greatestElementStaffIndex = projectStore.getGreatestStaffIndexForSheet(
+        this.props.spec.id
+      );
+      console.log(bottomStaffScroll, greatestElementStaffIndex);
+      if (
+        bottomStaffScroll < greatestElementStaffIndex &&
+        bottomStaffScroll >= 10 // TODO: move to constants.
+      ) {
+        this.props.spec.staffCount = greatestElementStaffIndex + 1;
+      }
     }
   };
 

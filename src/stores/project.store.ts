@@ -6,7 +6,7 @@ import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
 import { MatchType, RepeatSpec } from '../types/RepeatTypes';
 import { SetterSpec, SetterType } from '../types/SetterTypes';
-import { SheetSpec } from '../types/SheetTypes';
+import { SheetId, SheetSpec } from '../types/SheetTypes';
 import { ElementId, StaffElement, StaffIndex } from '../types/StaffTypes';
 
 export class ProjectStore {
@@ -56,6 +56,29 @@ export class ProjectStore {
         }
       })
     );
+  }
+
+  getGreatestStaffIndexForSheet(sheetId: SheetId) {
+    // TODO: use sheet.
+    let greatestStaffIndex = -1;
+    for (let element of this.elementList) {
+      if (
+        element.kind !== 'note' &&
+        element.staffIndex !== undefined &&
+        element.staffIndex > greatestStaffIndex
+      ) {
+        greatestStaffIndex = element.staffIndex;
+      }
+    }
+    for (let chord of this.chordList) {
+      if (
+        chord.staffIndex !== undefined &&
+        chord.staffIndex > greatestStaffIndex
+      ) {
+        greatestStaffIndex = chord.staffIndex;
+      }
+    }
+    return greatestStaffIndex;
   }
 
   getKeySignatureForNote(id: NoteId) {
