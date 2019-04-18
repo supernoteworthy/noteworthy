@@ -2,13 +2,7 @@ import classNames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
 import Clef from '../Clef/Clef';
-import {
-  CHORD_GUIDELINE_OFFSET,
-  CHORD_GUIDELINE_WIDTH,
-  LINE_DY,
-  STAFF_HEIGHT,
-  STAFF_MARGIN
-} from '../constants';
+import { CHORD_GUIDELINE_OFFSET, CHORD_GUIDELINE_WIDTH, LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
 import DraggableElement from '../DraggableElement/DraggableElement';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
@@ -18,7 +12,7 @@ import './Staff.css';
 
 interface StaffProps {
   index: number;
-  clef?: ClefType;
+  clef?: ClefType; // TODO: move clef to be a draggable.
 }
 
 interface InjectedProps extends StaffProps {
@@ -210,14 +204,17 @@ class Staff extends Component<StaffProps> {
   }
 
   render() {
-    const { index, clef } = this.props;
+    const { index } = this.props;
     const startY = index * STAFF_HEIGHT + index * STAFF_MARGIN;
     return (
       <g transform={`translate(0, ${startY})`}>
+        <text y={-10} className="StaffIndex">
+          {index + 1}
+        </text>
         {this.renderChordGuidelines()}
         {this.renderLines()}
         {this.renderLedgerLines()}
-        {clef !== undefined && <Clef x={10} y={-LINE_DY} />}
+        {index === 0 && <Clef x={10} y={-LINE_DY} />}
         {this.renderElements()}
       </g>
     );
