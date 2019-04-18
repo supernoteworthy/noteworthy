@@ -2,7 +2,9 @@ import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import {
   KEY_SIGNATURE_GUIDELINE_X,
+  MINIMUM_STAFF_COUNT,
   SHEET_MARGIN_TOP,
+  STAFF_FULL_HEIGHT,
   STAFF_HEIGHT,
   STAFF_MARGIN
 } from '../constants';
@@ -45,27 +47,42 @@ class Sheet extends Component<SheetProps> {
   }
 
   onScroll = () => {
-    const { uiStore, projectStore } = this.injected;
+    const { uiStore } = this.injected;
     const divRef = this.divRef.current;
     if (divRef) {
       uiStore.sheetScroll = divRef.scrollTop;
-      // Infinite scroll: increase staff count as needed.
-      const bottomStaffScroll = Math.ceil(
-        (uiStore.sheetScroll + divRef.clientHeight) /
-          (STAFF_HEIGHT + STAFF_MARGIN)
+      this.updateStaffCountForInfiniteScroll(
+        divRef.clientHeight,
+        divRef.scrollTop
       );
-      if (bottomStaffScroll > this.props.spec.staffCount) {
-        this.props.spec.staffCount++;
-      }
-      const greatestElementStaffIndex = Math.max(
-        projectStore.getGreatestStaffIndexForSheet(this.props.spec.id),
-        10
-      ); // TODO: move to constants.
-      if (bottomStaffScroll < greatestElementStaffIndex) {
-        this.props.spec.staffCount = greatestElementStaffIndex + 1;
-      }
     }
   };
+
+  updateStaffCountForInfiniteScroll(
+    viewportHeight: number,
+    currentScrollTop: number
+  ) {
+    const { projectStore } = this.injected;
+    const scrollPositionAtBottom = currentScrollTop + viewportHeight;
+    const lastStaffInViewport = Math.ceil(
+      scrollPositionAtBottom / STAFF_FULL_HEIGHT
+    );
+    // Increase staff count if we are scrolled to the bottom.
+    const reachedBottom = lastStaffInViewport > this.props.spec.staffCount;
+    if (reachedBottom) {
+      this.props.spec.staffCount++;
+    }
+    // Decrease staff count if we are scrolled above the last element.
+    const greatestElementStaffIndex = Math.max(
+      projectStore.getGreatestStaffIndexForSheet(this.props.spec.id),
+      MINIMUM_STAFF_COUNT
+    );
+    const shouldTrimStaffCount =
+      lastStaffInViewport < greatestElementStaffIndex;
+    if (shouldTrimStaffCount) {
+      this.props.spec.staffCount = greatestElementStaffIndex + 1;
+    }
+  }
 
   updateSheetBounds = () => {
     const { uiStore } = this.injected;
@@ -103,13 +120,18 @@ class Sheet extends Component<SheetProps> {
     return false;
   }
 
-  render() {
-    const { uiStore } = this.injected;
+  renderStaffs() {
     const { staffCount } = this.props.spec;
     const staffs = [];
     for (let i = 0; i < staffCount; i++) {
       staffs.push(<Staff key={`Staff_${i}`} index={i} />);
     }
+    return staffs;
+  }
+
+  render() {
+    const { uiStore } = this.injected;
+    const staffs = this.renderStaffs();
     const totalSVGHeight = (STAFF_HEIGHT + STAFF_MARGIN) * staffs.length;
     return (
       <div className="Sheet" ref={this.divRef}>
