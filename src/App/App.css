@@ -26,4 +26,6 @@
   width: 100%;
   background: #fff;
   user-select: none;
+  height: 100vh;
+  overflow: auto;
 }
