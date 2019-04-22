@@ -14,10 +14,12 @@ import Setter from '../Setter/Setter';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { NoteOrientation, NoteType } from '../types/NoteTypes';
+import { SheetId } from '../types/SheetTypes';
 import { ElementId } from '../types/StaffTypes';
 import './DraggableElement.css';
 
 interface DraggableElementProps {
+  sheetId: SheetId;
   id: ElementId;
   snapToStaff: boolean;
 }
@@ -39,9 +41,9 @@ export default class DraggableElement extends Component<DraggableElementProps> {
   }
 
   get spec() {
-    const { id } = this.props;
+    const { id, sheetId } = this.props;
     const { projectStore } = this.injected;
-    const specInStore = projectStore.getElementById(id);
+    const specInStore = projectStore.getElementById(sheetId, id);
     if (specInStore === undefined) {
       throw new Error(`Spec for element ${id} not found in project store.`);
     }
@@ -49,10 +51,10 @@ export default class DraggableElement extends Component<DraggableElementProps> {
   }
 
   get x() {
-    const { projectStore } = this.injected;
+    const { projectStore, sheetId } = this.injected;
     const spec = this.spec;
     if (spec.kind === 'note') {
-      const chord = projectStore.getChordById(spec.chordId);
+      const chord = projectStore.getChordById(sheetId, spec.chordId);
       if (!chord) {
         throw new Error(`Note ${this.props.id} exists outside chord.`);
       }
@@ -63,10 +65,10 @@ export default class DraggableElement extends Component<DraggableElementProps> {
   }
 
   get staffIndex() {
-    const { projectStore } = this.injected;
+    const { projectStore, sheetId } = this.injected;
     const spec = this.spec;
     if (spec.kind === 'note') {
-      const chord = projectStore.getChordById(spec.chordId);
+      const chord = projectStore.getChordById(sheetId, spec.chordId);
       if (!chord) {
         throw new Error(`Note ${this.props.id} exists outside chord.`);
       }
@@ -105,7 +107,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
   };
 
   onMouseMove = (e: MouseEvent) => {
-    const { id } = this.props;
+    const { id, sheetId } = this.props;
     const { projectStore, uiStore } = this.injected;
     const startingY = this.spec.y;
     const {
@@ -121,6 +123,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     const staffIndexAndY = this.getNewStaffIndexAndY(y);
     const positionChanged = staffIndexAndY.y !== startingY;
     projectStore.setElementPosition(
+      sheetId,
       id,
       x,
       staffIndexAndY.y,
@@ -128,6 +131,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
     );
     if (this.spec.kind === 'note') {
       uiStore.activeChord = projectStore.findAdjacentChord(
+        sheetId,
         x,
         staffIndexAndY.staffIndex,
         this.spec.chordId
@@ -144,7 +148,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
   };
 
   onMouseUp = () => {
-    const { uiStore, projectStore } = this.injected;
+    const { uiStore, projectStore, sheetId } = this.injected;
     uiStore.mouseMode = MouseMode.INSERT;
 
     const deleted = this.x < 0;
@@ -176,11 +180,11 @@ export default class DraggableElement extends Component<DraggableElementProps> {
       this.spec.chordId !== activeChord.id;
 
     if (this.spec.kind === 'note' && activeChord) {
-      projectStore.updateNoteChord(this.spec.id, activeChord.id);
+      projectStore.updateNoteChord(sheetId, this.spec.id, activeChord.id);
     }
 
     if (deleted) {
-      projectStore.deleteElement(this.spec.id);
+      projectStore.deleteElement(sheetId, this.spec.id);
       return;
     } else if (this.spec.kind === 'note' && (tapped || chordChanged)) {
       Audio.stopChord(this.spec.chordId!);
@@ -280,6 +284,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
         return (
           <Repeat
             id={spec.id}
+            sheetId={this.props.sheetId}
             x={spec.x}
             y={spec.y}
             type={spec.type}

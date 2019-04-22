@@ -18,9 +18,11 @@ import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { ChordSpec } from '../types/ChordTypes';
 import { NoteOrientation, NoteType } from '../types/NoteTypes';
+import { SheetId } from '../types/SheetTypes';
 import { ElementId, StaffIndex } from '../types/StaffTypes';
 
 interface CursorElementProps {
+  sheetId: SheetId;
   snapToStaff: boolean;
   getSheetBoundingX: () => { left: number; right: number } | undefined;
 }
@@ -48,19 +50,23 @@ export default class CursorElement extends Component<CursorElementProps> {
     document.addEventListener('mousedown', this.onMouseDown);
   }
   onMouseMove = (e: MouseEvent) => {
-    const { uiStore, projectStore } = this.injected;
+    const { uiStore, projectStore, sheetId } = this.injected;
     uiStore.insertX = e.clientX;
     uiStore.insertY = e.clientY;
 
     const { x, yOnStaff, staffIndex } = this.clientPositionToSvgPosition()!;
-    uiStore.activeChord = projectStore.findAdjacentChord(x, staffIndex);
+    uiStore.activeChord = projectStore.findAdjacentChord(
+      sheetId,
+      x,
+      staffIndex
+    );
     uiStore.insertStaffId = staffIndex;
     uiStore.insertStaffX = x;
     uiStore.insertStaffY = yOnStaff;
     this.setState({ justMounted: false });
   };
   onMouseDown = (e: MouseEvent) => {
-    const { uiStore } = this.injected;
+    const { uiStore, sheetId } = this.injected;
     const { cursorSpec } = uiStore;
 
     if (!cursorSpec || uiStore.mouseMode !== MouseMode.INSERT) {
@@ -74,7 +80,11 @@ export default class CursorElement extends Component<CursorElementProps> {
     if (x < 0 || (boundingX && x + boundingX.left > boundingX.right)) {
       return;
     }
-    const adjacentChord = projectStore.findAdjacentChord(x, staffIndex);
+    const adjacentChord = projectStore.findAdjacentChord(
+      sheetId,
+      x,
+      staffIndex
+    );
     const staffY = this.svgYToStaffY(y, staffIndex);
 
     uiStore.mouseMode = MouseMode.DRAG;
@@ -100,6 +110,7 @@ export default class CursorElement extends Component<CursorElementProps> {
       const chordId = adjacentChord ? adjacentChord.id : newChord!.id;
 
       projectStore.addElement(
+        sheetId,
         {
           ...cursorSpec,
           id: newElementId,
@@ -109,7 +120,7 @@ export default class CursorElement extends Component<CursorElementProps> {
         newChord
       );
     } else if (cursorSpec.kind === 'accidental') {
-      projectStore.addElement({
+      projectStore.addElement(sheetId, {
         ...cursorSpec,
         id: newElementId,
         x,
@@ -117,7 +128,7 @@ export default class CursorElement extends Component<CursorElementProps> {
         staffIndex
       });
     } else if (cursorSpec.kind === 'repeat') {
-      projectStore.addElement({
+      projectStore.addElement(sheetId, {
         ...cursorSpec,
         id: newElementId,
         x,
@@ -125,7 +136,7 @@ export default class CursorElement extends Component<CursorElementProps> {
         staffIndex
       });
     } else if (cursorSpec.kind === 'setter') {
-      projectStore.addElement({
+      projectStore.addElement(sheetId, {
         ...cursorSpec,
         id: newElementId,
         x,
@@ -213,6 +224,7 @@ export default class CursorElement extends Component<CursorElementProps> {
       case 'repeat':
         return (
           <Repeat
+            sheetId={this.props.sheetId}
             x={x}
             y={y}
             type={cursorSpec.type}

@@ -6,11 +6,13 @@ import { LINE_DY, STAFF_HEIGHT } from '../constants';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { MatchType, RepeatId, RepeatSpec } from '../types/RepeatTypes';
+import { SheetId } from '../types/SheetTypes';
 import { StaffIndex } from '../types/StaffTypes';
 import './Repeat.css';
 
 interface RepeatProps {
   id?: RepeatId;
+  sheetId?: SheetId;
   x: number;
   y: number;
   staffIndex?: StaffIndex;
@@ -51,7 +53,8 @@ export default class Repeat extends Component<RepeatProps> {
       onHitBoxMouseEnter,
       onHitBoxMouseLeave,
       shouldShowNumber,
-      nRepeats
+      nRepeats,
+      sheetId
     } = this.props;
     const { uiStore, projectStore } = this.injected;
 
@@ -65,7 +68,11 @@ export default class Repeat extends Component<RepeatProps> {
               precision={0}
               value={nRepeats || 2}
               onChange={value => {
+                if (!sheetId || !this.props.id) {
+                  return;
+                }
                 const element = projectStore.getElementById(
+                  sheetId,
                   this.props.id!
                 ) as RepeatSpec;
                 element.nRepeats = value || 2;

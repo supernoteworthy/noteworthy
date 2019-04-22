@@ -8,10 +8,12 @@ import { MouseMode, UiStore } from '../stores/ui.store';
 import { AccidentalType } from '../types/AccidentalTypes';
 import { NoteLength, NoteType } from '../types/NoteTypes';
 import { SetterId, SetterSpec, SetterType } from '../types/SetterTypes';
+import { SheetId } from '../types/SheetTypes';
 import './Setter.css';
 
 interface SetterProps {
   id?: SetterId;
+  sheetId?: SheetId;
   type: SetterType;
   x: number;
   y: number;
@@ -41,6 +43,7 @@ export default class Setter extends Component<SetterProps> {
     const { uiStore, projectStore } = this.injected;
     const {
       id,
+      sheetId,
       x,
       y,
       type,
@@ -70,7 +73,10 @@ export default class Setter extends Component<SetterProps> {
             precision={0}
             value={value as number}
             onChange={value => {
-              const element = projectStore.getElementById(id!) as SetterSpec;
+              const element = projectStore.getElementById(
+                sheetId!,
+                id!
+              ) as SetterSpec;
               element.value = value || 100;
             }}
           />
@@ -82,7 +88,10 @@ export default class Setter extends Component<SetterProps> {
           <Select
             value={value as string}
             onChange={value => {
-              const element = projectStore.getElementById(id!) as SetterSpec;
+              const element = projectStore.getElementById(
+                sheetId!,
+                id!
+              ) as SetterSpec;
               element.value = value;
             }}
           >
@@ -102,7 +111,10 @@ export default class Setter extends Component<SetterProps> {
             precision={0}
             value={value as number}
             onChange={value => {
-              const element = projectStore.getElementById(id!) as SetterSpec;
+              const element = projectStore.getElementById(
+                sheetId!,
+                id!
+              ) as SetterSpec;
               element.value = value;
               if (value === undefined) {
                 element.value = 4;
@@ -134,7 +146,10 @@ export default class Setter extends Component<SetterProps> {
             precision={0}
             value={value as number}
             onChange={value => {
-              const element = projectStore.getElementById(id!) as SetterSpec;
+              const element = projectStore.getElementById(
+                sheetId!,
+                id!
+              ) as SetterSpec;
               element.value = value || 100;
             }}
           />

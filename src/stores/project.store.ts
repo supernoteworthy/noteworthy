@@ -1,6 +1,10 @@
-import { action, computed, observable } from 'mobx';
-import { createTransformer } from 'mobx-utils';
-import { CHORD_GUIDELINE_WIDTH, KEY_SIGNATURE_GUIDELINE_X } from '../constants';
+import { action, observable } from 'mobx';
+import uuid from 'uuid/v4';
+import {
+  CHORD_GUIDELINE_WIDTH,
+  KEY_SIGNATURE_GUIDELINE_X,
+  MINIMUM_STAFF_COUNT
+} from '../constants';
 import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
@@ -14,25 +18,58 @@ export class ProjectStore {
     {
       id: 'abc',
       label: 'Piano',
-      staffCount: 10
+      staffCount: 10,
+      elementList: [],
+      chordList: []
     }
   ];
-  @observable elementList: StaffElement[] = [];
-  @observable chordList: ChordSpec[] = [];
-  firstElement?: ElementId;
 
-  @action
-  addElement(newElement: StaffElement, chord?: ChordSpec) {
-    this.elementList.push(newElement);
-    if (chord) {
-      this.chordList.push(chord);
-    }
-    this.updateNextElements();
-    this.updateMatchElements();
+  @action addSheet() {
+    this.sheetList.push({
+      id: uuid(),
+      label: 'Piano',
+      staffCount: MINIMUM_STAFF_COUNT,
+      elementList: [],
+      chordList: []
+    });
   }
 
-  findAdjacentChord(x: number, staffIndex: StaffIndex, excludeChord?: ChordId) {
-    const staffChords = this.chordList.filter(
+  private getSheet(sheetId: SheetId) {
+    return this.sheetList.find(sheet => sheet.id === sheetId);
+  }
+
+  getFirstElementId(sheetId: SheetId) {
+    const sheet = this.getSheet(sheetId);
+    if (sheet) {
+      return sheet.firstElement;
+    }
+  }
+
+  @action
+  addElement(sheetId: SheetId, newElement: StaffElement, chord?: ChordSpec) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return;
+    }
+    sheet.elementList.push(newElement);
+    if (chord) {
+      sheet.chordList.push(chord);
+    }
+    this.updateNextElements(sheetId);
+    this.updateMatchElements(sheetId);
+  }
+
+  findAdjacentChord(
+    sheetId: SheetId,
+    x: number,
+    staffIndex: StaffIndex,
+    excludeChord?: ChordId
+  ) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return;
+    }
+    const staffChords = sheet.chordList.filter(
       chord => chord.staffIndex === staffIndex
     );
     return staffChords.find(
@@ -43,25 +80,30 @@ export class ProjectStore {
     );
   }
 
-  @computed get getElementsForStaff() {
-    return createTransformer(staffIndex =>
-      this.elementList.filter(el => {
-        if (el.kind === 'note') {
-          const chord = this.getChordById(el.chordId);
-          if (chord) {
-            return chord.staffIndex === staffIndex;
-          }
-        } else {
-          return el.staffIndex === staffIndex;
+  getElementsForStaff(sheetId: SheetId, staffIndex: StaffIndex) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return [];
+    }
+    return sheet.elementList.filter(el => {
+      if (el.kind === 'note') {
+        const chord = this.getChordById(sheetId, el.chordId);
+        if (chord) {
+          return chord.staffIndex === staffIndex;
         }
-      })
-    );
+      } else {
+        return el.staffIndex === staffIndex;
+      }
+    });
   }
 
   getGreatestStaffIndexForSheet(sheetId: SheetId) {
-    // TODO: use sheet.
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return -1;
+    }
     let greatestStaffIndex = -1;
-    for (let element of this.elementList) {
+    for (let element of sheet.elementList) {
       if (
         element.kind !== 'note' &&
         element.staffIndex !== undefined &&
@@ -70,7 +112,7 @@ export class ProjectStore {
         greatestStaffIndex = element.staffIndex;
       }
     }
-    for (let chord of this.chordList) {
+    for (let chord of sheet.chordList) {
       if (
         chord.staffIndex !== undefined &&
         chord.staffIndex > greatestStaffIndex
@@ -81,16 +123,20 @@ export class ProjectStore {
     return greatestStaffIndex;
   }
 
-  getKeySignatureForNote(id: NoteId) {
-    const note = this.getElementById(id);
+  getKeySignatureForNote(sheetId: SheetId, id: NoteId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return AccidentalType.NATURAL;
+    }
+    const note = this.getElementById(sheetId, id);
     if (!note || note.kind !== 'note') {
       return AccidentalType.NATURAL;
     }
-    const chord = this.getChordById(note.chordId);
+    const chord = this.getChordById(sheetId, note.chordId);
     if (!chord) {
       return AccidentalType.NATURAL;
     }
-    const accidentals = this.elementList.filter(
+    const accidentals = sheet.elementList.filter(
       element =>
         element.kind === 'accidental' &&
         element.y === note.y &&
@@ -103,32 +149,44 @@ export class ProjectStore {
     return AccidentalType.NATURAL;
   }
 
-  @computed get getElementById() {
-    return createTransformer(
-      (elementId: ElementId) =>
-        this.elementList.find(
-          (element: StaffElement) => element.id === elementId
-        ) || this.chordList.find(chord => chord.id === elementId)
+  getElementById(sheetId: SheetId, elementId: ElementId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return undefined;
+    }
+    return (
+      sheet.elementList.find(
+        (element: StaffElement) => element.id === elementId
+      ) || sheet.chordList.find(chord => chord.id === elementId)
     );
   }
 
-  getNotesForChord(id: ChordId) {
-    return this.elementList.filter(
+  getNotesForChord(sheetId: SheetId, id: ChordId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return [];
+    }
+    return sheet.elementList.filter(
       note => note.kind === 'note' && note.chordId === id
     ) as NoteSpec[];
   }
 
-  getChordById(id?: ChordId) {
-    return this.chordList.find(chord => chord.id === id);
+  getChordById(sheetId: SheetId, id?: ChordId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return undefined;
+    }
+    return sheet.chordList.find(chord => chord.id === id);
   }
 
   @action setElementPosition(
+    sheetId: SheetId,
     id: ElementId,
     x: number,
     y: number,
     staffIndex?: StaffIndex
   ) {
-    const el = this.getElementById(id);
+    const el = this.getElementById(sheetId, id);
     if (!el) {
       throw new Error(`Could not find element ${id} in setNotePosition.`);
     }
@@ -137,12 +195,12 @@ export class ProjectStore {
     }
     const dy = y - el.y;
     if (el.kind === 'note') {
-      const chord = this.getChordById(el.chordId)!;
+      const chord = this.getChordById(sheetId, el.chordId)!;
       chord.x = x;
       if (staffIndex !== undefined) {
         chord.staffIndex = staffIndex;
       }
-      for (let chordNote of this.getNotesForChord(el.chordId!)) {
+      for (let chordNote of this.getNotesForChord(sheetId, el.chordId!)) {
         chordNote.y += dy;
       }
     } else {
@@ -152,49 +210,59 @@ export class ProjectStore {
         el.staffIndex = staffIndex;
       }
     }
-    this.updateNextElements();
-    this.updateMatchElements();
+    this.updateNextElements(sheetId);
+    this.updateMatchElements(sheetId);
   }
 
-  @action updateNoteChord(id: NoteId, newChord: ChordId) {
-    const spec = this.getElementById(id)!;
+  @action updateNoteChord(sheetId: SheetId, id: NoteId, newChord: ChordId) {
+    const spec = this.getElementById(sheetId, id)!;
     if (spec.kind === 'note' && newChord && spec.chordId) {
       spec.chordId = newChord;
     }
-    this.dropEmptyChords();
-    this.updateNextElements();
-    this.updateMatchElements();
+    this.dropEmptyChords(sheetId);
+    this.updateNextElements(sheetId);
+    this.updateMatchElements(sheetId);
   }
 
-  dropEmptyChords() {
-    this.chordList = this.chordList.filter(chord =>
-      this.elementList.find(el => el.kind === 'note' && el.chordId === chord.id)
+  dropEmptyChords(sheetId: SheetId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return;
+    }
+    sheet.chordList = sheet.chordList.filter(chord =>
+      sheet.elementList.find(
+        el => el.kind === 'note' && el.chordId === chord.id
+      )
     );
   }
 
-  @action deleteElement(id: ElementId) {
-    const spec = this.getElementById(id);
+  @action deleteElement(sheetId: SheetId, id: ElementId) {
+    const spec = this.getElementById(sheetId, id);
     if (spec && spec.kind === 'note') {
-      const notes = this.getNotesForChord(spec.chordId!);
-      notes.forEach(note => this.spliceElement(note.id));
-      this.dropEmptyChords();
+      const notes = this.getNotesForChord(sheetId, spec.chordId!);
+      notes.forEach(note => this.spliceElement(sheetId, note.id));
+      this.dropEmptyChords(sheetId);
     } else {
-      this.spliceElement(id);
+      this.spliceElement(sheetId, id);
     }
-    this.updateNextElements();
-    this.updateMatchElements();
+    this.updateNextElements(sheetId);
+    this.updateMatchElements(sheetId);
   }
 
-  @action spliceElement(id: ElementId) {
-    const element = this.getElementById(id);
+  @action spliceElement(sheetId: SheetId, id: ElementId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return;
+    }
+    const element = this.getElementById(sheetId, id);
     if (!element) {
       throw new Error(`Could not find element ${id} in spliceElement.`);
     }
-    this.elementList.splice(this.elementList.indexOf(element), 1);
+    sheet.elementList.splice(sheet.elementList.indexOf(element), 1);
   }
 
-  @action setNotePlaying(id: NoteId, isPlaying: boolean) {
-    const note = this.getElementById(id);
+  @action setNotePlaying(sheetId: SheetId, id: NoteId, isPlaying: boolean) {
+    const note = this.getElementById(sheetId, id);
     if (!note || note.kind !== 'note') {
       return;
     }
@@ -216,11 +284,15 @@ export class ProjectStore {
     return a.x - b.x;
   }
 
-  private updateNextElements() {
+  private updateNextElements(sheetId: SheetId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return;
+    }
     type Sortable = ChordSpec | AccidentalSpec | RepeatSpec;
     const inOrder: Sortable[] = [
-      ...this.chordList,
-      ...this.elementList.filter(el => el.kind !== 'note')
+      ...sheet.chordList,
+      ...sheet.elementList.filter(el => el.kind !== 'note')
     ] as Sortable[];
 
     if (inOrder.length === 0) {
@@ -229,10 +301,10 @@ export class ProjectStore {
 
     inOrder.sort(this.elementCompare);
 
-    this.firstElement = inOrder[0].id;
+    sheet.firstElement = inOrder[0].id;
     let previous = inOrder[0];
     inOrder.forEach(item => {
-      if (item.id !== this.firstElement) {
+      if (item.id !== sheet.firstElement) {
         previous.nextElement = item.id;
       }
       previous = item;
@@ -240,9 +312,13 @@ export class ProjectStore {
     inOrder[inOrder.length - 1].nextElement = undefined;
   }
 
-  private updateMatchElements() {
+  private updateMatchElements(sheetId: SheetId) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return;
+    }
     type Matchable = RepeatSpec;
-    const inOrder: Matchable[] = this.elementList.filter(
+    const inOrder: Matchable[] = sheet.elementList.filter(
       el => el.kind === 'repeat'
     ) as RepeatSpec[];
 
@@ -268,9 +344,19 @@ export class ProjectStore {
     }
   }
 
-  public getBacktrackSetter(type: SetterType, elementId: ElementId) {
-    let element = this.getElementById(elementId) as ChordSpec | AccidentalSpec;
-    const setters = this.elementList.filter(setter => {
+  public getBacktrackSetter(
+    sheetId: SheetId,
+    type: SetterType,
+    elementId: ElementId
+  ) {
+    const sheet = this.getSheet(sheetId);
+    if (!sheet) {
+      return;
+    }
+    let element = this.getElementById(sheetId, elementId) as
+      | ChordSpec
+      | AccidentalSpec;
+    const setters = sheet.elementList.filter(setter => {
       if (
         setter.kind !== 'setter' ||
         setter.type !== type ||

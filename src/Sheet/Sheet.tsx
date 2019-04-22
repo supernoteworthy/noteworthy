@@ -102,11 +102,11 @@ class Sheet extends Component<SheetProps> {
   };
 
   shouldDrawKeySignatureGuideline() {
-    const { uiStore, projectStore } = this.injected;
+    const { uiStore, projectStore, spec } = this.injected;
     if (uiStore.mouseMode === MouseMode.DRAG) {
       const dragElementId = uiStore.dragElementId;
       if (!dragElementId) return false;
-      const dragSpec = projectStore.getElementById(dragElementId);
+      const dragSpec = projectStore.getElementById(spec.id, dragElementId);
       if (dragSpec && dragSpec.kind === 'accidental') {
         return true;
       }
@@ -121,16 +121,16 @@ class Sheet extends Component<SheetProps> {
   }
 
   renderStaffs() {
-    const { staffCount } = this.props.spec;
+    const { staffCount, id } = this.props.spec;
     const staffs = [];
     for (let i = 0; i < staffCount; i++) {
-      staffs.push(<Staff key={`Staff_${i}`} index={i} />);
+      staffs.push(<Staff key={`Staff_${i}`} index={i} sheetId={id} />);
     }
     return staffs;
   }
 
   render() {
-    const { uiStore } = this.injected;
+    const { uiStore, spec } = this.injected;
     const staffs = this.renderStaffs();
     const totalSVGHeight = (STAFF_HEIGHT + STAFF_MARGIN) * staffs.length;
     return (
@@ -157,6 +157,7 @@ class Sheet extends Component<SheetProps> {
           <g transform={`translate(0, ${SHEET_MARGIN_TOP})`}>
             {uiStore.mouseMode === MouseMode.INSERT && (
               <CursorElement
+                sheetId={spec.id}
                 snapToStaff
                 getSheetBoundingX={this.getBoundingX}
               />

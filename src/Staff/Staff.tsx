@@ -2,15 +2,23 @@ import classNames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
 import Clef from '../Clef/Clef';
-import { CHORD_GUIDELINE_OFFSET, CHORD_GUIDELINE_WIDTH, LINE_DY, STAFF_HEIGHT, STAFF_MARGIN } from '../constants';
+import {
+  CHORD_GUIDELINE_OFFSET,
+  CHORD_GUIDELINE_WIDTH,
+  LINE_DY,
+  STAFF_HEIGHT,
+  STAFF_MARGIN
+} from '../constants';
 import DraggableElement from '../DraggableElement/DraggableElement';
 import { ProjectStore } from '../stores/project.store';
 import { MouseMode, UiStore } from '../stores/ui.store';
 import { ClefType } from '../types/ClefTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
+import { SheetId } from '../types/SheetTypes';
 import './Staff.css';
 
 interface StaffProps {
+  sheetId: SheetId;
   index: number;
   clef?: ClefType; // TODO: move clef to be a draggable.
 }
@@ -28,16 +36,16 @@ class Staff extends Component<StaffProps> {
   }
 
   get notes() {
-    const { index } = this.props;
+    const { index, sheetId } = this.props;
     const { projectStore } = this.injected;
     const notes = projectStore
-      .getElementsForStaff(index)
+      .getElementsForStaff(sheetId, index)
       .filter(note => note.kind === 'note') as NoteSpec[];
     return notes;
   }
 
   renderLedgerLines() {
-    const { index } = this.props;
+    const { index, sheetId } = this.props;
     const { uiStore, projectStore } = this.injected;
     let ledgerLines = [];
 
@@ -83,7 +91,7 @@ class Staff extends Component<StaffProps> {
 
     const notesAboveStaff = notes.filter(note => note.y < 0);
     for (let note of notesAboveStaff) {
-      const x = projectStore.getChordById(note.chordId)!.x;
+      const x = projectStore.getChordById(sheetId, note.chordId)!.x;
       for (let y = -LINE_DY; y >= note.y; y -= LINE_DY) {
         ledgerLines.push(
           <line
@@ -101,7 +109,7 @@ class Staff extends Component<StaffProps> {
     const notesBelowStaff = notes.filter(note => note.y >= STAFF_HEIGHT);
     for (let note of notesBelowStaff) {
       for (let y = STAFF_HEIGHT; y <= note.y; y += LINE_DY) {
-        const x = projectStore.getChordById(note.chordId)!.x;
+        const x = projectStore.getChordById(sheetId, note.chordId)!.x;
         ledgerLines.push(
           <line
             x1={x - 3}
@@ -118,13 +126,14 @@ class Staff extends Component<StaffProps> {
   }
 
   renderElements() {
-    const { index } = this.props;
+    const { index, sheetId } = this.props;
     const { projectStore } = this.injected;
-    const elements = projectStore.getElementsForStaff(index);
+    const elements = projectStore.getElementsForStaff(sheetId, index);
     return elements.map(element => (
       <DraggableElement
         key={`element_${element.id}`}
         id={element.id}
+        sheetId={sheetId}
         snapToStaff
       />
     ));

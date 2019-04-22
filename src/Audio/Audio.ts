@@ -1,4 +1,5 @@
 import { ProjectStore } from '../stores/project.store';
+import { UiStore } from '../stores/ui.store';
 import { AccidentalId, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
@@ -15,6 +16,7 @@ class Audio {
   private context: AudioContext;
   private instruments: { [instrumentName: string]: SampleLibrary };
   private projectStore?: ProjectStore;
+  private uiStore?: UiStore;
   private scheduler: Scheduler;
   private previousFeedbackNotes: NoteId[] = [];
 
@@ -35,15 +37,18 @@ class Audio {
     }
   }
 
-  public setProjectStore(projectStore: ProjectStore) {
+  public connectToStores(projectStore: ProjectStore, uiStore: UiStore) {
     this.projectStore = projectStore;
+    this.uiStore = uiStore;
   }
 
   public playSheet() {
-    if (!this.projectStore) {
-      throw new Error('Must call setProjectStore before other Audio methods.');
+    if (!this.projectStore || !this.uiStore) {
+      throw new Error('Must call connectToStores before other Audio methods.');
     }
-    const firstElement = this.projectStore.firstElement;
+    const firstElement = this.projectStore.getFirstElementId(
+      this.uiStore.activeSheet
+    );
     if (!firstElement) {
       return;
     }
@@ -53,37 +58,40 @@ class Audio {
       this.projectStore,
       this.instruments,
       EndCondition.END_OF_SHEET,
-      firstElement
+      firstElement,
+      this.uiStore.activeSheet
     );
     this.scheduler.pushPlayHead(playHead);
     this.scheduler.start();
   }
 
   public playChord(chordId: ChordId) {
-    if (!this.projectStore) {
-      throw new Error('Must call setProjectStore before other Audio methods.');
+    if (!this.projectStore || !this.uiStore) {
+      throw new Error('Must call connectToStores before other Audio methods.');
     }
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
       this.instruments,
       EndCondition.SAMPLE_ELEMENT,
-      chordId
+      chordId,
+      this.uiStore.activeSheet
     );
     this.scheduler.pushPlayHead(playHead);
     this.scheduler.start();
   }
 
   public playAccidentalSample(accidentalId: AccidentalId) {
-    if (!this.projectStore) {
-      throw new Error('Must call setProjectStore before other Audio methods.');
+    if (!this.projectStore || !this.uiStore) {
+      throw new Error('Must call connectToStores before other Audio methods.');
     }
     const playHead = new PlayHead(
       this.context,
       this.projectStore,
       this.instruments,
       EndCondition.SAMPLE_ELEMENT,
-      accidentalId
+      accidentalId,
+      this.uiStore.activeSheet
     );
     this.scheduler.pushPlayHead(playHead);
     this.scheduler.start();
@@ -122,21 +130,24 @@ class Audio {
   }
 
   private onUpdateFeedback = (playingChords: ChordSpec[]) => {
-    if (!this.projectStore) {
+    if (!this.projectStore || !this.uiStore) {
       return;
     }
+    const sheet = this.uiStore.activeSheet;
     const currentFeedbackNotes: NoteId[] = [];
     for (let chord of playingChords) {
-      const notes = this.projectStore.getNotesForChord(chord.id);
+      const notes = this.projectStore.getNotesForChord(sheet, chord.id);
       notes.forEach(note => {
         currentFeedbackNotes.push(note.id);
-        this.projectStore!.setNotePlaying(note.id, true);
+        this.projectStore!.setNotePlaying(sheet, note.id, true);
       });
     }
     const turnOff = this.previousFeedbackNotes.filter(
       noteId => !currentFeedbackNotes.includes(noteId)
     );
-    turnOff.forEach(noteId => this.projectStore!.setNotePlaying(noteId, false));
+    turnOff.forEach(noteId =>
+      this.projectStore!.setNotePlaying(sheet, noteId, false)
+    );
     this.previousFeedbackNotes = currentFeedbackNotes;
   };
 }

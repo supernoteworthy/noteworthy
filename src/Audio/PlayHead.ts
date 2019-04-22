@@ -5,6 +5,7 @@ import { ChordSpec } from '../types/ChordTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
 import { MatchType } from '../types/RepeatTypes';
 import { SetterType } from '../types/SetterTypes';
+import { SheetId } from '../types/SheetTypes';
 import { ElementId } from '../types/StaffTypes';
 import {
   beatsToSeconds,
@@ -26,6 +27,8 @@ export default class PlayHead {
   private projectStore: ProjectStore;
   private instruments: { [instrumentName: string]: SampleLibrary };
   private currentElement: ElementId;
+  private sheetId: SheetId;
+
   public currentChord?: ChordSpec;
   public endTime?: number;
   public endCondition: EndCondition;
@@ -40,17 +43,22 @@ export default class PlayHead {
     projectStore: ProjectStore,
     instruments: { [instrumentName: string]: SampleLibrary },
     endCondition: EndCondition,
-    currentElement: ElementId
+    currentElement: ElementId,
+    sheetId: SheetId
   ) {
     this.context = context;
     this.projectStore = projectStore;
     this.currentElement = currentElement;
     this.instruments = instruments;
     this.endCondition = endCondition;
+    this.sheetId = sheetId;
   }
 
   playCurrent() {
-    const element = this.projectStore.getElementById(this.currentElement);
+    const element = this.projectStore.getElementById(
+      this.sheetId,
+      this.currentElement
+    );
     if (!element) {
       return;
     }
@@ -102,7 +110,7 @@ export default class PlayHead {
           }
           let startRepeat = element.matchElement;
           if (!startRepeat) {
-            startRepeat = this.projectStore.firstElement;
+            startRepeat = this.projectStore.getFirstElementId(this.sheetId);
           }
           if (startRepeat) {
             this.currentElement = startRepeat;
@@ -123,9 +131,17 @@ export default class PlayHead {
       return workingValue;
     }
     if (this.currentElement) {
-      return this.projectStore.getBacktrackSetter(type, this.currentElement);
+      return this.projectStore.getBacktrackSetter(
+        this.sheetId,
+        type,
+        this.currentElement
+      );
     } else if (this.currentChord) {
-      return this.projectStore.getBacktrackSetter(type, this.currentChord.id);
+      return this.projectStore.getBacktrackSetter(
+        this.sheetId,
+        type,
+        this.currentChord.id
+      );
     }
     return null;
   }
@@ -134,11 +150,17 @@ export default class PlayHead {
     if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
       return false;
     }
-    const element = this.projectStore.getElementById(this.currentElement);
+    const element = this.projectStore.getElementById(
+      this.sheetId,
+      this.currentElement
+    );
     if (!element || !element.nextElement) {
       return false;
     }
-    const nextElement = this.projectStore.getElementById(element.nextElement);
+    const nextElement = this.projectStore.getElementById(
+      this.sheetId,
+      element.nextElement
+    );
     if (!nextElement) {
       return false;
     }
@@ -148,7 +170,7 @@ export default class PlayHead {
   }
 
   playChord(chord: ChordSpec, startTime: number) {
-    const notes = this.projectStore.getNotesForChord(chord.id);
+    const notes = this.projectStore.getNotesForChord(this.sheetId, chord.id);
     const bpm = (this.getSetterProperty(SetterType.BPM) as number) || 100;
     const noteTimes = notes.map(note =>
       beatsToSeconds(noteLengthToBeats(note.length), bpm)
@@ -168,7 +190,7 @@ export default class PlayHead {
     const source = this.context.createBufferSource();
     const accidental =
       this.workingAccidentals[spec.y] ||
-      this.projectStore.getKeySignatureForNote(spec.id);
+      this.projectStore.getKeySignatureForNote(this.sheetId, spec.id);
     if (this.workingAccidentals[spec.y]) {
       // Accidentals are applied to only one note.
       delete this.workingAccidentals[spec.y];

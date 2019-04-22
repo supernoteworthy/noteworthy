@@ -35,12 +35,19 @@ class App extends Component {
       <Provider projectStore={this.projectStore} uiStore={this.uiStore}>
         <div className={`App App${mouseModeClass}`}>
           <Palette />
-          <Tabs tabBarExtraContent={<Button>New sheet</Button>}>
+          <Tabs
+            tabBarExtraContent={
+              <Button onClick={() => this.projectStore.addSheet()}>
+                New sheet
+              </Button>
+            }
+            defaultActiveKey={this.projectStore.sheetList[0].id}
+            onChange={activeKey => {
+              this.uiStore.activeSheet = activeKey;
+            }}
+          >
             {this.projectStore.sheetList.map(sheetSpec => (
-              <Tabs.TabPane
-                tab={sheetSpec.label}
-                key={`Sheet_${sheetSpec.label}`}
-              >
+              <Tabs.TabPane tab={sheetSpec.label} key={sheetSpec.id}>
                 <Sheet spec={sheetSpec} />
               </Tabs.TabPane>
             ))}
@@ -52,7 +59,7 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    Audio.setProjectStore(this.projectStore);
+    Audio.connectToStores(this.projectStore, this.uiStore);
     await Audio.load();
   }
 }

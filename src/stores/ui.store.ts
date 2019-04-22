@@ -1,5 +1,6 @@
 import { computed, observable } from 'mobx';
 import { ChordSpec } from '../types/ChordTypes';
+import { SheetId } from '../types/SheetTypes';
 import { ElementId, StaffElement, StaffIndex } from '../types/StaffTypes';
 
 export enum MouseMode {
@@ -31,6 +32,8 @@ export class UiStore {
   @observable insertStaffY: number = 0;
 
   @observable activeChord?: ChordSpec;
+
+  @observable activeSheet: SheetId = 'abc'; /// XXX
 
   @computed get activeStaff() {
     if (this.mouseMode === MouseMode.INSERT) {
