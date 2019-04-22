@@ -37,11 +37,16 @@ class App extends Component {
           <Palette />
           <Tabs
             tabBarExtraContent={
-              <Button onClick={() => this.projectStore.addSheet()}>
+              <Button
+                onClick={() => {
+                  this.uiStore.activeSheet = this.projectStore.addSheet();
+                }}
+              >
                 New sheet
               </Button>
             }
             defaultActiveKey={this.projectStore.sheetList[0].id}
+            activeKey={this.uiStore.activeSheet}
             onChange={activeKey => {
               this.uiStore.activeSheet = activeKey;
             }}

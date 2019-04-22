@@ -25,13 +25,15 @@ export class ProjectStore {
   ];
 
   @action addSheet() {
+    const id = uuid();
     this.sheetList.push({
-      id: uuid(),
+      id,
       label: 'Piano',
       staffCount: MINIMUM_STAFF_COUNT,
       elementList: [],
       chordList: []
     });
+    return id;
   }
 
   private getSheet(sheetId: SheetId) {
