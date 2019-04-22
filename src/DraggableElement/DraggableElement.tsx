@@ -310,6 +310,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
         return (
           <Setter
             id={spec.id}
+            sheetId={this.props.sheetId}
             x={spec.x}
             y={spec.y}
             type={spec.type}
