@@ -389,7 +389,7 @@ export class ProjectStore {
         case SetterType.BPM:
           return 100;
         case SetterType.INSTRUMENT:
-          return 'Piano';
+          return sheet.instrumentName;
         case SetterType.OCTAVE:
           return 4;
         case SetterType.VOLUME:
