@@ -9,6 +9,11 @@ export default class PlayControls extends Component {
       // Enter
       if (e.keyCode === 13) {
         e.preventDefault();
+        Audio.playAll();
+      }
+      // Space
+      if (e.keyCode === 32) {
+        e.preventDefault();
         Audio.playSheet();
       }
     });
@@ -20,12 +25,18 @@ export default class PlayControls extends Component {
           type="primary"
           shape="circle"
           icon="caret-right"
+          onClick={() => Audio.playAll()}
+        />
+        <Button
+          type="dashed"
+          shape="circle"
+          icon="file"
           onClick={() => Audio.playSheet()}
         />
         <Button
           type="danger"
           shape="circle"
-          icon="stop"
+          icon="close"
           onClick={() => Audio.stopAll()}
         />
       </div>

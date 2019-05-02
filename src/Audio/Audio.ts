@@ -3,6 +3,7 @@ import { UiStore } from '../stores/ui.store';
 import { AccidentalId, AccidentalType } from '../types/AccidentalTypes';
 import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
+import { SheetId } from '../types/SheetTypes';
 import { staffPositionToMidi } from './AudioMath';
 import { Piano } from './Instruments/Piano';
 import { Sawtooth } from './Instruments/Sawtooth';
@@ -46,13 +47,27 @@ class Audio {
     return Object.keys(this.instruments);
   }
 
+  public playAll() {
+    if (!this.projectStore || !this.uiStore) {
+      throw new Error('Must call connectToStores before other Audio methods.');
+    }
+    this.projectStore.sheetList.forEach(sheet => this.scheduleSheet(sheet.id));
+    this.scheduler.start();
+  }
+
   public playSheet() {
     if (!this.projectStore || !this.uiStore) {
       throw new Error('Must call connectToStores before other Audio methods.');
     }
-    const firstElement = this.projectStore.getFirstElementId(
-      this.uiStore.activeSheet
-    );
+    this.scheduleSheet(this.uiStore.activeSheet);
+    this.scheduler.start();
+  }
+
+  private scheduleSheet(sheetId: SheetId) {
+    if (!this.projectStore || !this.uiStore) {
+      throw new Error('Must call connectToStores before other Audio methods.');
+    }
+    const firstElement = this.projectStore.getFirstElementId(sheetId);
     if (!firstElement) {
       return;
     }
@@ -63,10 +78,9 @@ class Audio {
       this.instruments,
       EndCondition.END_OF_SHEET,
       firstElement,
-      this.uiStore.activeSheet
+      sheetId
     );
     this.scheduler.pushPlayHead(playHead);
-    this.scheduler.start();
   }
 
   public playChord(chordId: ChordId) {
