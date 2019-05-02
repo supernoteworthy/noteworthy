@@ -95,10 +95,11 @@ export default class Setter extends Component<SetterProps> {
               element.value = value;
             }}
           >
-            <Select.Option value="Piano">Piano</Select.Option>
-            <Select.Option value="Sine">Sine</Select.Option>
-            <Select.Option value="Sawtooth">Sawtooth</Select.Option>
-            <Select.Option value="Snare">Snare</Select.Option>
+            {Audio.getInstrumentNames().map(instrumentName => (
+              <Select.Option key={instrumentName} value={instrumentName}>
+                {instrumentName}
+              </Select.Option>
+            ))}
           </Select>
         );
         break;
