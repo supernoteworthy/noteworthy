@@ -5,6 +5,8 @@ import { ChordId, ChordSpec } from '../types/ChordTypes';
 import { NoteId, NoteSpec } from '../types/NoteTypes';
 import { SheetId } from '../types/SheetTypes';
 import { staffPositionToMidi } from './AudioMath';
+import { EightOEight } from './Instruments/808';
+import { Moog } from './Instruments/Moog';
 import { Piano } from './Instruments/Piano';
 import { Sawtooth } from './Instruments/Sawtooth';
 import { Sine } from './Instruments/Sine';
@@ -27,7 +29,9 @@ class Audio {
       Piano: new SampleLibrary(this.context, Piano),
       Sine: new SampleLibrary(this.context, Sine),
       Sawtooth: new SampleLibrary(this.context, Sawtooth),
-      Snare: new SampleLibrary(this.context, Snare)
+      Snare: new SampleLibrary(this.context, Snare),
+      Moog: new SampleLibrary(this.context, Moog),
+      '808 boom': new SampleLibrary(this.context, EightOEight)
     };
     this.scheduler = new Scheduler(this.context, this.onUpdateFeedback);
   }
