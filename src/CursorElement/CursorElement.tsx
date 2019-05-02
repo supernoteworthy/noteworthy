@@ -47,7 +47,7 @@ export default class CursorElement extends Component<CursorElementProps> {
   }
   componentWillUnmount() {
     document.removeEventListener('mousemove', this.onMouseMove);
-    document.addEventListener('mousedown', this.onMouseDown);
+    document.removeEventListener('mousedown', this.onMouseDown);
   }
   onMouseMove = (e: MouseEvent) => {
     const { uiStore, projectStore, sheetId } = this.injected;
@@ -159,7 +159,7 @@ export default class CursorElement extends Component<CursorElementProps> {
     }
 
     let x = insertX;
-    let y = insertY + uiStore.sheetScroll - 60; // HACK: -60 for tab height.
+    let y = insertY + uiStore.sheetScroll - 30; // HACK: -30 for tab height.
 
     if (snapToStaff) {
       y = Math.round(y / (LINE_DY / 2)) * (LINE_DY / 2);

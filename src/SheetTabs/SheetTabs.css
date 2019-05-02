@@ -1,0 +1,27 @@
+.SheetTabs {
+  width: 100%;
+}
+
+.SheetTabs_TabZone {
+  cursor: default;
+  padding-top: 3px;
+}
+
+.SheetTabs_Tab {
+  float: left;
+  /* Replicate antd buttons */
+  line-height: 1.499;
+  background: #e4e4e4;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px 4px 0 0;
+  color: rgba(0, 0, 0, 0.65);
+  height: 32px;
+  padding: 0 15px;
+  margin-right: 1px;
+  outline: none;
+}
+
+.SheetTabs_Tab--active {
+  background: #fff;
+  border-bottom: none;
+}

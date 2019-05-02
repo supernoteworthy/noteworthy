@@ -42,6 +42,10 @@ class Audio {
     this.uiStore = uiStore;
   }
 
+  public getInstrumentNames() {
+    return Object.keys(this.instruments);
+  }
+
   public playSheet() {
     if (!this.projectStore || !this.uiStore) {
       throw new Error('Must call connectToStores before other Audio methods.');

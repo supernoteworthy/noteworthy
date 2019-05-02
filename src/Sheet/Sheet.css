@@ -3,6 +3,7 @@
   height: 100vh;
   overflow: auto;
   background: #fff;
+  padding-top: 5px;
 }
 
 .Sheet > svg {

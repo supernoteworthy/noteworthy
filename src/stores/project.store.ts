@@ -18,22 +18,34 @@ export class ProjectStore {
     {
       id: 'abc',
       label: 'Piano',
+      instrumentName: 'Piano',
       staffCount: 10,
       elementList: [],
       chordList: []
     }
   ];
 
-  @action addSheet() {
+  @action addSheet(instrumentName: string) {
     const id = uuid();
     this.sheetList.push({
       id,
-      label: 'Piano',
+      label: this.getUniqueLabelForSheet(instrumentName),
+      instrumentName,
       staffCount: MINIMUM_STAFF_COUNT,
       elementList: [],
       chordList: []
     });
     return id;
+  }
+
+  private getUniqueLabelForSheet(instrumentName: string) {
+    const instrumentCount = this.sheetList.filter(
+      sheet => sheet.instrumentName === instrumentName
+    ).length;
+    if (instrumentCount === 0) {
+      return instrumentName;
+    }
+    return `${instrumentName} ${instrumentCount + 1}`;
   }
 
   private getSheet(sheetId: SheetId) {

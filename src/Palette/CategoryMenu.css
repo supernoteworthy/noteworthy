@@ -2,6 +2,7 @@
   padding-top: 5px;
   padding-bottom: 5px;
   background: rgb(87, 105, 127);
+  cursor: default;
 }
 
 .CategoryMenu button {
