@@ -1,5 +1,6 @@
 .SheetTabs {
   width: 100%;
+  user-select: none;
 }
 
 .SheetTabs_TabZone {
@@ -19,6 +20,7 @@
   padding: 0 15px;
   margin-right: 1px;
   outline: none;
+  cursor: pointer;
 }
 
 .SheetTabs_Tab--active {
