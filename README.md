@@ -30,6 +30,6 @@ Credits:
   - https://thenounproject.com/search/?q=instrument&i=1544454
   - https://thenounproject.com/search/?q=volume&i=993436
   - https://thenounproject.com/search/?q=wave&i=990808
-  - and a Speedometer I can't find anymore :(
+  - https://thenounproject.com/search/?q=speed&i=2349076
 - Most notes are traced from Wikimedia [Musical score components](https://commons.wikimedia.org/wiki/Category:Musical_score_components) but some I have created by hand.
 - Recurse Center for providing the space to work on this project!
