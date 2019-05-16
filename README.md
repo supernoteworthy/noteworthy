@@ -22,6 +22,7 @@ To run it locally, use `npm start`.
 
 Credits:
 
+- Cappie Pomeroy, for coming up with the project name!
 - [Ant Design Toolkit](https://ant.design/) for buttons, drop-downs, tooltips, etc.
 - [Salamander Grand Piano V3](https://archive.org/details/SalamanderGrandPianoV3)
 - [Landr Samples](https://samples.landr.com/) - snare, 808, moog
