@@ -1,7 +1,7 @@
 {
   "name": "noteworthy",
   "version": "0.1.0",
-  "homepage": "https://tmickel.github.io/noteworthy",
+  "homepage": "https://supernoteworthy.com",
   "private": true,
   "dependencies": {
     "@types/classnames": "^2.2.7",
