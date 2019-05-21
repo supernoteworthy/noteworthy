@@ -146,10 +146,6 @@ export class ProjectStore {
     if (!note || note.kind !== 'note') {
       return AccidentalType.NATURAL;
     }
-    const chord = this.getChordById(sheetId, note.chordId);
-    if (!chord) {
-      return AccidentalType.NATURAL;
-    }
     const accidentals = sheet.elementList.filter(
       element =>
         element.kind === 'accidental' &&
