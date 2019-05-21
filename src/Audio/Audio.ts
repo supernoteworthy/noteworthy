@@ -24,7 +24,8 @@ class Audio {
   private previousFeedbackNotes: NoteId[] = [];
 
   constructor() {
-    this.context = new window.AudioContext();
+    const AudioContext = window.AudioContext || (<any>window).webkitAudioContext;
+    this.context = new AudioContext();
     this.instruments = {
       Piano: new SampleLibrary(this.context, Piano),
       Sine: new SampleLibrary(this.context, Sine),
