@@ -185,7 +185,6 @@ export default class PlayHead {
   }
 
   playElement(spec: NoteSpec | AccidentalSpec, start: number, stop: number) {
-    //debugger;
     if (spec.kind === 'note' && spec.type === NoteType.REST) {
       return;
     }
