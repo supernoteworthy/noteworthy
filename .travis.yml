@@ -1,13 +1,12 @@
 language: node_js
 node_js:
   - '9'
-before_install:
+before_deploy:
   - openssl aes-256-cbc -K $encrypted_1fb9006fac49_key -iv $encrypted_1fb9006fac49_iv
     -in deploy_travis.enc -out ./deploy_travis -d
   - eval "$(ssh-agent -s)"
   - chmod 600 deploy_travis
   - ssh-add deploy_travis
-before_deploy:
   - npm run build
 deploy:
   provider: script
