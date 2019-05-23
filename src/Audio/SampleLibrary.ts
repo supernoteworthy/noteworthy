@@ -17,12 +17,16 @@ export default class SampleLibrary {
     this.audioContext = context;
   }
 
-  async decodeToAudioBuffers() {
+  decodeToAudioBuffers() {
     for (let key of Object.keys(this.instrumentSamples)) {
-      this.instrumentAudioBuffers[
-        key
-      ] = await this.audioContext.decodeAudioData(
-        this.instrumentSamples[key].buffer
+      this.audioContext.decodeAudioData(
+        this.instrumentSamples[key].buffer,
+        buffer => {
+          this.instrumentAudioBuffers[key] = buffer;
+        },
+        () => {
+          throw new Error(`Failed to decode ${key}`);
+        }
       );
     }
   }

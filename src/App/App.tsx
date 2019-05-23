@@ -44,7 +44,7 @@ class App extends Component {
 
   async componentDidMount() {
     Audio.connectToStores(this.projectStore, this.uiStore);
-    await Audio.load();
+    Audio.load();
   }
 }
 
