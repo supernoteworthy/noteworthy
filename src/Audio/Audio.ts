@@ -40,7 +40,7 @@ class Audio {
 
   public async load() {
     for (let instrument of Object.values(this.instruments)) {
-      await instrument.decodeToAudioBuffers();
+      instrument.decodeToAudioBuffers();
     }
   }
 

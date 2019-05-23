@@ -205,6 +205,9 @@ export default class PlayHead {
     const { buffer, playbackRate } = this.instruments[
       instrument
     ].getBufferAndRateForMidi(midiNote);
+    if (!buffer) {
+      return; // Audio buffer not yet loaded.
+    }
     source.buffer = buffer;
     source.playbackRate.value = playbackRate;
     source.start(start);
@@ -233,6 +236,5 @@ export default class PlayHead {
     }
     this.gain.gain.cancelScheduledValues(0);
     this.gain.gain.linearRampToValueAtTime(0.000001, stopTime);
-    this.source.stop(stopTime);
   }
 }
