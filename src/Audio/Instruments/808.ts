@@ -1,5 +1,6 @@
 import { InstrumentSamples } from '../SampleLibrary';
 
+/* eslint-disable */
 export const EightOEight: InstrumentSamples = {
   G4: {
     midiBaseNote: 67,

@@ -1,5 +1,6 @@
 import { InstrumentSamples } from '../SampleLibrary';
 
+/* eslint-disable */
 export const Sawtooth: InstrumentSamples = {
   C4: {
     midiBaseNote: 60,

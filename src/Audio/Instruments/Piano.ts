@@ -1,5 +1,6 @@
 import { InstrumentSamples } from '../SampleLibrary';
 
+/* eslint-disable */
 export const Piano: InstrumentSamples = {
   A0: {
     midiBaseNote: 21,

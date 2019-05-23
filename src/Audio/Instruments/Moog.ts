@@ -1,5 +1,6 @@
 import { InstrumentSamples } from '../SampleLibrary';
 
+/* eslint-disable */
 export const Moog: InstrumentSamples = {
   Ds4: {
     midiBaseNote: 63,

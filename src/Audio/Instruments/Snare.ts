@@ -1,5 +1,6 @@
 import { InstrumentSamples } from '../SampleLibrary';
 
+/* eslint-disable */
 export const Snare: InstrumentSamples = {
   C4: {
     midiBaseNote: 60,
