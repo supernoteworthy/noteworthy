@@ -17,6 +17,13 @@ export default class PlayControls extends Component {
         Audio.playSheet();
       }
     });
+
+    document.addEventListener('keydown', e => {
+      // escape
+      if (e.keyCode === 27) {
+        Audio.stopAll();
+      }
+    });
   }
   render() {
     return (
