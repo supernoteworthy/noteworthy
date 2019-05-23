@@ -71,6 +71,7 @@ export default class PlayHead {
         if (element.x > KEY_SIGNATURE_GUIDELINE_X) {
           this.workingAccidentals[element.y] = element.type;
         }
+      // eslint-disable no-fallthrough
       case 'note':
         if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
           let time = 0.5;

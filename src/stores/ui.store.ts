@@ -42,5 +42,6 @@ export class UiStore {
     if (this.mouseMode === MouseMode.DRAG) {
       return this.dragActiveStaffIndex;
     }
+    return undefined;
   }
 }

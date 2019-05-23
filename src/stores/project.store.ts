@@ -108,6 +108,7 @@ export class ProjectStore {
       } else {
         return el.staffIndex === staffIndex;
       }
+      return false;
     });
   }
 

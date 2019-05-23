@@ -299,7 +299,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             }}
             onHitBoxMouseLeave={() =>
               !dragging &&
-              uiStore.mouseMode == MouseMode.DRAG &&
+              uiStore.mouseMode === MouseMode.DRAG &&
               (uiStore.mouseMode = MouseMode.INSERT)
             }
             shouldShowNumber
@@ -325,7 +325,7 @@ export default class DraggableElement extends Component<DraggableElementProps> {
             }}
             onHitBoxMouseLeave={() =>
               !dragging &&
-              uiStore.mouseMode == MouseMode.DRAG &&
+              uiStore.mouseMode === MouseMode.DRAG &&
               (uiStore.mouseMode = MouseMode.INSERT)
             }
             shouldShowValue

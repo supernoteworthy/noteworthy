@@ -186,6 +186,7 @@ export default class Palette extends Component<PaletteProps> {
                       </Tooltip>
                     );
                 }
+                return null;
               })}
             </g>
           </svg>
