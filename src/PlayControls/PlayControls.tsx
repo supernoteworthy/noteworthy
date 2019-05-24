@@ -4,26 +4,34 @@ import Audio from '../Audio/Audio';
 import './PlayControls.css';
 
 export default class PlayControls extends Component {
-  componentDidMount() {
-    document.addEventListener('keypress', e => {
-      // Enter
-      if (e.keyCode === 13) {
-        e.preventDefault();
-        Audio.playAll();
-      }
-      // Space
-      if (e.keyCode === 32) {
-        e.preventDefault();
-        Audio.playSheet();
-      }
-    });
+  handleKeyPress = (e: KeyboardEvent) => {
+    // Enter
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      Audio.playAll();
+    }
+    // Space
+    if (e.keyCode === 32) {
+      e.preventDefault();
+      Audio.playSheet();
+    }
+  };
 
-    document.addEventListener('keydown', e => {
-      // escape
-      if (e.keyCode === 27) {
-        Audio.stopAll();
-      }
-    });
+  handleKeyDown = (e: KeyboardEvent) => {
+    // escape
+    if (e.keyCode === 27) {
+      Audio.stopAll();
+    }
+  };
+
+  componentDidMount() {
+    document.addEventListener('keypress', this.handleKeyPress);
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keypress', this.handleKeyPress);
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
   render() {
     return (
