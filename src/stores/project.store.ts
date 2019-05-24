@@ -38,6 +38,10 @@ export class ProjectStore {
     return id;
   }
 
+  @action removeSheet(sheetId: SheetId) {
+    this.sheetList = this.sheetList.filter(sheet => sheet.id !== sheetId);
+  }
+
   private getUniqueLabelForSheet(instrumentName: string) {
     const instrumentCount = this.sheetList.filter(
       sheet => sheet.instrumentName === instrumentName
@@ -48,7 +52,7 @@ export class ProjectStore {
     return `${instrumentName} ${instrumentCount + 1}`;
   }
 
-  private getSheet(sheetId: SheetId) {
+  public getSheet(sheetId: SheetId) {
     return this.sheetList.find(sheet => sheet.id === sheetId);
   }
 
