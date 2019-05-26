@@ -56,6 +56,27 @@ export class ProjectStore {
     return this.sheetList.find(sheet => sheet.id === sheetId);
   }
 
+  public getAdjacentSheets(
+    sheetId: SheetId
+  ): { prevSheet: SheetId | null; nextSheet: SheetId | null } {
+    let prevSheet = null;
+    let nextSheet = null;
+
+    for (let i = 0; i < this.sheetList.length; i++) {
+      if (this.sheetList[i].id === sheetId) {
+        if (i !== 0) {
+          prevSheet = this.sheetList[i - 1].id;
+        }
+        if (i + 1 !== this.sheetList.length) {
+          nextSheet = this.sheetList[i + 1].id;
+        }
+        break;
+      }
+    }
+
+    return { prevSheet, nextSheet };
+  }
+
   getFirstElementId(sheetId: SheetId) {
     const sheet = this.getSheet(sheetId);
     if (sheet) {
