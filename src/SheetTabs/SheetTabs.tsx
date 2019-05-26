@@ -24,9 +24,14 @@ export default class SheetTabs extends Component<SheetTabsProps> {
 
   confirmSheetTabClosing = (e: React.MouseEvent, sheetId: SheetId) => {
     e.stopPropagation();
-    // TODO: add the sheet name.
+    const sheetToClose = this.injected.projectStore.getSheet(sheetId);
+    if (!sheetToClose)
+      throw new Error(`Could not find a sheet with id of: ${sheetId}`);
+
     Modal.confirm({
-      title: 'Are you sure you want to delete this sheet?',
+      title: `Are you sure you want to delete the "${
+        sheetToClose.label
+      }" tab sheet?`,
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
