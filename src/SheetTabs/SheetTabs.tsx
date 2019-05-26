@@ -81,7 +81,8 @@ export default class SheetTabs extends Component<SheetTabsProps> {
           {projectStore.sheetList.map(sheet => (
             <div
               className={classNames('SheetTabs_Tab', {
-                'SheetTabs_Tab--active': sheet.id === uiStore.activeSheet
+                'SheetTabs_Tab--active': sheet.id === uiStore.activeSheet,
+                'SheetTabs_Tab--single': !displayCloseSheet
               })}
               onClick={() => (uiStore.activeSheet = sheet.id)}
               key={sheet.id}

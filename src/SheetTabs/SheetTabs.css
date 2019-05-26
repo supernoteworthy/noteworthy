@@ -18,12 +18,16 @@
   border-radius: 4px 4px 0 0;
   color: rgba(0, 0, 0, 0.65);
   height: 32px;
-  padding: 0 15px;
+  padding: 0 7px 0 15px;
   margin-right: 1px;
   outline: none;
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.SheetTabs_Tab--single {
+  padding: 0 15px;
 }
 
 .SheetTabs_Tab--active {
@@ -37,6 +41,7 @@
 
 .SheetTabs_CloseIcon {
   margin-left: 7px;
+  padding-bottom: 1px;
 }
 
 .SheetTabs_CloseIcon:hover {
