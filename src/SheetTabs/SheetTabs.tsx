@@ -1,4 +1,4 @@
-import { Button, Dropdown, Menu, Modal } from 'antd';
+import { Button, Dropdown, Menu, Modal, Icon } from 'antd';
 import classNames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
@@ -36,14 +36,21 @@ export default class SheetTabs extends Component<SheetTabsProps> {
 
   closeSheetTab(sheetId: SheetId) {
     console.log(`closing sheet id: ${sheetId}`);
+    const {
+      prevSheet,
+      nextSheet
+    } = this.injected.projectStore.getAdjacentSheets(sheetId);
+
     this.injected.projectStore.removeSheet(sheetId);
-    if (this.injected.uiStore.activeSheet == sheetId) {
-      // TODO: write helper method in project store to determine if a given sheet has a sheet to the right. (handle inside store!)
+
+    // Logic for determining what sheet to focus on when closing the current sheet:
+    if (this.injected.uiStore.activeSheet === sheetId) {
+      if (nextSheet) {
+        this.injected.uiStore.activeSheet = nextSheet;
+      } else if (prevSheet) {
+        this.injected.uiStore.activeSheet = prevSheet;
+      }
     }
-    // if uiStore.currentSheet == sheetId:
-    //   if the current sheet has a sheet to the right,
-    //   set currentSheet to that one.
-    //   if there is one on the left, set currentSheet to that one.
   }
 
   render() {
@@ -74,11 +81,15 @@ export default class SheetTabs extends Component<SheetTabsProps> {
               onClick={() => (uiStore.activeSheet = sheet.id)}
               key={sheet.id}
             >
-              {sheet.label}
+              <p className="SheetTabs_TabName">{sheet.label}</p>
               {displayCloseSheet && (
-                <button onClick={e => this.confirmSheetTabClosing(e, sheet.id)}>
-                  x
-                </button>
+                <Icon
+                  type="close-circle"
+                  className="SheetTabs_CloseIcon"
+                  onClick={(e: React.MouseEvent) =>
+                    this.confirmSheetTabClosing(e, sheet.id)
+                  }
+                />
               )}
             </div>
           ))}
