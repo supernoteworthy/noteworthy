@@ -40,7 +40,6 @@ export default class SheetTabs extends Component<SheetTabsProps> {
   };
 
   closeSheetTab(sheetId: SheetId) {
-    console.log(`closing sheet id: ${sheetId}`);
     const {
       prevSheet,
       nextSheet
@@ -48,7 +47,6 @@ export default class SheetTabs extends Component<SheetTabsProps> {
 
     this.injected.projectStore.removeSheet(sheetId);
 
-    // Logic for determining what sheet to focus on when closing the current sheet:
     if (this.injected.uiStore.activeSheet === sheetId) {
       if (nextSheet) {
         this.injected.uiStore.activeSheet = nextSheet;
