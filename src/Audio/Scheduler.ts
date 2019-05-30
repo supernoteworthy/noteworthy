@@ -7,6 +7,7 @@ export default class Scheduler {
   private scheduleInterval?: NodeJS.Timeout;
   private playHeads: PlayHead[] = [];
   private updateFeedbackCallback: (playingChords: ChordSpec[]) => void;
+  public _debugScheduleTime?: Date;
 
   constructor(
     context: AudioContext,
@@ -55,6 +56,7 @@ export default class Scheduler {
   }
 
   private schedule = () => {
+    this._debugScheduleTime = new Date();
     const startWindow = this.context.currentTime;
     const endWindow = this.context.currentTime + SCHEDULER_LOOKAHEAD_MS / 1000;
 
