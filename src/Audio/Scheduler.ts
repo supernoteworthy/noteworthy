@@ -6,14 +6,14 @@ export default class Scheduler {
   private context: AudioContext;
   private scheduleInterval?: NodeJS.Timeout;
   private playHeads: PlayHead[] = [];
-  private onUpdateFeedback: (playingChords: ChordSpec[]) => void;
+  private updateFeedbackCallback: (playingChords: ChordSpec[]) => void;
 
   constructor(
     context: AudioContext,
-    onUpdateFeedback: (playingChords: ChordSpec[]) => void
+    updateFeedbackCallback: (playingChords: ChordSpec[]) => void
   ) {
     this.context = context;
-    this.onUpdateFeedback = onUpdateFeedback;
+    this.updateFeedbackCallback = updateFeedbackCallback;
   }
 
   public start() {
@@ -89,7 +89,7 @@ export default class Scheduler {
         chordsPlaying.push(playHead.currentChord);
       }
     }
-    this.onUpdateFeedback(chordsPlaying);
+    this.updateFeedbackCallback(chordsPlaying);
     if (this.playHeads.length > 0) {
       requestAnimationFrame(this.updateFeedback);
     }
