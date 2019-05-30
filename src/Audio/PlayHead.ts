@@ -84,8 +84,6 @@ export default class PlayHead {
             this.context.currentTime + time
           );
           this.endTime = this.context.currentTime + time;
-        } else {
-          this.next();
         }
         break;
       case 'repeat':
