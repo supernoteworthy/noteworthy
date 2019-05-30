@@ -66,6 +66,9 @@ export function staffPositionToMidi(
   return 1;
 }
 
-export function midiToPlaybackRate(midi: number, midiBaseNote: number) {
+export function playbackRateForMidiInterval(
+  midi: number,
+  midiBaseNote: number
+) {
   return Math.pow(2, (midi - midiBaseNote) / 12);
 }

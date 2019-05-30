@@ -1,4 +1,4 @@
-import { midiToPlaybackRate } from './AudioMath';
+import { playbackRateForMidiInterval } from './AudioMath';
 
 export interface SampleSpec {
   midiBaseNote: number;
@@ -43,7 +43,7 @@ export default class SampleLibrary {
     }
     return {
       buffer: this.instrumentAudioBuffers[bestSampleKey],
-      playbackRate: midiToPlaybackRate(
+      playbackRate: playbackRateForMidiInterval(
         midi,
         this.instrumentSamples[bestSampleKey].midiBaseNote
       )
