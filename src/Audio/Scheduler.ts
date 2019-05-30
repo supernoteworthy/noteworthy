@@ -30,7 +30,7 @@ export default class Scheduler {
       clearInterval(this.scheduleInterval);
       this.scheduleInterval = undefined;
     }
-    this.playHeads.forEach(playHead => playHead.stop());
+    this.playHeads.forEach(playHead => playHead.stopAudio());
     this.playHeads = [];
   }
 
@@ -41,7 +41,7 @@ export default class Scheduler {
         playHead.currentChord.id === chordId &&
         playHead.endCondition === EndCondition.SAMPLE_ELEMENT
       ) {
-        playHead.stop();
+        playHead.stopAudio();
         this.dropPlayHead(playHead);
       }
     }

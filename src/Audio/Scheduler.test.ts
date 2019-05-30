@@ -48,7 +48,7 @@ describe('Scheduler', () => {
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       scheduler.pushPlayHead({
         playCurrent: () => {},
-        stop: () => {}
+        stopAudio: () => {}
       } as PlayHead);
       expect(scheduler._debugScheduleTime).toBeUndefined();
       scheduler.start();
