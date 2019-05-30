@@ -1,10 +1,9 @@
-import { KEY_SIGNATURE_GUIDELINE_X } from '../constants';
 import { ProjectStore } from '../stores/project.store';
 import { AccidentalSpec, AccidentalType } from '../types/AccidentalTypes';
 import { ChordSpec } from '../types/ChordTypes';
 import { NoteSpec, NoteType } from '../types/NoteTypes';
-import { MatchType } from '../types/RepeatTypes';
-import { SetterType } from '../types/SetterTypes';
+import { MatchType, RepeatId, RepeatSpec } from '../types/RepeatTypes';
+import { SetterSpec, SetterType } from '../types/SetterTypes';
 import { SheetId } from '../types/SheetTypes';
 import { ElementId } from '../types/StaffTypes';
 import {
@@ -21,6 +20,10 @@ export enum EndCondition {
 }
 
 export default class PlayHead {
+  public currentChord?: ChordSpec;
+  public endTime?: number;
+  public endCondition: EndCondition;
+
   private context: AudioContext;
   private gain?: GainNode;
   private source?: AudioBufferSourceNode;
@@ -28,10 +31,6 @@ export default class PlayHead {
   private instruments: { [instrumentName: string]: SampleLibrary };
   private currentElement: ElementId;
   private sheetId: SheetId;
-
-  public currentChord?: ChordSpec;
-  public endTime?: number;
-  public endCondition: EndCondition;
   private repeatCounters: { [counter: string]: number } = {};
   private workingAccidentals: { [y: number]: AccidentalType } = {};
   private workingSetterProperties: {
@@ -54,100 +53,104 @@ export default class PlayHead {
     this.sheetId = sheetId;
   }
 
-  playCurrent() {
+  // ----- Playhead sequencing -----
+  // Handles anything we might encounter on the sheet until
+  // we encounter a playable element (chord).
+  // Output that chord to audio if we reach it.
+
+  public proceedAndOutputNextSound() {
     const element = this.projectStore.getElementById(
       this.sheetId,
       this.currentElement
     );
-    if (!element) {
+    const handlers = {
+      chord: this.handleCurrentChord,
+      accidental: this.handleCurrentAccidental,
+      note: this.handleCurrentNote,
+      repeat: this.handleCurrentRepeat,
+      setter: this.handleCurrentSetter
+    };
+    if (!element || !handlers[element.kind]) {
       return;
     }
-    switch (element.kind) {
-      case 'chord':
-        this.currentChord = element;
-        this.playChord(element, this.context.currentTime);
-        break;
-      case 'accidental':
-        if (element.x > KEY_SIGNATURE_GUIDELINE_X) {
-          this.workingAccidentals[element.y] = element.type;
-        }
-      // eslint-disable no-fallthrough
-      case 'note':
-        if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
-          let time = 0.5;
-          if (element.kind === 'note') {
-            time = beatsToSeconds(noteLengthToBeats(element.length), 100);
-          }
-          this.playElement(
-            element,
-            this.context.currentTime,
-            this.context.currentTime + time
-          );
-          this.endTime = this.context.currentTime + time;
-        } else {
-          this.next();
-        }
-        break;
-      case 'repeat':
-        if (element.type === MatchType.START) {
-          if (element.nextElement === element.matchElement) {
-            // Repeat block is empty.
-            return;
-          }
-          this.next(); // Start repeat -- no-op; go to next note.
-        } else {
-          // End repeat. Go to start repeat!
-          if (this.repeatCounters[element.id] === undefined) {
-            this.repeatCounters[element.id] = 1;
-          } else {
-            this.repeatCounters[element.id]++;
-          }
-          if (
-            element.nRepeats === undefined ||
-            this.repeatCounters[element.id] >= element.nRepeats
-          ) {
-            delete this.repeatCounters[element.id];
-            return;
-          }
-          let startRepeat = element.matchElement;
-          if (!startRepeat) {
-            startRepeat = this.projectStore.getFirstElementId(this.sheetId);
-          }
-          if (startRepeat) {
-            this.currentElement = startRepeat;
-            this.playCurrent();
-          }
-        }
-        break;
-      case 'setter':
-        this.workingSetterProperties[element.type] = element.value;
-        this.next();
-        break;
+    handlers[element.kind].bind(this)(element as any);
+  }
+
+  private handleCurrentChord(element: ChordSpec) {
+    this.currentChord = element;
+    this.chordToAudio(element, this.context.currentTime);
+  }
+
+  private handleCurrentAccidental(element: AccidentalSpec) {
+    this.workingAccidentals[element.y] = element.type;
+    if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
+      let time = 0.5;
+      this.noteToAudio(
+        element,
+        this.context.currentTime,
+        this.context.currentTime + time
+      );
+      this.endTime = this.context.currentTime + time;
+    }
+    this.next();
+  }
+
+  private handleCurrentNote(element: NoteSpec) {
+    if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
+      const time = beatsToSeconds(noteLengthToBeats(element.length), 100);
+      this.noteToAudio(
+        element,
+        this.context.currentTime,
+        this.context.currentTime + time
+      );
+      this.endTime = this.context.currentTime + time;
     }
   }
 
-  private getSetterProperty(type: SetterType) {
-    const workingValue = this.workingSetterProperties[type];
-    if (workingValue) {
-      return workingValue;
+  private handleCurrentRepeat(element: RepeatSpec) {
+    if (element.type === MatchType.START) {
+      // Start repeat -- go to next note.
+      const isRepeatBlockEmpty = element.nextElement === element.matchElement;
+      if (isRepeatBlockEmpty) {
+        return;
+      }
+      this.next();
+    } else {
+      // End repeat -- go to start repeat if needed.
+      this.incrementRepeatCounter(element.id);
+      const isRepeatCounterAtLimit =
+        element.nRepeats === undefined ||
+        this.repeatCounters[element.id] >= element.nRepeats;
+      if (isRepeatCounterAtLimit) {
+        delete this.repeatCounters[element.id];
+        return;
+      }
+      let startRepeat = element.matchElement;
+      if (!startRepeat) {
+        // If no matching start is present, use the start of sheet.
+        startRepeat = this.projectStore.getFirstElementId(this.sheetId);
+      }
+      if (startRepeat) {
+        this.currentElement = startRepeat;
+        this.proceedAndOutputNextSound();
+      }
     }
-    if (this.currentElement) {
-      return this.projectStore.getBacktrackSetter(
-        this.sheetId,
-        type,
-        this.currentElement
-      );
-    } else if (this.currentChord) {
-      return this.projectStore.getBacktrackSetter(
-        this.sheetId,
-        type,
-        this.currentChord.id
-      );
-    }
-    return null;
   }
 
-  next() {
+  private handleCurrentSetter(element: SetterSpec) {
+    this.workingSetterProperties[element.type] = element.value;
+    this.next();
+  }
+
+  private incrementRepeatCounter(id: RepeatId) {
+    if (this.repeatCounters[id] === undefined) {
+      this.repeatCounters[id] = 1;
+    } else {
+      this.repeatCounters[id]++;
+    }
+  }
+
+  public next() {
     if (this.endCondition === EndCondition.SAMPLE_ELEMENT) {
       return false;
     }
@@ -166,13 +169,25 @@ export default class PlayHead {
       return false;
     }
     this.currentElement = nextElement.id;
-    this.playCurrent();
+    this.proceedAndOutputNextSound();
     return true;
   }
 
-  playChord(chord: ChordSpec, startTime: number) {
+  // ----- Audio handlers ------
+  // Output the playhead state to the Web Audio API context.
+
+  private getSetterProperty(type: SetterType, elementId: ElementId) {
+    const workingValue = this.workingSetterProperties[type];
+    if (workingValue) {
+      return workingValue;
+    }
+    return this.projectStore.getBacktrackSetter(this.sheetId, type, elementId);
+  }
+
+  private chordToAudio(chord: ChordSpec, startTime: number) {
     const notes = this.projectStore.getNotesForChord(this.sheetId, chord.id);
-    const bpm = (this.getSetterProperty(SetterType.BPM) as number) || 100;
+    const bpm =
+      (this.getSetterProperty(SetterType.BPM, chord.id) as number) || 100;
     const noteTimes = notes.map(note =>
       beatsToSeconds(noteLengthToBeats(note.length), bpm)
     );
@@ -180,11 +195,15 @@ export default class PlayHead {
     this.endTime = startTime + chordTime;
     notes.forEach(note => {
       const noteTime = beatsToSeconds(noteLengthToBeats(note.length), bpm);
-      this.playElement(note, startTime, startTime + noteTime);
+      this.noteToAudio(note, startTime, startTime + noteTime);
     });
   }
 
-  playElement(spec: NoteSpec | AccidentalSpec, start: number, stop: number) {
+  private noteToAudio(
+    spec: NoteSpec | AccidentalSpec,
+    start: number,
+    stop: number
+  ) {
     if (spec.kind === 'note' && spec.type === NoteType.REST) {
       return;
     }
@@ -198,10 +217,11 @@ export default class PlayHead {
     }
     const midiNote = staffPositionToMidi(
       spec.y,
-      (this.getSetterProperty(SetterType.OCTAVE) as number) || 0,
+      (this.getSetterProperty(SetterType.OCTAVE, spec.id) as number) || 0,
       spec.kind === 'note' ? accidental : spec.type
     );
-    const instrument = this.getSetterProperty(SetterType.INSTRUMENT) || 'Piano';
+    const instrument =
+      this.getSetterProperty(SetterType.INSTRUMENT, spec.id) || 'Piano';
     const { buffer, playbackRate } = this.instruments[
       instrument
     ].getBufferAndRateForMidi(midiNote);
@@ -214,7 +234,8 @@ export default class PlayHead {
     source.stop(stop);
 
     const volume =
-      ((this.getSetterProperty(SetterType.VOLUME) as number) || 100) / 100;
+      ((this.getSetterProperty(SetterType.VOLUME, spec.id) as number) || 100) /
+      100;
 
     const gain = this.context.createGain();
     source.connect(gain);
@@ -226,7 +247,7 @@ export default class PlayHead {
     this.gain = gain;
   }
 
-  stop() {
+  public stopAudio() {
     if (!this.gain || !this.source) {
       return;
     }

@@ -2,6 +2,7 @@
  * Utilities for calculating audio properties.
  */
 
+import { LINE_DY } from '../constants';
 import { AccidentalType } from '../types/AccidentalTypes';
 import { NoteLength } from '../types/NoteTypes';
 
@@ -31,15 +32,17 @@ export function staffPositionToMidi(
   octave: number,
   accidentalType: AccidentalType
 ) {
-  // XXX: Could be simplified a bit?
-  let midi = 12 + octave * 12;
+  const OCTAVE_DY = 7 * (LINE_DY / 2);
+  const MIDI_OCTAVE_INTERVAL = 12;
+  let midi = (octave + 1) * MIDI_OCTAVE_INTERVAL;
+  // TODO: Fix magic numbers 100 and 40.
   while (y > 100) {
-    midi -= 12;
-    y -= 70;
+    midi -= MIDI_OCTAVE_INTERVAL;
+    y -= OCTAVE_DY;
   }
   while (y < 40) {
-    midi += 12;
-    y += 70;
+    midi += MIDI_OCTAVE_INTERVAL;
+    y += OCTAVE_DY;
   }
   if (accidentalType === AccidentalType.SHARP) {
     midi += 1;
@@ -50,22 +53,30 @@ export function staffPositionToMidi(
   switch (y) {
     case 100: // Middle C
       return midi;
+    // C sharp = + 1
     case 90: // D
       return midi + 2;
+    // D sharp = + 3
     case 80: // E
       return midi + 4;
     case 70: // F
       return midi + 5;
+    // F sharp = + 6
     case 60: // G
       return midi + 7;
+    // G sharp = + 8
     case 50: // A
       return midi + 9;
+    // B flat = + 10
     case 40: // B
       return midi + 11;
   }
-  return 1;
+  throw new Error('Could not convert y position to midi note');
 }
 
-export function midiToPlaybackRate(midi: number, midiBaseNote: number) {
+export function playbackRateForMidiInterval(
+  midi: number,
+  midiBaseNote: number
+) {
   return Math.pow(2, (midi - midiBaseNote) / 12);
 }

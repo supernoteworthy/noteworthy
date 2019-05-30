@@ -6,14 +6,15 @@ export default class Scheduler {
   private context: AudioContext;
   private scheduleInterval?: NodeJS.Timeout;
   private playHeads: PlayHead[] = [];
-  private onUpdateFeedback: (playingChords: ChordSpec[]) => void;
+  private updateFeedbackCallback: (playingChords: ChordSpec[]) => void;
+  public _debugScheduleTime?: Date;
 
   constructor(
     context: AudioContext,
-    onUpdateFeedback: (playingChords: ChordSpec[]) => void
+    updateFeedbackCallback: (playingChords: ChordSpec[]) => void
   ) {
     this.context = context;
-    this.onUpdateFeedback = onUpdateFeedback;
+    this.updateFeedbackCallback = updateFeedbackCallback;
   }
 
   public start() {
@@ -29,7 +30,7 @@ export default class Scheduler {
       clearInterval(this.scheduleInterval);
       this.scheduleInterval = undefined;
     }
-    this.playHeads.forEach(playHead => playHead.stop());
+    this.playHeads.forEach(playHead => playHead.stopAudio());
     this.playHeads = [];
   }
 
@@ -40,7 +41,7 @@ export default class Scheduler {
         playHead.currentChord.id === chordId &&
         playHead.endCondition === EndCondition.SAMPLE_ELEMENT
       ) {
-        playHead.stop();
+        playHead.stopAudio();
         this.dropPlayHead(playHead);
       }
     }
@@ -55,12 +56,13 @@ export default class Scheduler {
   }
 
   private schedule = () => {
+    this._debugScheduleTime = new Date();
     const startWindow = this.context.currentTime;
     const endWindow = this.context.currentTime + SCHEDULER_LOOKAHEAD_MS / 1000;
 
     for (let playHead of this.playHeads) {
       if (!playHead.endTime) {
-        playHead.playCurrent();
+        playHead.proceedAndOutputNextSound();
       } else if (
         playHead.endTime >= startWindow &&
         playHead.endTime <= endWindow
@@ -89,7 +91,7 @@ export default class Scheduler {
         chordsPlaying.push(playHead.currentChord);
       }
     }
-    this.onUpdateFeedback(chordsPlaying);
+    this.updateFeedbackCallback(chordsPlaying);
     if (this.playHeads.length > 0) {
       requestAnimationFrame(this.updateFeedback);
     }
