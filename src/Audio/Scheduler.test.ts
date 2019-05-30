@@ -30,13 +30,13 @@ describe('Scheduler', () => {
       const context = {} as AudioContext;
       const updateFeedbackCallback = () => {};
       const scheduler = new Scheduler(context, updateFeedbackCallback);
-      const playCurrent = jest.fn();
+      const proceedAndOutputNextSound = jest.fn();
       scheduler.pushPlayHead(({
-        playCurrent
+        proceedAndOutputNextSound
       } as unknown) as PlayHead);
       scheduler.start();
       jest.advanceTimersByTime(10);
-      expect(playCurrent).toBeCalled();
+      expect(proceedAndOutputNextSound).toBeCalled();
     });
   });
 
@@ -47,7 +47,7 @@ describe('Scheduler', () => {
       const updateFeedbackCallback = () => {};
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       scheduler.pushPlayHead({
-        playCurrent: () => {},
+        proceedAndOutputNextSound: () => {},
         stopAudio: () => {}
       } as PlayHead);
       expect(scheduler._debugScheduleTime).toBeUndefined();
@@ -63,13 +63,13 @@ describe('Scheduler', () => {
       const context = {} as AudioContext;
       const updateFeedbackCallback = () => {};
       const scheduler = new Scheduler(context, updateFeedbackCallback);
-      const stop = jest.fn();
+      const stopAudio = jest.fn();
       scheduler.pushPlayHead(({
-        playCurrent: () => {},
-        stop
+        proceedAndOutputNextSound: () => {},
+        stopAudio
       } as unknown) as PlayHead);
       scheduler.stop();
-      expect(stop).toBeCalled();
+      expect(stopAudio).toBeCalled();
     });
   });
 
@@ -92,7 +92,7 @@ describe('Scheduler', () => {
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       const currentChord = {} as ChordSpec;
       scheduler.pushPlayHead({
-        playCurrent: () => {},
+        proceedAndOutputNextSound: () => {},
         currentChord,
         endTime: 10
       } as PlayHead);

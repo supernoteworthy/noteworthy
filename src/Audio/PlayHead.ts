@@ -54,11 +54,11 @@ export default class PlayHead {
   }
 
   // ----- Playhead sequencing -----
-  // Handles anything we might encounter on the sheet.
-  // Output the current element to audio, if needed,
-  // and move the playhead to the next element.
+  // Handles anything we might encounter on the sheet until
+  // we encounter a playable element (chord).
+  // Output that chord to audio if we reach it.
 
-  playCurrent() {
+  public proceedAndOutputNextSound() {
     const element = this.projectStore.getElementById(
       this.sheetId,
       this.currentElement
@@ -91,9 +91,8 @@ export default class PlayHead {
         this.context.currentTime + time
       );
       this.endTime = this.context.currentTime + time;
-    } else {
-      this.next();
     }
+    this.next();
   }
 
   private handleCurrentNote(element: NoteSpec) {
@@ -133,7 +132,7 @@ export default class PlayHead {
       }
       if (startRepeat) {
         this.currentElement = startRepeat;
-        this.playCurrent();
+        this.proceedAndOutputNextSound();
       }
     }
   }
@@ -170,7 +169,7 @@ export default class PlayHead {
       return false;
     }
     this.currentElement = nextElement.id;
-    this.playCurrent();
+    this.proceedAndOutputNextSound();
     return true;
   }
 

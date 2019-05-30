@@ -62,7 +62,7 @@ export default class Scheduler {
 
     for (let playHead of this.playHeads) {
       if (!playHead.endTime) {
-        playHead.playCurrent();
+        playHead.proceedAndOutputNextSound();
       } else if (
         playHead.endTime >= startWindow &&
         playHead.endTime <= endWindow
