@@ -2,6 +2,7 @@
 
 set -ex
 
+mkdir -p build
 # npm install
 
 npx esbuild src/index.tsx --bundle --loader:.mp3=binary --outfile=out.js
