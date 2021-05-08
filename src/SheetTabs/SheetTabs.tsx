@@ -1,4 +1,3 @@
-import { Button, Dropdown, Menu, Modal, Icon } from 'antd';
 import classNames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
@@ -9,7 +8,7 @@ import { UiStore } from '../stores/ui.store';
 import './SheetTabs.css';
 import { SheetId } from '../types/SheetTypes';
 
-interface SheetTabsProps {}
+interface SheetTabsProps { }
 interface InjectedProps extends SheetTabsProps {
   projectStore: ProjectStore;
   uiStore: UiStore;
@@ -28,7 +27,7 @@ export default class SheetTabs extends Component<SheetTabsProps> {
     if (!sheetToClose)
       throw new Error(`Could not find a sheet with id of: ${sheetId}`);
 
-    Modal.confirm({
+    /*Modal.confirm({
       title: `Are you sure you want to delete the "${
         sheetToClose.label
       }" tab sheet?`,
@@ -36,7 +35,7 @@ export default class SheetTabs extends Component<SheetTabsProps> {
       okType: 'danger',
       cancelText: 'No',
       onOk: () => this.closeSheetTab(sheetId)
-    });
+    });*/
   };
 
   closeSheetTab(sheetId: SheetId) {
@@ -60,17 +59,6 @@ export default class SheetTabs extends Component<SheetTabsProps> {
     const { uiStore, projectStore } = this.injected;
     const currentSheet = projectStore.getSheet(uiStore.activeSheet);
     const instruments = Audio.getInstrumentNames();
-    const instrumentMenu = (
-      <Menu
-        onClick={param => {
-          uiStore.activeSheet = projectStore.addSheet(param.key);
-        }}
-      >
-        {instruments.map(instrumentName => (
-          <Menu.Item key={instrumentName}>{instrumentName}</Menu.Item>
-        ))}
-      </Menu>
-    );
     const displayCloseSheet = projectStore.sheetList.length > 1;
 
     return (
@@ -86,20 +74,8 @@ export default class SheetTabs extends Component<SheetTabsProps> {
               key={sheet.id}
             >
               <p className="SheetTabs_TabName">{sheet.label}</p>
-              {displayCloseSheet && (
-                <Icon
-                  type="close-circle"
-                  className="SheetTabs_CloseIcon"
-                  onClick={(e: React.MouseEvent) =>
-                    this.confirmSheetTabClosing(e, sheet.id)
-                  }
-                />
-              )}
             </div>
           ))}
-          <Dropdown overlay={instrumentMenu}>
-            <Button icon="plus" type="primary" ghost />
-          </Dropdown>
         </div>
         {currentSheet && <Sheet spec={currentSheet} />}
       </div>

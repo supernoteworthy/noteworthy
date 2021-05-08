@@ -1,4 +1,3 @@
-import { InputNumber, Popover, Select } from 'antd';
 import classNames from 'classnames';
 import { inject } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
@@ -66,94 +65,24 @@ export default class Setter extends Component<SetterProps> {
     switch (type) {
       case SetterType.BPM:
         editorContent = (
-          <InputNumber
-            autoFocus
-            min={1}
-            max={500}
-            precision={0}
-            value={value as number}
-            onChange={value => {
-              const element = projectStore.getElementById(
-                sheetId!,
-                id!
-              ) as SetterSpec;
-              element.value = value || 100;
-            }}
-          />
+          <></>
         );
         label = ' bpm';
         break;
       case SetterType.INSTRUMENT:
         editorContent = (
-          <Select
-            value={value as string}
-            onChange={value => {
-              const element = projectStore.getElementById(
-                sheetId!,
-                id!
-              ) as SetterSpec;
-              element.value = value;
-            }}
-          >
-            {Audio.getInstrumentNames().map(instrumentName => (
-              <Select.Option key={instrumentName} value={instrumentName}>
-                {instrumentName}
-              </Select.Option>
-            ))}
-          </Select>
+          <></>
         );
         break;
       case SetterType.OCTAVE:
         editorContent = (
-          <InputNumber
-            autoFocus
-            min={0}
-            max={9}
-            precision={0}
-            value={value as number}
-            onChange={value => {
-              const element = projectStore.getElementById(
-                sheetId!,
-                id!
-              ) as SetterSpec;
-              element.value = value;
-              if (value === undefined) {
-                element.value = 4;
-              }
-              Audio.playNoteSample(
-                {
-                  kind: 'note',
-                  id: 'SAMPLE',
-                  type: NoteType.TONE,
-                  length: NoteLength.HALF,
-                  y: 100,
-                  isPlaying: true,
-                  nextElement: undefined
-                },
-                AccidentalType.NATURAL,
-                element.value!
-              );
-            }}
-          />
+          <></>
         );
         prefix = 'Octave ';
         break;
       case SetterType.VOLUME:
         editorContent = (
-          <InputNumber
-            autoFocus
-            min={0}
-            max={300}
-            precision={0}
-            value={value as number}
-            onChange={value => {
-              const element = projectStore.getElementById(
-                sheetId!,
-                id!
-              ) as SetterSpec;
-              element.value = value || 100;
-            }}
-          />
+          <></>
         );
 
         label = '%';
@@ -161,23 +90,7 @@ export default class Setter extends Component<SetterProps> {
     }
 
     const valueEditor = (
-      <Popover
-        content={editorContent}
-        placement="bottom"
-        onVisibleChange={visible => {
-          if (visible) {
-            uiStore.mouseMode = MouseMode.POPOVER;
-          } else {
-            uiStore.mouseMode = MouseMode.INSERT;
-          }
-        }}
-      >
-        <text x={20} y={105}>
-          {prefix}
-          {value}
-          {label}
-        </text>
-      </Popover>
+      <></>
     );
 
     const selectBoxClasses = classNames('SelectBox', {

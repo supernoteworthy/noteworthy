@@ -1,4 +1,3 @@
-import { InputNumber, Popover } from 'antd';
 import classNames from 'classnames';
 import { inject } from 'mobx-react';
 import React, { Component, Fragment } from 'react';
@@ -57,44 +56,6 @@ export default class Repeat extends Component<RepeatProps> {
       sheetId
     } = this.props;
     const { uiStore, projectStore } = this.injected;
-
-    const repeatEditor = (
-      <Popover
-        content={
-          <Fragment>
-            <InputNumber
-              autoFocus
-              min={2}
-              precision={0}
-              value={nRepeats || 2}
-              onChange={value => {
-                if (!sheetId || !this.props.id) {
-                  return;
-                }
-                const element = projectStore.getElementById(
-                  sheetId,
-                  this.props.id!
-                ) as RepeatSpec;
-                element.nRepeats = value || 2;
-              }}
-            />
-            {' times'}
-          </Fragment>
-        }
-        placement="bottom"
-        onVisibleChange={visible => {
-          if (visible) {
-            uiStore.mouseMode = MouseMode.POPOVER;
-          } else {
-            uiStore.mouseMode = MouseMode.INSERT;
-          }
-        }}
-      >
-        <text x={8} y={100}>
-          {nRepeats || 2} times
-        </text>
-      </Popover>
-    );
 
     const selectBoxClasses = classNames('SelectBox', {
       'SelectBox--selected': isSelected
@@ -163,7 +124,7 @@ export default class Repeat extends Component<RepeatProps> {
           onMouseEnter={onHitBoxMouseEnter}
           onMouseLeave={onHitBoxMouseLeave}
         />
-        {shouldShowNumber && type === MatchType.END && repeatEditor}
+        {shouldShowNumber && type === MatchType.END}
       </g>
     );
   }
