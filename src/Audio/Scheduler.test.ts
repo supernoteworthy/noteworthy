@@ -6,7 +6,7 @@ describe('Scheduler', () => {
   describe('start', () => {
     it('causes schedule to be called', () => {
       const context = {} as AudioContext;
-      const updateFeedbackCallback = () => {};
+      const updateFeedbackCallback = () => { };
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       expect(scheduler._debugScheduleTime).toBeUndefined();
       scheduler.start();
@@ -28,7 +28,7 @@ describe('Scheduler', () => {
     it('causes playHeads to play', () => {
       jest.useFakeTimers();
       const context = {} as AudioContext;
-      const updateFeedbackCallback = () => {};
+      const updateFeedbackCallback = () => { };
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       const proceedAndOutputNextSound = jest.fn();
       scheduler.pushPlayHead(({
@@ -44,11 +44,11 @@ describe('Scheduler', () => {
     it('causes schedule to stop being called', () => {
       jest.useFakeTimers();
       const context = {} as AudioContext;
-      const updateFeedbackCallback = () => {};
+      const updateFeedbackCallback = () => { };
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       scheduler.pushPlayHead({
-        proceedAndOutputNextSound: () => {},
-        stopAudio: () => {}
+        proceedAndOutputNextSound: () => { },
+        stopAudio: () => { }
       } as PlayHead);
       expect(scheduler._debugScheduleTime).toBeUndefined();
       scheduler.start();
@@ -61,11 +61,11 @@ describe('Scheduler', () => {
     });
     it('causes playHeads to stop', () => {
       const context = {} as AudioContext;
-      const updateFeedbackCallback = () => {};
+      const updateFeedbackCallback = () => { };
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       const stopAudio = jest.fn();
       scheduler.pushPlayHead(({
-        proceedAndOutputNextSound: () => {},
+        proceedAndOutputNextSound: () => { },
         stopAudio
       } as unknown) as PlayHead);
       scheduler.stop();
@@ -92,7 +92,7 @@ describe('Scheduler', () => {
       const scheduler = new Scheduler(context, updateFeedbackCallback);
       const currentChord = {} as ChordSpec;
       scheduler.pushPlayHead({
-        proceedAndOutputNextSound: () => {},
+        proceedAndOutputNextSound: () => { },
         currentChord,
         endTime: 10
       } as PlayHead);
